@@ -12,6 +12,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
@@ -47,11 +48,11 @@ public class RenderOverlay implements IWorldRenderer{
                     break;
                 }
                 case ENTITY:{
-                    addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.getBlockPos(), trace.sideHit, resolution, fontRenderer));
+                    addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.entityHit, resolution, fontRenderer));
                     break;
                 }
                 case MISS:{
-                    addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace.getBlockPos(), trace.sideHit, resolution, fontRenderer));
+                    addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, resolution, fontRenderer));
                     break;
                 }
             }
@@ -64,11 +65,12 @@ public class RenderOverlay implements IWorldRenderer{
         return component;
     }
 
-    private TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, ScaledResolution resolution, FontRenderer fontRenderer){
-        return null;
+    private TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, ScaledResolution resolution, FontRenderer fontRenderer){
+        TooltipComponent component = new TooltipComponent().addRenderer(new TextComponent(entity.getName()));
+        return component;
     }
 
-    private TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, ScaledResolution resolution, FontRenderer fontRenderer){
+    private TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, ScaledResolution resolution, FontRenderer fontRenderer){
         return null;
     }
 
@@ -114,17 +116,18 @@ public class RenderOverlay implements IWorldRenderer{
                 Vec3d vec3d2 = vec3d.addVector(vec3d1.xCoord * maxDistance, vec3d1.yCoord * maxDistance, vec3d1.zCoord * maxDistance);
                 pointedEntity = null;
                 Vec3d vec3d3 = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(vec3d1.xCoord * maxDistance, vec3d1.yCoord * maxDistance, vec3d1.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(vec3d1.xCoord * maxDistance, vec3d1.yCoord * maxDistance, vec3d1.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), new Predicate<Entity>()
                 {
                     public boolean apply(@Nullable Entity p_apply_1_)
                     {
-                        return p_apply_1_ != null && p_apply_1_.canBeCollidedWith();
+                        return p_apply_1_ != null;
                     }
-                }));
+                });
                 double d2 = d1;
 
                 for(Entity entity : list){
-                    AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expandXyz((double) entity.getCollisionBorderSize());
+                    double collisionBorder = entity.getCollisionBorderSize();
+                    AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(collisionBorder, collisionBorder + (entity instanceof EntityItem ? 0.35 : 0), collisionBorder);
                     RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3d, vec3d2);
 
                     if(axisalignedbb.isVecInside(vec3d)){
