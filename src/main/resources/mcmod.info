@@ -1,0 +1,16 @@
+[
+{
+  "modid": "tumat",
+  "name": "TUMAT",
+  "description": "Tell us more about this.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["canitzp"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
