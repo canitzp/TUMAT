@@ -3,6 +3,7 @@ package de.canitzp.tumat;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -27,20 +28,20 @@ public class TUMAT{
 
         System.out.println("Start TUMAT");
 
-        TUMATApi.registerRenderComponent(RenderOverlay.class);
+        TUMATApi.addGuiWhereToRender(GuiInventory.class);
 
-        MinecraftForge.EVENT_BUS.register(new TUMAT());
+        MinecraftForge.EVENT_BUS.register(TUMAT.class);
 
     }
 
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void gameOverlayRenderEvent(RenderGameOverlayEvent.Post event){
-        if(event.getType().equals(RenderGameOverlayEvent.ElementType.ALL) && Minecraft.getMinecraft().currentScreen == null){
+    public static void gameOverlayRenderEvent(RenderGameOverlayEvent.Post event){
+        if(event.getType().equals(RenderGameOverlayEvent.ElementType.ALL)){
             Minecraft mc = Minecraft.getMinecraft();
-            for(IWorldRenderer component : TUMATApi.getRegisteredComponents()){
-                component.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks());
+            if(mc.currentScreen == null || TUMATApi.guisWhereToRender.contains(mc.currentScreen.getClass())){
+                RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 10 == 0);
             }
         }
     }

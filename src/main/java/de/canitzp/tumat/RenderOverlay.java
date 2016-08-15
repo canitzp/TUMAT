@@ -4,8 +4,10 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import de.canitzp.tumat.api.IComponentRender;
 import de.canitzp.tumat.api.IWorldRenderer;
+import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -14,6 +16,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -33,48 +36,67 @@ import java.util.List;
  * @author canitzp
  */
 @SideOnly(Side.CLIENT)
-public class RenderOverlay implements IWorldRenderer{
+public class RenderOverlay{
 
     private static final double distance = 32;
 
-    @Override
-    public void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks){
-        RayTraceResult trace = createRayTraceForDistance(world, player, distance, partialTicks);
+    private static RayTraceResult savedTrace;
+
+    public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){
+        boolean calculate = savedTrace == null || shouldCalculate;
+        RayTraceResult trace;
+        if(calculate){
+            trace = savedTrace = createRayTraceForDistance(world, player, distance, partialTicks);
+        } else {
+            trace = savedTrace;
+        }
         if(trace != null){
             List<TooltipComponent> componentsForRendering = new ArrayList<TooltipComponent>();
             switch(trace.typeOfHit){
-                case BLOCK: {
-                    addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, resolution, fontRenderer));
+                case BLOCK:{
+                    addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
                     break;
                 }
                 case ENTITY:{
-                    addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.entityHit, resolution, fontRenderer));
+                    addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.entityHit, calculate));
                     break;
                 }
                 case MISS:{
-                    addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, resolution, fontRenderer));
+                    addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, calculate));
                     break;
                 }
             }
-            renderComponents(fontRenderer, resolution.getScaledWidth()/2, 5, componentsForRendering);
+            renderComponents(fontRenderer, resolution.getScaledWidth() / 2, 5, componentsForRendering);
         }
     }
 
-    private TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, ScaledResolution resolution, FontRenderer fontRenderer){
-        TooltipComponent component = new TooltipComponent().addRenderer(new TextComponent(TooltipComponent.getBlockName(world.getBlockState(pos))));
+    public static TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, boolean shouldCalculate){
+        TooltipComponent component = new TooltipComponent();
+        if(!world.isAirBlock(pos)){
+            IBlockState state = world.getBlockState(pos);
+            component.addRenderer(new TextComponent(TooltipComponent.getBlockName(state)));
+            TileEntity tile = world.getTileEntity(pos);
+            for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+                if(tile != null){
+                    renderer.renderTileEntity(world, player, tile, side, component, shouldCalculate);
+                } else {
+                    renderer.renderBlock(world, player, pos, side, component, shouldCalculate);
+                }
+            }
+        }
         return component;
     }
 
-    private TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, ScaledResolution resolution, FontRenderer fontRenderer){
+    public static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent().addRenderer(new TextComponent(entity.getName()));
         return component;
     }
 
-    private TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, ScaledResolution resolution, FontRenderer fontRenderer){
+    public static TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, boolean shouldCalculate){
         return null;
     }
 
-    private void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
+    private static void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
@@ -93,13 +115,13 @@ public class RenderOverlay implements IWorldRenderer{
         }
     }
 
-    private <T> void addToListIfNotNull(List<T> list, T object){
+    private static <T> void addToListIfNotNull(List<T> list, T object){
         if(object != null){
             list.add(object);
         }
     }
 
-    private RayTraceResult createRayTraceForDistance(World world, EntityPlayer player, double maxDistance, float partialTicks){
+    private static RayTraceResult createRayTraceForDistance(World world, EntityPlayer player, double maxDistance, float partialTicks){
         Entity pointedEntity;
         RayTraceResult traceResult = null;
         if (player != null){
