@@ -18,23 +18,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IWorldRenderer{
 
     default TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        return null;
+        return component;
     }
 
-    default TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, TooltipComponent component){
-        return null;
+    default TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, TooltipComponent component, boolean shouldCalculate){
+        return component;
     }
 
-    default TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, TooltipComponent component){
-        return null;
+    default TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, TooltipComponent component, boolean shouldCalculate){
+        return component;
     }
 
     default TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        return null;
+        return component;
     }
 
-    default TooltipComponent renderLivingEntity(WorldClient world, EntityPlayerSP player, EntityLivingBase entity, TooltipComponent component){
-        return null;
+    default TooltipComponent renderLivingEntity(WorldClient world, EntityPlayerSP player, EntityLivingBase entity, TooltipComponent component, boolean shouldCalculate){
+        return component;
     }
 
 }

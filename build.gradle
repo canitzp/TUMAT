@@ -4,6 +4,7 @@ buildscript {
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
+
         }
     }
     dependencies {
@@ -21,12 +22,24 @@ group= "de.canizp.tumat"
 archivesBaseName = "tumat"
 
 minecraft {
-    version = "1.10.2-12.18.1.2064"
+    version = "1.10.2-12.18.1.2066"
     runDir = "run"
-    mappings = "snapshot_20160815"
+    mappings = "snapshot_20160818"
 }
 
-dependencies {}
+repositories {
+    maven {
+        url 'http://maven.epoxide.xyz'
+        }
+    maven {
+        url 'http://maven.chaosfield.at'
+    }
+}
+
+dependencies {
+    compile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.42"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r60"
+}
 
 processResources
 {

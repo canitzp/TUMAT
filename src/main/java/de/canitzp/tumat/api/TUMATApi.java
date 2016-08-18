@@ -1,6 +1,10 @@
 package de.canitzp.tumat.api;
 
+import de.canitzp.tumat.integration.Tesla;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,22 +12,32 @@ import java.util.List;
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class TUMATApi{
 
-    private static List<IWorldRenderer> registeredComponents = new ArrayList<IWorldRenderer>();
-    public static List<Class<? extends GuiScreen>> guisWhereToRender = new ArrayList<>();
+    private static List<IWorldRenderer> registeredComponents = new ArrayList<>();
+    public static List<Class<? extends GuiScreen>> allowedGuis = new ArrayList<>();
 
-    public static void registerRenderComponent(IWorldRenderer component){
-        if(!registeredComponents.contains(component)){
-            registeredComponents.add(component);
+    @SafeVarargs
+    public static void registerRenderComponent(Class<? extends IWorldRenderer>... components){
+        for(Class<? extends IWorldRenderer> renderer : components){
+            try{
+                IWorldRenderer renderer1 = renderer.newInstance();
+                if(!registeredComponents.contains(renderer1)){
+                    registeredComponents.add(renderer1);
+                }
+            } catch(InstantiationException | IllegalAccessException e){
+                e.printStackTrace();
+            }
         }
     }
 
-    public static void registerRenderComponent(Class<? extends IWorldRenderer> component){
-        try{
-            registerRenderComponent(component.newInstance());
-        } catch(InstantiationException | IllegalAccessException e){
-            e.printStackTrace();
+    @SafeVarargs
+    public static void allowGuiToRenderOverlay(Class<? extends GuiScreen>... guis){
+        for(Class<? extends GuiScreen> gui : guis){
+            if(!allowedGuis.contains(gui)){
+                allowedGuis.add(gui);
+            }
         }
     }
 
@@ -31,10 +45,8 @@ public class TUMATApi{
         return registeredComponents;
     }
 
-    public static void addGuiWhereToRender(Class<? extends GuiScreen> gui){
-        if(!guisWhereToRender.contains(gui)){
-            guisWhereToRender.add(gui);
-        }
+    public static List<Class<? extends GuiScreen>> getAllowedGuis(){
+        return allowedGuis;
     }
 
 }

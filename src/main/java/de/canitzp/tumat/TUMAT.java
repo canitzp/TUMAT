@@ -2,15 +2,28 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.integration.Tesla;
+import de.canitzp.tumat.network.NetworkHandler;
+import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author canitzp
@@ -22,27 +35,47 @@ public class TUMAT{
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
 
+    public static final Logger logger = LogManager.getLogger(MODNAME);
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event){
-
-        System.out.println("Start TUMAT");
-
-        TUMATApi.addGuiWhereToRender(GuiInventory.class);
-
+        logger.info("[PreInit] Started " + MODNAME + " Version " + MODVERSION);
+        logger.info("[PreInit] Load config");
+        Config.init(event);
+        NetworkHandler.init();
+        if(event.getSide().isClient()){
+            logger.info("[PreInit] Load client stuff");
+            loadIntegrations();
+            TUMATApi.allowGuiToRenderOverlay(GuiInventory.class, GuiContainerCreative.class, GuiIngameMenu.class);
+        }
         MinecraftForge.EVENT_BUS.register(TUMAT.class);
-
+        logger.info("[PreInit] Completed loading");
     }
 
+    @SideOnly(Side.CLIENT)
+    private void loadIntegrations(){
+        if(Loader.isModLoaded("tesla")){
+            TUMATApi.registerRenderComponent(Tesla.class);
+        }
+    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void gameOverlayRenderEvent(RenderGameOverlayEvent.Post event){
-        if(event.getType().equals(RenderGameOverlayEvent.ElementType.ALL)){
+        if(Config.shouldRenderOverlay && event.getType().equals(RenderGameOverlayEvent.ElementType.ALL)){
             Minecraft mc = Minecraft.getMinecraft();
-            if(mc.currentScreen == null || TUMATApi.guisWhereToRender.contains(mc.currentScreen.getClass())){
-                RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 10 == 0);
+            if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
+                RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
             }
+        }
+    }
+
+    @SideOnly(Side.SERVER)
+    @SubscribeEvent
+    public static void serverJoinEvent(EntityJoinWorldEvent event){
+        Entity entity = event.getEntity();
+        if(entity instanceof EntityPlayerMP){
+            NetworkHandler.network.sendTo(new PacketSendServerConfig(), (EntityPlayerMP) entity);
         }
     }
 

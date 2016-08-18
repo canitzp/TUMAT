@@ -7,6 +7,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,6 +27,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -38,14 +42,13 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class RenderOverlay{
 
-    private static final double distance = 32;
-
     private static RayTraceResult savedTrace;
 
     public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){
         boolean calculate = savedTrace == null || shouldCalculate;
         RayTraceResult trace;
         if(calculate){
+            float distance = player.isCreative() ? Config.distanceToRenderCreative : Config.distanceToRenderSurvival;
             trace = savedTrace = createRayTraceForDistance(world, player, distance, partialTicks);
         } else {
             trace = savedTrace;
@@ -70,7 +73,7 @@ public class RenderOverlay{
         }
     }
 
-    public static TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, boolean shouldCalculate){
+    private static TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
@@ -78,22 +81,43 @@ public class RenderOverlay{
             TileEntity tile = world.getTileEntity(pos);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(tile != null){
-                    renderer.renderTileEntity(world, player, tile, side, component, shouldCalculate);
+                    renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
                 } else {
-                    renderer.renderBlock(world, player, pos, side, component, shouldCalculate);
+                    renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
                 }
             }
         }
         return component;
     }
 
-    public static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
-        TooltipComponent component = new TooltipComponent().addRenderer(new TextComponent(entity.getName()));
+    private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
+        TooltipComponent component = new TooltipComponent();
+        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+            if(entity instanceof EntityItem){
+                component.addRenderer(new TextComponent("Item " + ((EntityItem) entity).getEntityItem().getDisplayName() + " * " + ((EntityItem) entity).getEntityItem().stackSize));
+            } else if(entity instanceof EntityLivingBase){
+                component.addRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+                renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component.newLine(), shouldCalculate);
+            } else {
+                component.addRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+                renderer.renderEntity(world, player, entity, component.newLine(), shouldCalculate);
+            }
+        }
         return component;
     }
 
-    public static TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, boolean shouldCalculate){
-        return null;
+    private static TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, boolean shouldCalculate){
+        TooltipComponent component = new TooltipComponent();
+        if(!world.isAirBlock(trace.getBlockPos())){
+            IBlockState state = world.getBlockState(trace.getBlockPos());
+            if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
+                component.addRenderer(new TextComponent(state.getBlock().getLocalizedName()));
+            }
+        }
+        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+            renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+        }
+        return component;
     }
 
     private static void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
@@ -127,55 +151,51 @@ public class RenderOverlay{
         if (player != null){
             if (world != null){
                 traceResult = player.rayTrace(maxDistance, partialTicks);
-                Vec3d vec3d = player.getPositionEyes(partialTicks);
-                double d1 = maxDistance;
+                Vec3d eyeVec = player.getPositionEyes(partialTicks);
+                double currentDistance = maxDistance;
 
                 if (traceResult != null){
-                    d1 = traceResult.hitVec.distanceTo(vec3d);
+                    currentDistance = traceResult.hitVec.distanceTo(eyeVec);
                 }
 
-                Vec3d vec3d1 = player.getLook(partialTicks);
-                Vec3d vec3d2 = vec3d.addVector(vec3d1.xCoord * maxDistance, vec3d1.yCoord * maxDistance, vec3d1.zCoord * maxDistance);
+                Vec3d lookVec = player.getLook(partialTicks);
+                Vec3d lookingEyeVec = eyeVec.addVector(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance);
                 pointedEntity = null;
-                Vec3d vec3d3 = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(vec3d1.xCoord * maxDistance, vec3d1.yCoord * maxDistance, vec3d1.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), new Predicate<Entity>()
-                {
-                    public boolean apply(@Nullable Entity p_apply_1_)
-                    {
-                        return p_apply_1_ != null;
-                    }
+                Vec3d calcVec = null;
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> {
+                    return entity != null && !(entity instanceof EntityItem) || Config.showEntityItems;
                 });
-                double d2 = d1;
+                double d2 = currentDistance;
 
                 for(Entity entity : list){
                     double collisionBorder = entity.getCollisionBorderSize();
                     AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(collisionBorder, collisionBorder + (entity instanceof EntityItem ? 0.35 : 0), collisionBorder);
-                    RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3d, vec3d2);
+                    RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(eyeVec, lookingEyeVec);
 
-                    if(axisalignedbb.isVecInside(vec3d)){
+                    if(axisalignedbb.isVecInside(eyeVec)){
                         if(d2 >= 0.0D){
                             pointedEntity = entity;
-                            vec3d3 = raytraceresult == null ? vec3d : raytraceresult.hitVec;
+                            calcVec = raytraceresult == null ? eyeVec : raytraceresult.hitVec;
                             d2 = 0.0D;
                         }
                     } else if(raytraceresult != null){
-                        double d3 = vec3d.distanceTo(raytraceresult.hitVec);
+                        double d3 = eyeVec.distanceTo(raytraceresult.hitVec);
                         if(d3 < d2 || d2 == 0.0D){
                             if(entity.getLowestRidingEntity() == player.getLowestRidingEntity() && !player.canRiderInteract()){
                                 if(d2 == 0.0D){
                                     pointedEntity = entity;
-                                    vec3d3 = raytraceresult.hitVec;
+                                    calcVec = raytraceresult.hitVec;
                                 }
                             } else {
                                 pointedEntity = entity;
-                                vec3d3 = raytraceresult.hitVec;
+                                calcVec = raytraceresult.hitVec;
                                 d2 = d3;
                             }
                         }
                     }
                 }
-                if (pointedEntity != null && (d2 < d1 || traceResult == null)){
-                    traceResult = new RayTraceResult(pointedEntity, vec3d3);
+                if (pointedEntity != null && (d2 < currentDistance || traceResult == null)){
+                    traceResult = new RayTraceResult(pointedEntity, calcVec);
                 }
             }
         }

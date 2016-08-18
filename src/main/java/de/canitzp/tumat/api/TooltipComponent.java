@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class TooltipComponent{
 
-    private List<List<IComponentRender>> objects = new ArrayList<List<IComponentRender>>();
-    private List<IComponentRender> currentObjects = new ArrayList<IComponentRender>();
+    private List<List<IComponentRender>> objects = new ArrayList<>();
+    private List<IComponentRender> currentObjects = new ArrayList<>();
 
     public TooltipComponent addRenderer(IComponentRender render){
         this.currentObjects.add(render);
@@ -22,13 +22,15 @@ public class TooltipComponent{
     }
 
     public TooltipComponent newLine(){
-        this.objects.add(new ArrayList<IComponentRender>(this.currentObjects));
-        this.currentObjects.clear();
+        if(!this.currentObjects.isEmpty()){
+            this.objects.add(new ArrayList<>(this.currentObjects));
+            this.currentObjects.clear();
+        }
         return this;
     }
 
     public List<List<IComponentRender>> endComponent(){
-        this.objects.add(new ArrayList<IComponentRender>(this.currentObjects));
+        this.objects.add(new ArrayList<>(this.currentObjects));
         return this.objects;
     }
 
