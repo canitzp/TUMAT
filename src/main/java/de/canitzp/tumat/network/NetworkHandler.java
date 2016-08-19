@@ -18,6 +18,8 @@ public class NetworkHandler{
 
     public static void init(){
         network.registerMessage(PacketSendServerConfig.class, PacketSendServerConfig.class, 0, Side.CLIENT);
+        network.registerMessage(PacketUpdateTileEntity.class, PacketUpdateTileEntity.class, 1, Side.SERVER);
+        network.registerMessage(PacketUpdateTileEntity.PacketTileEntityToClient.class, PacketUpdateTileEntity.PacketTileEntityToClient.class, 2, Side.CLIENT);
     }
 
 }

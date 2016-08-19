@@ -17,7 +17,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.0.0"
+version = "Beta 1.0.0-RC1"
 group= "de.canizp.tumat"
 archivesBaseName = "tumat"
 
@@ -25,6 +25,8 @@ minecraft {
     version = "1.10.2-12.18.1.2066"
     runDir = "run"
     mappings = "snapshot_20160818"
+    replaceIn "TUMAT.java"
+    replace "@VERSION@", project.version.toString()
 }
 
 repositories {

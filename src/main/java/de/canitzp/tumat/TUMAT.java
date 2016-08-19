@@ -2,10 +2,12 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.integration.ActuallyAdditions;
 import de.canitzp.tumat.integration.Tesla;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -46,7 +48,7 @@ public class TUMAT{
         if(event.getSide().isClient()){
             logger.info("[PreInit] Load client stuff");
             loadIntegrations();
-            TUMATApi.allowGuiToRenderOverlay(GuiInventory.class, GuiContainerCreative.class, GuiIngameMenu.class);
+            TUMATApi.allowGuiToRenderOverlay(GuiInventory.class, GuiContainerCreative.class, GuiIngameMenu.class, GuiChat.class);
         }
         MinecraftForge.EVENT_BUS.register(TUMAT.class);
         logger.info("[PreInit] Completed loading");
@@ -55,7 +57,12 @@ public class TUMAT{
     @SideOnly(Side.CLIENT)
     private void loadIntegrations(){
         if(Loader.isModLoaded("tesla")){
+            logger.info("[Integration] Loading Tesla integration");
             TUMATApi.registerRenderComponent(Tesla.class);
+        }
+        if(Loader.isModLoaded("actuallyadditions")){
+            logger.info("[Integration] Loading ActuallyAdditions integration");
+            TUMATApi.registerRenderComponent(ActuallyAdditions.class);
         }
     }
 

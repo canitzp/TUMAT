@@ -4,6 +4,9 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -34,6 +37,10 @@ public interface IWorldRenderer{
     }
 
     default TooltipComponent renderLivingEntity(WorldClient world, EntityPlayerSP player, EntityLivingBase entity, TooltipComponent component, boolean shouldCalculate){
+        return component;
+    }
+
+    default TooltipComponent renderEntityItem(WorldClient world, EntityPlayerSP player, EntityItem entity, ItemStack stack, TooltipComponent component, boolean shouldCalculate){
         return component;
     }
 

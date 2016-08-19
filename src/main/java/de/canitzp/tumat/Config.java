@@ -44,7 +44,6 @@ public class Config{
         }
     }
 
-    @SideOnly(Side.SERVER)
     public static NBTTagCompound sendConfigToClient(){
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setBoolean("shouldRenderOverlay", shouldRenderOverlay);

@@ -1,9 +1,12 @@
 package de.canitzp.tumat.api;
 
+import de.canitzp.tumat.network.NetworkHandler;
+import de.canitzp.tumat.network.PacketUpdateTileEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,10 @@ public class TooltipComponent{
     public TooltipComponent addRenderer(IComponentRender render){
         this.currentObjects.add(render);
         return this;
+    }
+
+    public TooltipComponent addOneLineRenderer(IComponentRender renderer){
+        return this.addRenderer(renderer).newLine();
     }
 
     public TooltipComponent newLine(){
@@ -48,6 +55,12 @@ public class TooltipComponent{
             return itemBlock.getItemStackDisplayName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
         } else {
             return state.getBlock().getLocalizedName();
+        }
+    }
+
+    public static void syncTileEntity(TileEntity tile, boolean shouldCalculate, String... nbtKeys){
+        if(shouldCalculate){
+            NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
         }
     }
 
