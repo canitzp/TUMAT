@@ -15,7 +15,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -30,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author canitzp
  */
-@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION)
+@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.GuiConfigFactory")
 public class TUMAT{
 
     public static final String MODNAME = "TUMAT";
@@ -83,6 +87,16 @@ public class TUMAT{
         Entity entity = event.getEntity();
         if(entity instanceof EntityPlayerMP){
             NetworkHandler.network.sendTo(new PacketSendServerConfig(), (EntityPlayerMP) entity);
+        }
+    }
+
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if(event.getModID().equals(TUMAT.MODID)){
+            Config.init();
+            Config.config.save();
         }
     }
 

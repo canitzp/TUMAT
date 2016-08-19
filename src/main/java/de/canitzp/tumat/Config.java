@@ -15,7 +15,7 @@ public class Config{
     public static float distanceToRenderSurvival, distanceToRenderCreative;
     public static boolean showEntityItems;
 
-    private static Configuration config;
+    public static Configuration config;
 
     public static void init(FMLPreInitializationEvent event){
         config = new Configuration(event.getSuggestedConfigurationFile());
@@ -24,7 +24,7 @@ public class Config{
         config.save();
     }
 
-    private static void init(){
+    public static void init(){
         String cat = "general";
         shouldRenderOverlay = config.getBoolean("ShouldRenderOverlay", cat, true, "The main on or off switch. Set this to false to deactivate the rendering.");
         cat = "distances";
