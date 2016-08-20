@@ -1,8 +1,10 @@
 package de.canitzp.tumat.integration;
 
 import de.canitzp.tumat.api.IWorldRenderer;
+import de.canitzp.tumat.api.ReMapper;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.ellpeck.actuallyadditions.mod.blocks.InitBlocks;
 import de.ellpeck.actuallyadditions.mod.tile.*;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -11,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,4 +51,10 @@ public class ActuallyAdditions implements IWorldRenderer{
         }
         return component;
     }
+
+    @Override
+    public void remap(ReMapper<IForgeRegistryEntry, String, String> reMapper){
+        reMapper.remap(InitBlocks.blockAtomicReconstructor, "Strange Thing", "Actually Addons");
+    }
+
 }

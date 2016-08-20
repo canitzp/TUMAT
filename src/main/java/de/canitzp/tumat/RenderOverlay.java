@@ -1,11 +1,6 @@
 package de.canitzp.tumat;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import de.canitzp.tumat.api.IComponentRender;
-import de.canitzp.tumat.api.IWorldRenderer;
-import de.canitzp.tumat.api.TUMATApi;
-import de.canitzp.tumat.api.TooltipComponent;
+import de.canitzp.tumat.api.*;
 import de.canitzp.tumat.api.components.TextComponent;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
@@ -15,11 +10,11 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -29,14 +24,16 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +44,21 @@ import java.util.Map;
 public class RenderOverlay{
 
     private static RayTraceResult savedTrace;
-    private static Map<String, ModContainer> modMap = Loader.instance().getIndexedModList();
+    private static Map<String, ModContainer> modMap;
+    private static String modNameFormat;
+    //                       Block/Item, Name, ModName
+    public static Map<IForgeRegistryEntry, Pair<String, String>> remapMappings;
+
+    static {
+        modMap = Loader.instance().getIndexedModList();
+        modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
+        remapMappings = new HashMap<>();
+        ReMapper<IForgeRegistryEntry, String, String> reMapper = new ReMapper<>();
+        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+            renderer.remap(reMapper);
+        }
+        reMapper.mergeRemappedElementsWithExisting(remapMappings);
+    }
 
     public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){
         boolean calculate = savedTrace == null || shouldCalculate;
@@ -92,7 +103,7 @@ public class RenderOverlay{
                     renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
                 }
             }
-            component.newLine().addRenderer(new TextComponent(TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString() + getModName(state.getBlock().getRegistryName().getResourceDomain())));
+            showModName(state.getBlock(), component);
         }
         return component;
     }
@@ -100,21 +111,24 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + ((EntityItem) entity).getEntityItem().getDisplayName() + " * " + ((EntityItem) entity).getEntityItem().stackSize)).newLine();
+            component.addOneLineRenderer(new TextComponent("Item " + ((EntityItem) entity).getEntityItem().getDisplayName() + " * " + ((EntityItem) entity).getEntityItem().stackSize));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
             }
-            component.addOneLineRenderer(new TextComponent(TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString() + getModName(((EntityItem) entity).getEntityItem().getItem().getRegistryName().getResourceDomain())));
+            showModName(((EntityItem) entity).getEntityItem().getItem(), component);
         } else if(entity instanceof EntityLivingBase){
-            component.addRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+            component.addOneLineRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+            component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
             }
+            showModName(entity, component);
         } else {
-            component.addRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+            component.addOneLineRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 renderer.renderEntity(world, player, entity, component, shouldCalculate);
             }
+            showModName(entity, component);
         }
         return component;
     }
@@ -124,7 +138,8 @@ public class RenderOverlay{
         if(!world.isAirBlock(trace.getBlockPos())){
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
-                component.addRenderer(new TextComponent(state.getBlock().getLocalizedName()));
+                component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
+                showModName(state.getBlock(), component);
             }
         }
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -216,12 +231,35 @@ public class RenderOverlay{
     }
 
     private static String getModName(String modid){
-        for(ModContainer mod : modMap.values()){
-            if(mod.getModId().equals(modid)){
-                return mod.getName();
+        if(!modid.equals("minecraft")){
+            for(ModContainer mod : modMap.values()){
+                if(mod.getModId().equals(modid)){
+                    return StringUtils.capitalize(mod.getName());
+                }
             }
         }
-        return modid;
+        return StringUtils.capitalize(modid);
+    }
+
+    public static void showModName(IForgeRegistryEntry o, TooltipComponent component){
+        String modName;
+        if(remapMappings.containsKey(o) && remapMappings.get(o).getValue() != null){
+            modName = remapMappings.get(o).getValue();
+        } else {
+            modName = getModName(o.getRegistryName().getResourceDomain());
+        }
+        component.addOneLineRenderer(new TextComponent(modNameFormat + modName));
+    }
+
+    public static void showModName(Entity entity, TooltipComponent component){
+        String entityName = EntityList.getEntityString(entity);
+        String[] array = entityName.split(".");
+        if(array.length >= 2){
+            entityName = getModName(array[0]);
+        } else {
+            entityName = "Minecraft";
+        }
+        component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(entityName)));
     }
 
 }

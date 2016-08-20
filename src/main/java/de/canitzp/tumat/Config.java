@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class Config{
 
+    public static boolean serverControl;
     public static boolean shouldRenderOverlay;
     public static float distanceToRenderSurvival, distanceToRenderCreative;
     public static boolean showEntityItems;
@@ -26,6 +27,7 @@ public class Config{
 
     public static void init(){
         String cat = "general";
+        serverControl = config.getBoolean("ServerControl", cat, false, "Should the Server control the tooltips for the clients. At the client this config changes nothing.");
         shouldRenderOverlay = config.getBoolean("ShouldRenderOverlay", cat, true, "The main on or off switch. Set this to false to deactivate the rendering.");
         cat = "distances";
         distanceToRenderSurvival = config.getFloat("DistanceOfViewSurvival", cat, 4.5F, 0F, 192F, "The distance a player in survival can see the blocks. Can be increased up to 12 chunks (192 blocks).");

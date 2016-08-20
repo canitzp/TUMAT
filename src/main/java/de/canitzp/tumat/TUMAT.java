@@ -84,9 +84,11 @@ public class TUMAT{
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public static void serverJoinEvent(EntityJoinWorldEvent event){
-        Entity entity = event.getEntity();
-        if(entity instanceof EntityPlayerMP){
-            NetworkHandler.network.sendTo(new PacketSendServerConfig(), (EntityPlayerMP) entity);
+        if(Config.serverControl){
+            Entity entity = event.getEntity();
+            if(entity instanceof EntityPlayerMP){
+                NetworkHandler.network.sendTo(new PacketSendServerConfig(), (EntityPlayerMP) entity);
+            }
         }
     }
 
