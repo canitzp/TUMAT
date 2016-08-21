@@ -1,5 +1,6 @@
 package de.canitzp.tumat.integration;
 
+import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.ReMapper;
 import de.canitzp.tumat.api.TooltipComponent;
@@ -8,6 +9,7 @@ import de.ellpeck.actuallyadditions.mod.blocks.InitBlocks;
 import de.ellpeck.actuallyadditions.mod.tile.*;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.BannerTextures;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -53,8 +55,7 @@ public class ActuallyAdditions implements IWorldRenderer{
     }
 
     @Override
-    public void remap(ReMapper<IForgeRegistryEntry, String, String> reMapper){
-        reMapper.remap(InitBlocks.blockAtomicReconstructor, "Strange Thing", "Actually Addons");
+    public boolean shouldBeActive(){
+        return Config.showSpecialAbilities;
     }
-
 }

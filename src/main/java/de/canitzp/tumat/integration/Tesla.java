@@ -1,5 +1,6 @@
 package de.canitzp.tumat.integration;
 
+import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
@@ -44,4 +45,10 @@ public class Tesla implements IWorldRenderer{
         }
         return component;
     }
+
+    @Override
+    public boolean shouldBeActive(){
+        return Config.showEnergy;
+    }
+
 }

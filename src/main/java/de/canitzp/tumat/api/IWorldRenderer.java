@@ -45,6 +45,8 @@ public interface IWorldRenderer{
         return component;
     }
 
-    default void remap(ReMapper<IForgeRegistryEntry, String, String> reMapper){}
+    default void remap(ReMapper<ItemStack, String, String> reMapper){}
+
+    default boolean shouldBeActive(){return true;}
 
 }

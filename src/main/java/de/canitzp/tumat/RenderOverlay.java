@@ -2,6 +2,7 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.*;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.json.JsonReader;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -14,6 +15,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -32,6 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -44,16 +48,17 @@ public class RenderOverlay{
     private static Map<String, ModContainer> modMap;
     private static String modNameFormat;
     //                       Block/Item, Name, ModName
-    public static Map<IForgeRegistryEntry, Pair<String, String>> remapMappings;
+    public static Map<ItemStack, Pair<String, String>> remapMappings;
 
     static {
         modMap = Loader.instance().getIndexedModList();
         modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
         remapMappings = new HashMap<>();
-        ReMapper<IForgeRegistryEntry, String, String> reMapper = new ReMapper<>();
+        ReMapper<ItemStack, String, String> reMapper = new ReMapper<>();
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
             renderer.remap(reMapper);
         }
+        new JsonReader(new File(Config.config.getConfigFile().getParentFile() + File.separator + "tumat_rename.json")).data.remap(reMapper);
         reMapper.mergeRemappedElementsWithExisting(remapMappings);
     }
 
@@ -94,13 +99,15 @@ public class RenderOverlay{
             component.addRenderer(new TextComponent(TooltipComponent.getBlockName(state)));
             TileEntity tile = world.getTileEntity(pos);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-                if(tile != null){
-                    renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
-                } else {
-                    renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
+                if(renderer.shouldBeActive()){
+                    if(tile != null){
+                        renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
+                    } else {
+                        renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
+                    }
                 }
             }
-            showModName(state.getBlock(), component);
+            showModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)), component);
         }
         return component;
     }
@@ -110,20 +117,26 @@ public class RenderOverlay{
         if(entity instanceof EntityItem){
             component.addOneLineRenderer(new TextComponent("Item " + ((EntityItem) entity).getEntityItem().getDisplayName() + " * " + ((EntityItem) entity).getEntityItem().stackSize));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-                renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
+                if(renderer.shouldBeActive()){
+                    renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
+                }
             }
-            showModName(((EntityItem) entity).getEntityItem().getItem(), component);
+            showModName(new ItemStack(((EntityItem) entity).getEntityItem().getItem(), 1, ((EntityItem) entity).getEntityItem().getItemDamage()), component);
         } else if(entity instanceof EntityLivingBase){
-            component.addOneLineRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+            component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-                renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
+                if(renderer.shouldBeActive()){
+                    renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
+                }
             }
             showModName(entity, component);
         } else {
-            component.addOneLineRenderer(new TextComponent(entity.getDisplayName().getFormattedText()));
+            component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-                renderer.renderEntity(world, player, entity, component, shouldCalculate);
+                if(renderer.shouldBeActive()){
+                    renderer.renderEntity(world, player, entity, component, shouldCalculate);
+                }
             }
             showModName(entity, component);
         }
@@ -136,11 +149,13 @@ public class RenderOverlay{
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
                 component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
-                showModName(state.getBlock(), component);
+                showModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)), component);
             }
         }
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-            renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+            if(renderer.shouldBeActive()){
+                renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+            }
         }
         return component;
     }
@@ -230,7 +245,7 @@ public class RenderOverlay{
     private static String getModName(String modid){
         if(!modid.equals("minecraft")){
             for(ModContainer mod : modMap.values()){
-                if(mod.getModId().toLowerCase(Locale.ENGLISH).equals(modid)){
+                if(mod.getModId().toLowerCase().equals(modid)){
                     return StringUtils.capitalize(mod.getName());
                 }
             }
@@ -238,19 +253,17 @@ public class RenderOverlay{
         return StringUtils.capitalize(modid);
     }
 
-    public static void showModName(IForgeRegistryEntry o, TooltipComponent component){
-        String modName;
-        if(remapMappings.containsKey(o) && remapMappings.get(o).getValue() != null){
-            modName = remapMappings.get(o).getValue();
-        } else {
-            modName = getModName(o.getRegistryName().getResourceDomain());
+    public static void showModName(ItemStack stack, TooltipComponent component){
+        String modName = TooltipComponent.getName(stack, remapMappings).getValue();
+        if(modName == null){
+            modName = getModName(stack.getItem().getRegistryName().getResourceDomain());
         }
         component.addOneLineRenderer(new TextComponent(modNameFormat + modName));
     }
 
     public static void showModName(Entity entity, TooltipComponent component){
         String entityName = EntityList.getEntityString(entity);
-        String[] array = entityName.split(".");
+        String[] array = entityName.split("\\.");
         if(array.length >= 2){
             entityName = getModName(array[0]);
         } else {

@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -99,6 +100,15 @@ public class TUMAT{
         if(event.getModID().equals(TUMAT.MODID)){
             Config.init();
             Config.config.save();
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void onLoggout(PlayerEvent.PlayerLoggedOutEvent event){
+        if(event.player.isServerWorld()){
+            Config.config.load();
+            Config.init();
         }
     }
 

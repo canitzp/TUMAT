@@ -115,7 +115,6 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
                         NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());
                         oldNBT.merge(message.nbt);
                         tileEntity.readFromNBT(oldNBT);
-                        System.out.println(message.nbt);
                     }
                 }
             });

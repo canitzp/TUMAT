@@ -6,13 +6,15 @@ import de.canitzp.tumat.network.PacketUpdateTileEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author canitzp
@@ -52,25 +54,24 @@ public class TooltipComponent{
         if(text == null){
             text = "TUMAT NPE Error";
         }
-        fontRendererIn.drawStringWithShadow(text, (float)(x - fontRendererIn.getStringWidth(text) / 2), (float)y, color);
+        fontRendererIn.drawStringWithShadow(text, (float) (x - fontRendererIn.getStringWidth(text) / 2), (float) y, color);
     }
 
     public static String getBlockName(IBlockState state){
-        if(!RenderOverlay.remapMappings.containsKey(state.getBlock()) || (RenderOverlay.remapMappings.containsKey(state.getBlock()) && RenderOverlay.remapMappings.get(state.getBlock()).getKey() == null)){
-            Item itemBlock = Item.getItemFromBlock(state.getBlock());
-            if(itemBlock != null){
-                return itemBlock.getItemStackDisplayName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
-            } else {
-                return state.getBlock().getLocalizedName();
-            }
+        Item itemBlock = Item.getItemFromBlock(state.getBlock());
+        if(itemBlock != null){
+            ItemStack stack = new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state));
+            String name = getName(stack, RenderOverlay.remapMappings).getKey();
+            return name != null ? name : itemBlock.getItemStackDisplayName(stack);
+        } else {
+            return state.getBlock().getLocalizedName();
         }
-        return RenderOverlay.remapMappings.get(state.getBlock()).getKey();
     }
 
     public static String getEntityName(Entity entity){
-        String defaultName = entity.getDisplayName().getFormattedText();
+        String defaultName = entity.getName();
         if(defaultName.endsWith(".name")){
-            String[] array = defaultName.split(".");
+            String[] array = defaultName.split("\\.");
             defaultName = StringUtils.capitalize(array[array.length-2]);
         }
         return defaultName;
@@ -80,6 +81,15 @@ public class TooltipComponent{
         if(shouldCalculate){
             NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
         }
+    }
+
+    public static Pair<String, String> getName(ItemStack stack, Map<ItemStack, Pair<String, String>> map){
+        for(ItemStack s : map.keySet()){
+            if(ItemStack.areItemsEqual(s, stack)){
+                return map.get(s);
+            }
+        }
+        return Pair.of(null, null);
     }
 
 }
