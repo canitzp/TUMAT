@@ -32,10 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author canitzp
@@ -233,7 +230,7 @@ public class RenderOverlay{
     private static String getModName(String modid){
         if(!modid.equals("minecraft")){
             for(ModContainer mod : modMap.values()){
-                if(mod.getModId().equals(modid)){
+                if(mod.getModId().toLowerCase(Locale.ENGLISH).equals(modid)){
                     return StringUtils.capitalize(mod.getName());
                 }
             }
