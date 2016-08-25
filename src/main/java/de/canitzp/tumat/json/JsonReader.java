@@ -2,15 +2,12 @@ package de.canitzp.tumat.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
 import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.api.ReMapper;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -56,7 +53,7 @@ public class JsonReader{
             for(JsonMod mod : mods){
                 if(Loader.isModLoaded(mod.modid)){
                     for(JsonModData modData : mod.modData){
-                        Item item = getItemFromName(mod.modid + ":" + modData.objectName);
+                        Item item = getItemFromName(new ResourceLocation(mod.modid, modData.objectName));
                         if(item != null){
                             for(int meta : modData.meta){
                                 remapper.remap(new ItemStack(item, 1, meta), modData.newObjectName, modData.newModName);
@@ -98,19 +95,8 @@ public class JsonReader{
     }
 
     @Nullable
-    private static Item getItemFromName(String name){
-        ResourceLocation resourcelocation = new ResourceLocation(name);
-        if (Item.REGISTRY.containsKey(resourcelocation)){
-            return Item.REGISTRY.getObject(resourcelocation);
-        }
-        else {
-            try{
-                return Item.REGISTRY.getObjectById(Integer.parseInt(name));
-            }
-            catch (NumberFormatException var3){
-                return null;
-            }
-        }
+    private static Item getItemFromName(ResourceLocation loc){
+        return Item.REGISTRY.containsKey(loc) ? Item.REGISTRY.getObject(loc) : null;
     }
 
 }

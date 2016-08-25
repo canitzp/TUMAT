@@ -1,8 +1,10 @@
 package de.canitzp.tumat.api;
 
 import de.canitzp.tumat.RenderOverlay;
+import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketUpdateTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.Entity;
@@ -23,6 +25,7 @@ public class TooltipComponent{
 
     private List<List<IComponentRender>> objects = new ArrayList<>();
     private List<IComponentRender> currentObjects = new ArrayList<>();
+    private boolean shouldShowModName = true;
 
     public TooltipComponent addRenderer(IComponentRender render){
         this.currentObjects.add(render);
@@ -46,6 +49,20 @@ public class TooltipComponent{
         return this.objects;
     }
 
+    public TooltipComponent addOwnModName(){
+        this.shouldShowModName = false;
+        return this;
+    }
+
+    public boolean shouldShowModName(){
+        return shouldShowModName;
+    }
+
+    public TooltipComponent clear(){
+        this.objects.clear();
+        this.currentObjects.clear();
+        return this;
+    }
 
     /**
      * Renders the specified text to the screen, center-aligned. Args : renderer, string, x, y, color
@@ -90,6 +107,12 @@ public class TooltipComponent{
             }
         }
         return Pair.of(null, null);
+    }
+
+    public static void showModNameSpecial(Block block, TooltipComponent component){
+        if(block != null){
+            component.addOneLineRenderer(new TextComponent(RenderOverlay.modNameFormat + RenderOverlay.getModName(block.getRegistryName().getResourceDomain())));
+        }
     }
 
 }

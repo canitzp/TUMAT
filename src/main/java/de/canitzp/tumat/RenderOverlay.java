@@ -27,6 +27,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
@@ -46,7 +47,7 @@ public class RenderOverlay{
 
     private static RayTraceResult savedTrace;
     private static Map<String, ModContainer> modMap;
-    private static String modNameFormat;
+    public static String modNameFormat;
     //                       Block/Item, Name, ModName
     public static Map<ItemStack, Pair<String, String>> remapMappings;
 
@@ -87,7 +88,7 @@ public class RenderOverlay{
                     break;
                 }
             }
-            renderComponents(fontRenderer, resolution.getScaledWidth() / 2, 5, componentsForRendering);
+            renderComponents(fontRenderer, (resolution.getScaledWidth() / 2) + Math.round(Config.x), Math.round(Config.y), componentsForRendering);
         }
     }
 
@@ -149,7 +150,7 @@ public class RenderOverlay{
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
                 component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
-                showModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)), component);
+                component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(state.getBlock().getRegistryName().getResourceDomain())));
             }
         }
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -168,6 +169,7 @@ public class RenderOverlay{
                         for(IComponentRender component : lists){
                             if(component != null){
                                 GlStateManager.pushMatrix();
+                                GlStateManager.scale(Config.scale, Config.scale, Config.scale);
                                 component.render(fontRenderer, x, y, 0xFFFFFF);
                                 GlStateManager.popMatrix();
                             }
@@ -242,7 +244,7 @@ public class RenderOverlay{
         return traceResult;
     }
 
-    private static String getModName(String modid){
+    public static String getModName(String modid){
         if(!modid.equals("minecraft")){
             for(ModContainer mod : modMap.values()){
                 if(mod.getModId().toLowerCase().equals(modid)){
@@ -254,22 +256,26 @@ public class RenderOverlay{
     }
 
     public static void showModName(ItemStack stack, TooltipComponent component){
-        String modName = TooltipComponent.getName(stack, remapMappings).getValue();
-        if(modName == null){
-            modName = getModName(stack.getItem().getRegistryName().getResourceDomain());
+        if(component.shouldShowModName()){
+            String modName = TooltipComponent.getName(stack, remapMappings).getValue();
+            if(modName == null && stack != null && stack.getItem() != null){
+                modName = getModName(stack.getItem().getRegistryName().getResourceDomain());
+            }
+            component.addOneLineRenderer(new TextComponent(modNameFormat + modName));
         }
-        component.addOneLineRenderer(new TextComponent(modNameFormat + modName));
     }
 
     public static void showModName(Entity entity, TooltipComponent component){
-        String entityName = EntityList.getEntityString(entity);
-        String[] array = entityName.split("\\.");
-        if(array.length >= 2){
-            entityName = getModName(array[0]);
-        } else {
-            entityName = "Minecraft";
+        if(component.shouldShowModName()){
+            String entityName = EntityList.getEntityString(entity);
+            String[] array = entityName.split("\\.");
+            if(array.length >= 2){
+                entityName = getModName(array[0]);
+            } else {
+                entityName = "Minecraft";
+            }
+            component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(entityName)));
         }
-        component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(entityName)));
     }
 
 }

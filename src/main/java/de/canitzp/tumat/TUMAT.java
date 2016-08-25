@@ -2,8 +2,10 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.integration.ActuallyAdditions;
 import de.canitzp.tumat.integration.Tesla;
+import de.canitzp.tumat.integration.Vanilla;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
@@ -61,6 +63,7 @@ public class TUMAT{
 
     @SideOnly(Side.CLIENT)
     private void loadIntegrations(){
+        TUMATApi.registerRenderComponent(Vanilla.class);
         if(Loader.isModLoaded("tesla")){
             logger.info("[Integration] Loading Tesla integration");
             TUMATApi.registerRenderComponent(Tesla.class);
@@ -77,7 +80,14 @@ public class TUMAT{
         if(Config.shouldRenderOverlay && event.getType().equals(RenderGameOverlayEvent.ElementType.ALL)){
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
-                RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
+                try{
+                    RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
+                } catch(Exception e){
+                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", event.getResolution().getScaledWidth() / 2 + (int) Config.x, (int) Config.y, 0xFFFFFF);
+                    if(mc.theWorld.getTotalWorldTime() % 100 == 0){
+                        logger.error("An Error occurred while rendering the tooltip.", e);
+                    }
+                }
             }
         }
     }

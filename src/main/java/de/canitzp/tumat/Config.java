@@ -20,6 +20,7 @@ public class Config{
     public static boolean showEntityItems;
     public static boolean showEnergy;
     public static boolean showSpecialAbilities;
+    public static float x, y, scale;
 
     public static Configuration config;
 
@@ -41,6 +42,9 @@ public class Config{
         showEntityItems = config.getBoolean("ShowEntityItem", cat, true, "Should be the tooltip be activated for EntityItems");
         showEnergy = config.getBoolean("ShowEnergy", cat, true, "Should the tooltip shows the energy of the block or item");
         showSpecialAbilities = config.getBoolean("ShowSpecialAbilities", cat, true, "Should the tooltip shows special information about the block or item.");
+        x = config.getFloat("XOffset", cat, 0, -4000, 4000, "The x offset for the tooltip. Can be changed via the ingame Gui");
+        y = config.getFloat("YOffset", cat, 5, -4000, 4000, "The y offset for the tooltip. Can be changed via the ingame Gui");
+        scale = config.getFloat("Scale", cat, 1.0F, 0F, 5F, "The scale factor for the tooltip. Can be changed via the ingame Gui");
     }
 
     @SideOnly(Side.CLIENT)
