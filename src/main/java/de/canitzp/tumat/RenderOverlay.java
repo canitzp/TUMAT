@@ -49,13 +49,13 @@ public class RenderOverlay{
     private static Map<String, ModContainer> modMap;
     public static String modNameFormat;
     //                       Block/Item, Name, ModName
-    public static Map<ItemStack, Pair<String, String>> remapMappings;
+    public static Map<ItemStack, Pair<String, Pair<String, String[]>>> remapMappings;
 
     static {
         modMap = Loader.instance().getIndexedModList();
         modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
         remapMappings = new HashMap<>();
-        ReMapper<ItemStack, String, String> reMapper = new ReMapper<>();
+        ReMapper<ItemStack, String, Pair<String, String[]>> reMapper = new ReMapper<>();
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
             renderer.remap(reMapper);
         }
@@ -97,7 +97,13 @@ public class RenderOverlay{
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
             //component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T"));
-            component.addRenderer(new TextComponent(TooltipComponent.getBlockName(state)));
+            component.addOneLineRenderer(new TextComponent(TooltipComponent.getBlockName(state)));
+            String[] desc = TooltipComponent.getDescription(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
+            if(desc != null){
+                for(String s : desc){
+                    component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
+                }
+            }
             TileEntity tile = world.getTileEntity(pos);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
@@ -116,7 +122,13 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + ((EntityItem) entity).getEntityItem().getDisplayName() + " * " + ((EntityItem) entity).getEntityItem().stackSize));
+            component.addOneLineRenderer(new TextComponent("Item " + TooltipComponent.getItemStackDisplayString(((EntityItem) entity).getEntityItem()) + " * " + ((EntityItem) entity).getEntityItem().stackSize));
+            String[] desc = TooltipComponent.getDescription(((EntityItem) entity).getEntityItem());
+            if(desc != null){
+                for(String s : desc){
+                    component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
+                }
+            }
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
@@ -257,7 +269,7 @@ public class RenderOverlay{
 
     public static void showModName(ItemStack stack, TooltipComponent component){
         if(component.shouldShowModName()){
-            String modName = TooltipComponent.getName(stack, remapMappings).getValue();
+            String modName = TooltipComponent.getName(stack, remapMappings).getValue().getKey();
             if(modName == null && stack != null && stack.getItem() != null){
                 modName = getModName(stack.getItem().getRegistryName().getResourceDomain());
             }

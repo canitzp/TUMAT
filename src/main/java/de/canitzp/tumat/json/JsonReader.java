@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -39,7 +40,7 @@ public class JsonReader{
     }
 
     private JsonData createExample(){
-        return new JsonData(Collections.singletonList(new JsonMod("examplemod", Collections.singletonList(new JsonModData("exampleBlock", new int[]{0, 2, 2596}, "exampleBlockRenameTest", "ExampleModRenameTest")))));
+        return new JsonData(Collections.singletonList(new JsonMod("examplemod", Collections.singletonList(new JsonModData("exampleBlock", new int[]{0, 2, 2596}, "exampleBlockRenameTest", "ExampleModRenameTest", new String[]{"ExampleDescription"})))));
     }
 
     public class JsonData{
@@ -49,14 +50,14 @@ public class JsonReader{
             this.mods = mods;
         }
 
-        public void remap(ReMapper<ItemStack, String, String> remapper){
+        public void remap(ReMapper<ItemStack, String, Pair<String, String[]>> remapper){
             for(JsonMod mod : mods){
                 if(Loader.isModLoaded(mod.modid)){
                     for(JsonModData modData : mod.modData){
                         Item item = getItemFromName(new ResourceLocation(mod.modid, modData.objectName));
                         if(item != null){
                             for(int meta : modData.meta){
-                                remapper.remap(new ItemStack(item, 1, meta), modData.newObjectName, modData.newModName);
+                                remapper.remap(new ItemStack(item, 1, meta), modData.newObjectName, Pair.of(modData.newModName, modData.newDescription));
                             }
                         }
                     }
@@ -84,12 +85,14 @@ public class JsonReader{
         public int[] meta;
         public String newObjectName;
         public String newModName;
+        public String[] newDescription;
 
-        public JsonModData(String objectName, int[] meta, String newObjectName, String newModName){
+        public JsonModData(String objectName, int[] meta, String newObjectName, String newModName, String[] newDescription){
             this.objectName = objectName;
             this.meta = meta;
             this.newObjectName = newObjectName;
             this.newModName = newModName;
+            this.newDescription = newDescription;
         }
 
     }

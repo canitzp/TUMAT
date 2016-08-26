@@ -14,6 +14,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * @author canitzp
@@ -45,7 +46,7 @@ public interface IWorldRenderer{
         return component;
     }
 
-    default void remap(ReMapper<ItemStack, String, String> reMapper){}
+    default void remap(ReMapper<ItemStack, String, Pair<String, String[]>> reMapper){}
 
     default boolean shouldBeActive(){return true;}
 

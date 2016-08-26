@@ -3,6 +3,7 @@ package de.canitzp.tumat.api.components;
 import de.canitzp.tumat.api.IComponentRender;
 import de.canitzp.tumat.api.TooltipComponent;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -15,7 +16,7 @@ public class TextComponent implements IComponentRender{
     private String displayString;
 
     public TextComponent(String displayString){
-        this.displayString = displayString;
+        this.displayString = TextFormatting.RESET + displayString;
     }
 
     @Override

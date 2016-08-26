@@ -3,6 +3,7 @@ package de.canitzp.tumat;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
+import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.integration.ActuallyAdditions;
 import de.canitzp.tumat.integration.Tesla;
 import de.canitzp.tumat.integration.Vanilla;
@@ -15,16 +16,19 @@ import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -90,6 +94,32 @@ public class TUMAT{
                 }
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SideOnly(Side.CLIENT)
+    public static void tooltipRenderEvent(ItemTooltipEvent event){
+        String s = TooltipComponent.getName(event.getItemStack(), RenderOverlay.remapMappings).getKey();
+        if(s != null){
+            event.getToolTip().clear();
+            event.getToolTip().add(s + (Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? TextFormatting.RESET + TooltipComponent.getAdvancedName(event.getItemStack()) : ""));
+            String[] desc = TooltipComponent.getDescription(event.getItemStack());
+            if(desc != null){
+                for(String desc1 : desc){
+                    event.getToolTip().add(TextFormatting.GRAY + desc1);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SideOnly(Side.CLIENT)
+    public static void tooltipRenderEventModName(ItemTooltipEvent event){
+        String s = TooltipComponent.getName(event.getItemStack(), RenderOverlay.remapMappings).getValue().getKey();
+        if(s == null){
+            s = RenderOverlay.getModName(event.getItemStack().getItem().getRegistryName().getResourceDomain());
+        }
+        event.getToolTip().add(RenderOverlay.modNameFormat + s);
     }
 
     @SideOnly(Side.SERVER)
