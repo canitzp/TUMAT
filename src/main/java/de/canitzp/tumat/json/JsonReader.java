@@ -50,14 +50,14 @@ public class JsonReader{
             this.mods = mods;
         }
 
-        public void remap(ReMapper<ItemStack, String, Pair<String, String[]>> remapper){
+        public void remap(ReMapper<ItemStack, String, String, String[]> remapper){
             for(JsonMod mod : mods){
                 if(Loader.isModLoaded(mod.modid)){
                     for(JsonModData modData : mod.modData){
                         Item item = getItemFromName(new ResourceLocation(mod.modid, modData.objectName));
                         if(item != null){
                             for(int meta : modData.meta){
-                                remapper.remap(new ItemStack(item, 1, meta), modData.newObjectName, Pair.of(modData.newModName, modData.newDescription));
+                                remapper.remap(new ItemStack(item, 1, meta), modData.newObjectName, modData.newModName, modData.newDescription);
                             }
                         }
                     }

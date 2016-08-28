@@ -1,66 +1,81 @@
 package de.canitzp.tumat.api;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author canitzp
  */
-public class ReMapper<T, K, M>{
+public class ReMapper<T, K, M, E>{
 
-    private Map<T, Pair<K, M>> nameChangedElements = new HashMap<>();
+    private Map<T, Triple<K, M, E>> nameChangedElements = new HashMap<>();
 
-    public ReMapper<T, K, M> remapName(T object, K newName){
-        M modName = null;
+    public ReMapper<T, K, M, E> remapFirst(T object, K value){
+        M currentMiddle = null;
+        E currentRight = null;
         if(this.nameChangedElements.containsKey(object)){
-            modName = this.nameChangedElements.get(object).getValue();
+            currentMiddle = this.nameChangedElements.get(object).getMiddle();
+            currentRight = this.nameChangedElements.get(object).getRight();
         }
-        nameChangedElements.put(object, Pair.of(newName, modName));
+        nameChangedElements.put(object, Triple.of(value, currentMiddle, currentRight));
         return this;
     }
 
-    public ReMapper<T, K, M> remapModName(T object, M newModName){
-        K name = null;
+    public ReMapper<T, K, M, E> remapSecond(T object, M value){
+        K currentLeft = null;
+        E currentRight = null;
         if(this.nameChangedElements.containsKey(object)){
-            name = this.nameChangedElements.get(object).getKey();
+            currentLeft = this.nameChangedElements.get(object).getLeft();
+            currentRight = this.nameChangedElements.get(object).getRight();
         }
-        nameChangedElements.put(object, Pair.of(name, newModName));
+        nameChangedElements.put(object, Triple.of(currentLeft, value, currentRight));
         return this;
     }
 
-    public ReMapper<T, K, M> remap(T object, K newName, M newModName){
-        this.nameChangedElements.put(object, Pair.of(newName, newModName));
+    public ReMapper<T, K, M, E> remap(T object, K left, M middle, E right){
+        this.nameChangedElements.put(object, Triple.of(left, middle, right));
         return this;
     }
 
-    public ReMapper<T, K, M> removeMapping(T object){
+    public ReMapper<T, K, M, E> removeMapping(T object){
         this.nameChangedElements.remove(object);
         return this;
     }
 
-    public Map<T, Pair<K, M>> getRemappedElements(){
-        return nameChangedElements;
-    }
-
-    public Map<T, Pair<K, M>> mergeRemappedElementsWithExisting(Map<T, Pair<K, M>> existing){
-        for(Map.Entry<T, Pair<K, M>> entry : nameChangedElements.entrySet()){
-            K name = null;
-            M modName = null;
+    public Map<T, Triple<K, M, E>> mergeRemappedElementsWithExisting(Map<T, Triple<K, M, E>> existing){
+        for(Map.Entry<T, Triple<K, M, E>> entry : nameChangedElements.entrySet()){
+            K left = null;
+            M middle = null;
+            E right = null;
             if(existing.containsKey(entry.getKey())){
-                name = existing.get(entry.getKey()).getKey();
-                modName = existing.get(entry.getKey()).getValue();
+                left = existing.get(entry.getKey()).getLeft();
+                middle = existing.get(entry.getKey()).getMiddle();
+                right = existing.get(entry.getKey()).getRight();
             }
-            if(entry.getValue().getKey() != null){
-                name = entry.getValue().getKey();
+            if(entry.getValue().getLeft() != null){
+                left = entry.getValue().getLeft();
             }
-            if(entry.getValue().getValue() != null){
-                modName = entry.getValue().getValue();
+            if(entry.getValue().getMiddle() != null){
+                middle = entry.getValue().getMiddle();
             }
-            existing.put(entry.getKey(), Pair.of(name, modName));
+            if(entry.getValue().getRight() != null){
+                right = entry.getValue().getRight();
+            }
+            existing.put(entry.getKey(), Triple.of(left, middle, right));
         }
         return existing;
+    }
+
+    public Set<T> getKeys(){
+        return this.nameChangedElements.keySet();
+    }
+
+    public Triple<K, M, E> getValue(T key){
+        return this.nameChangedElements.containsKey(key) ? this.nameChangedElements.get(key) : Triple.of(null, null, null);
     }
 
 }

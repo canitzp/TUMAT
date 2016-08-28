@@ -1,6 +1,10 @@
 package de.canitzp.tumat.network;
 
+import de.canitzp.tumat.GuiTUMAT;
 import de.canitzp.tumat.TUMAT;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;

@@ -1,15 +1,14 @@
 package de.canitzp.tumat;
 
-import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.integration.ActuallyAdditions;
 import de.canitzp.tumat.integration.Tesla;
 import de.canitzp.tumat.integration.Vanilla;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
@@ -17,22 +16,18 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +42,9 @@ public class TUMAT{
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
+
+    @Mod.Instance(MODID)
+    public static TUMAT instance;
 
     public static final Logger logger = LogManager.getLogger(MODNAME);
 
@@ -76,6 +74,9 @@ public class TUMAT{
             logger.info("[Integration] Loading ActuallyAdditions integration");
             TUMATApi.registerRenderComponent(ActuallyAdditions.class);
         }
+        if(Loader.isModLoaded("tconstruct")){
+            Vanilla.isTinkersConstructLoaded = true;
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -99,11 +100,11 @@ public class TUMAT{
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEvent(ItemTooltipEvent event){
-        String s = TooltipComponent.getName(event.getItemStack(), RenderOverlay.remapMappings).getKey();
+        String s = InfoUtil.getItemName(event.getItemStack());
         if(s != null){
             event.getToolTip().clear();
             event.getToolTip().add(s + (Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? TextFormatting.RESET + TooltipComponent.getAdvancedName(event.getItemStack()) : ""));
-            String[] desc = TooltipComponent.getDescription(event.getItemStack());
+            String[] desc = InfoUtil.getDescription(event.getItemStack());
             if(desc != null){
                 for(String desc1 : desc){
                     event.getToolTip().add(TextFormatting.GRAY + desc1);
@@ -115,7 +116,7 @@ public class TUMAT{
     @SubscribeEvent(priority = EventPriority.LOWEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEventModName(ItemTooltipEvent event){
-        String s = TooltipComponent.getName(event.getItemStack(), RenderOverlay.remapMappings).getValue().getKey();
+        String s = InfoUtil.getModName(event.getItemStack());
         if(s == null){
             s = RenderOverlay.getModName(event.getItemStack().getItem().getRegistryName().getResourceDomain());
         }
@@ -149,6 +150,25 @@ public class TUMAT{
         if(event.player.isServerWorld()){
             Config.config.load();
             Config.init();
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void openInventory(GuiScreenEvent.InitGuiEvent event){
+        if(event.getGui().getClass().equals(GuiInventory.class) || event.getGui().getClass().equals(GuiContainerCreative.class)){
+            String s = "Configure TUMAT";
+            event.getButtonList().add(new GuiButton(963, 0, 0, Minecraft.getMinecraft().fontRendererObj.getStringWidth(s) + 20, 20, s));
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void buttonPressInventory(GuiScreenEvent.ActionPerformedEvent event) {
+        if (event.getGui().getClass().equals(GuiInventory.class) || event.getGui().getClass().equals(GuiContainerCreative.class)) {
+            if(event.getButton().id == 963){
+                Minecraft.getMinecraft().displayGuiScreen(new GuiTUMAT());
+            }
         }
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,7 +27,8 @@ public class TooltipComponent{
 
     private List<List<IComponentRender>> objects = new ArrayList<>();
     private List<IComponentRender> currentObjects = new ArrayList<>();
-    private boolean shouldShowModName = true;
+
+    private TextComponent modName;
 
     public TooltipComponent addRenderer(IComponentRender render){
         this.currentObjects.add(render);
@@ -46,22 +48,23 @@ public class TooltipComponent{
     }
 
     public List<List<IComponentRender>> endComponent(){
+        newLine();
+        addOneLineRenderer(this.modName);
         this.objects.add(new ArrayList<>(this.currentObjects));
         return this.objects;
-    }
-
-    public TooltipComponent addOwnModName(){
-        this.shouldShowModName = false;
-        return this;
-    }
-
-    public boolean shouldShowModName(){
-        return shouldShowModName;
     }
 
     public TooltipComponent clear(){
         this.objects.clear();
         this.currentObjects.clear();
+        this.modName = null;
+        return this;
+    }
+
+    public TooltipComponent setModName(String s){
+        if(modName == null){
+            this.modName = new TextComponent(s);
+        }
         return this;
     }
 
@@ -73,28 +76,6 @@ public class TooltipComponent{
             text = "TUMAT NPE Error";
         }
         fontRendererIn.drawStringWithShadow(text, (float) (x - fontRendererIn.getStringWidth(text) / 2), (float) y, color);
-    }
-
-    public static String getBlockName(IBlockState state){
-        Item itemBlock = Item.getItemFromBlock(state.getBlock());
-        if(itemBlock != null){
-            ItemStack stack = new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state));
-            String name = getName(stack, RenderOverlay.remapMappings).getKey();
-            return name != null ? name : getItemStackDisplayString(stack);
-        } else {
-            return state.getBlock().getLocalizedName();
-        }
-    }
-
-    public static String getItemStackDisplayString(ItemStack stack){
-        String displayString = getName(stack, RenderOverlay.remapMappings).getKey();
-        if(displayString == null){
-            displayString = stack.getDisplayName();
-        } else {
-            //Maybe add this later if I know how to remove and readd this at last/first render tick
-            //stack.setStackDisplayName(displayString);
-        }
-        return displayString;
     }
 
     public static String getEntityName(Entity entity){
@@ -110,36 +91,6 @@ public class TooltipComponent{
         if(shouldCalculate){
             NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
         }
-    }
-
-    public static Pair<String, Pair<String, String[]>> getName(ItemStack stack, Map<ItemStack, Pair<String, Pair<String, String[]>>> map){
-        for(ItemStack s : map.keySet()){
-            if(ItemStack.areItemsEqual(s, stack)){
-                return map.get(s);
-            }
-        }
-        return Pair.of(null, Pair.of(null, null));
-    }
-
-    public static void showModNameSpecial(Block block, TooltipComponent component){
-        if(block != null){
-            component.addOneLineRenderer(new TextComponent(RenderOverlay.modNameFormat + RenderOverlay.getModName(block.getRegistryName().getResourceDomain())));
-        }
-    }
-
-    public static String[] getDescription(ItemStack stack){
-        String[] strings = getName(stack, RenderOverlay.remapMappings).getValue().getValue();
-        if(strings == null || strings.length == 0){
-            List<String> tooltip = new ArrayList<>();
-            stack.getItem().addInformation(stack, null, tooltip, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-            if(!tooltip.isEmpty()){
-                strings = (String[]) tooltip.toArray();
-            }
-        }
-        if(strings != null && strings.length > 0){
-            return strings;
-        }
-        return null;
     }
 
     public static String getAdvancedName(ItemStack stack){

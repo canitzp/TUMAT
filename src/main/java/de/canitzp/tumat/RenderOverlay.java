@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.File;
 import java.util.*;
@@ -48,19 +49,18 @@ public class RenderOverlay{
     private static RayTraceResult savedTrace;
     private static Map<String, ModContainer> modMap;
     public static String modNameFormat;
-    //                       Block/Item, Name, ModName
-    public static Map<ItemStack, Pair<String, Pair<String, String[]>>> remapMappings;
+    //                Block/Item,       Name,   ModName, block/item desc
+    public static ReMapper<ItemStack, String, String, String[]> remaped;
 
     static {
         modMap = Loader.instance().getIndexedModList();
         modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
-        remapMappings = new HashMap<>();
-        ReMapper<ItemStack, String, Pair<String, String[]>> reMapper = new ReMapper<>();
+        ReMapper<ItemStack, String, String, String[]> reMapper = new ReMapper<>();
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
             renderer.remap(reMapper);
         }
         new JsonReader(new File(Config.config.getConfigFile().getParentFile() + File.separator + "tumat_rename.json")).data.remap(reMapper);
-        reMapper.mergeRemappedElementsWithExisting(remapMappings);
+        remaped = reMapper;
     }
 
     public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){
@@ -97,8 +97,8 @@ public class RenderOverlay{
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
             //component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T"));
-            component.addOneLineRenderer(new TextComponent(TooltipComponent.getBlockName(state)));
-            String[] desc = TooltipComponent.getDescription(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
+            component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
+            String[] desc = InfoUtil.getDescription(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
             if(desc != null){
                 for(String s : desc){
                     component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
@@ -109,12 +109,12 @@ public class RenderOverlay{
                 if(renderer.shouldBeActive()){
                     if(tile != null){
                         renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
-                    } else {
-                        renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
                     }
+                    renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
                 }
             }
-            showModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)), component);
+            String modName = InfoUtil.getModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
+            component.setModName(modName != null ? modName : InfoUtil.getModNameFromBlock(state.getBlock()));
         }
         return component;
     }
@@ -122,8 +122,8 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + TooltipComponent.getItemStackDisplayString(((EntityItem) entity).getEntityItem()) + " * " + ((EntityItem) entity).getEntityItem().stackSize));
-            String[] desc = TooltipComponent.getDescription(((EntityItem) entity).getEntityItem());
+            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + " * " + ((EntityItem) entity).getEntityItem().stackSize));
+            String[] desc = InfoUtil.getDescription(((EntityItem) entity).getEntityItem());
             if(desc != null){
                 for(String s : desc){
                     component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
@@ -134,7 +134,7 @@ public class RenderOverlay{
                     renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
                 }
             }
-            showModName(new ItemStack(((EntityItem) entity).getEntityItem().getItem(), 1, ((EntityItem) entity).getEntityItem().getItemDamage()), component);
+            component.setModName(InfoUtil.getModName(new ItemStack(((EntityItem) entity).getEntityItem().getItem(), 1, ((EntityItem) entity).getEntityItem().getItemDamage())));
         } else if(entity instanceof EntityLivingBase){
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
@@ -143,7 +143,7 @@ public class RenderOverlay{
                     renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
                 }
             }
-            showModName(entity, component);
+            component.setModName(InfoUtil.getModName(entity));
         } else {
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -151,7 +151,7 @@ public class RenderOverlay{
                     renderer.renderEntity(world, player, entity, component, shouldCalculate);
                 }
             }
-            showModName(entity, component);
+            component.setModName(InfoUtil.getModName(entity));
         }
         return component;
     }
@@ -173,7 +173,7 @@ public class RenderOverlay{
         return component;
     }
 
-    private static void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
+    public static void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
@@ -265,29 +265,6 @@ public class RenderOverlay{
             }
         }
         return StringUtils.capitalize(modid);
-    }
-
-    public static void showModName(ItemStack stack, TooltipComponent component){
-        if(component.shouldShowModName()){
-            String modName = TooltipComponent.getName(stack, remapMappings).getValue().getKey();
-            if(modName == null && stack != null && stack.getItem() != null){
-                modName = getModName(stack.getItem().getRegistryName().getResourceDomain());
-            }
-            component.addOneLineRenderer(new TextComponent(modNameFormat + modName));
-        }
-    }
-
-    public static void showModName(Entity entity, TooltipComponent component){
-        if(component.shouldShowModName()){
-            String entityName = EntityList.getEntityString(entity);
-            String[] array = entityName.split("\\.");
-            if(array.length >= 2){
-                entityName = getModName(array[0]);
-            } else {
-                entityName = "Minecraft";
-            }
-            component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(entityName)));
-        }
     }
 
 }

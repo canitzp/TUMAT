@@ -15,6 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author canitzp
@@ -29,6 +30,14 @@ public class Tesla implements IWorldRenderer{
             long capacity = tileEntity.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getCapacity();
             if(capacity > 0){
                 component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA + TeslaUtils.getDisplayableTeslaCount(currentEnergy) + "/" + TeslaUtils.getDisplayableTeslaCount(capacity)));
+            }
+        } else {
+            for (EnumFacing facing : EnumFacing.values()){
+                if(facing != side){
+                    if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, facing)){
+                        component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA + "Found Tesla holder at side " + StringUtils.capitalize(facing.getName())));
+                    }
+                }
             }
         }
         return component;

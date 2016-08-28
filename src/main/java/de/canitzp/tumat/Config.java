@@ -1,13 +1,10 @@
 package de.canitzp.tumat;
 
-import de.canitzp.tumat.json.JsonReader;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.io.File;
 
 /**
  * @author canitzp
@@ -20,7 +17,10 @@ public class Config{
     public static boolean showEntityItems;
     public static boolean showEnergy;
     public static boolean showSpecialAbilities;
-    public static float x, y, scale;
+    public static float x, y, scale, toSaveX, toSaveY, toSaveScale;
+    public static boolean showHarvestTooltip;
+
+    public static boolean markDirty;
 
     public static Configuration config;
 
@@ -41,10 +41,21 @@ public class Config{
         cat = "rendering";
         showEntityItems = config.getBoolean("ShowEntityItem", cat, true, "Should be the tooltip be activated for EntityItems");
         showEnergy = config.getBoolean("ShowEnergy", cat, true, "Should the tooltip shows the energy of the block or item");
-        showSpecialAbilities = config.getBoolean("ShowSpecialAbilities", cat, true, "Should the tooltip shows special information about the block or item.");
+        showSpecialAbilities = config.getBoolean("ShowSpecialAbilities", cat, false, "Should the tooltip shows special information about the block or item.");
+        showHarvestTooltip = config.getBoolean("ShowHarvestability", cat, false, "Should the tooltip shows the harvest tool for the block you're looking at.");
         x = config.getFloat("XOffset", cat, 0, -4000, 4000, "The x offset for the tooltip. Can be changed via the ingame Gui");
         y = config.getFloat("YOffset", cat, 5, -4000, 4000, "The y offset for the tooltip. Can be changed via the ingame Gui");
         scale = config.getFloat("Scale", cat, 1.0F, 0F, 5F, "The scale factor for the tooltip. Can be changed via the ingame Gui");
+
+        markDirtyCheck();
+    }
+
+    private static void markDirtyCheck(){
+        if(markDirty){
+            x = toSaveX;
+            y = toSaveY;
+            scale = toSaveScale;
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -56,6 +67,7 @@ public class Config{
             showEntityItems = nbt.getBoolean("showEntityItems");
             showEnergy = nbt.getBoolean("showEnergy");
             showSpecialAbilities = nbt.getBoolean("showSpecialAbilities");
+            showHarvestTooltip = nbt.getBoolean("showHarvestTooltip");
         }
     }
 
@@ -67,6 +79,7 @@ public class Config{
         nbt.setBoolean("showEntityItems", showEntityItems);
         nbt.setBoolean("showEnergy", showEnergy);
         nbt.setBoolean("showSpecialAbilities", showSpecialAbilities);
+        nbt.setBoolean("showHarvestTooltip", showHarvestTooltip);
         return nbt;
     }
 

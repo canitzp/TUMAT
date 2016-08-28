@@ -46,7 +46,7 @@ public interface IWorldRenderer{
         return component;
     }
 
-    default void remap(ReMapper<ItemStack, String, Pair<String, String[]>> reMapper){}
+    default void remap(ReMapper<ItemStack, String, String, String[]> reMapper){}
 
     default boolean shouldBeActive(){return true;}
 
