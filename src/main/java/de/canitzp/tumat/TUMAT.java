@@ -3,6 +3,7 @@ package de.canitzp.tumat;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.integration.ActuallyAdditions;
+import de.canitzp.tumat.integration.RedstoneFlux;
 import de.canitzp.tumat.integration.Tesla;
 import de.canitzp.tumat.integration.Vanilla;
 import de.canitzp.tumat.network.NetworkHandler;
@@ -24,6 +25,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModAPIManager;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -70,6 +72,10 @@ public class TUMAT{
             logger.info("[Integration] Loading Tesla integration");
             TUMATApi.registerRenderComponent(Tesla.class);
         }
+        if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
+            logger.info("[Integration] Loading RedstoneFlux integration");
+            TUMATApi.registerRenderComponent(RedstoneFlux.class);
+        }
         if(Loader.isModLoaded("actuallyadditions")){
             logger.info("[Integration] Loading ActuallyAdditions integration");
             TUMATApi.registerRenderComponent(ActuallyAdditions.class);
@@ -82,7 +88,7 @@ public class TUMAT{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void gameOverlayRenderEvent(RenderGameOverlayEvent.Post event){
-        if(Config.shouldRenderOverlay && event.getType().equals(RenderGameOverlayEvent.ElementType.ALL)){
+        if(Config.shouldRenderOverlay && event.getType().equals(RenderGameOverlayEvent.ElementType.HOTBAR)){
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
                 try{
@@ -91,6 +97,7 @@ public class TUMAT{
                     TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", event.getResolution().getScaledWidth() / 2 + (int) Config.x, (int) Config.y, 0xFFFFFF);
                     if(mc.theWorld.getTotalWorldTime() % 100 == 0){
                         logger.error("An Error occurred while rendering the tooltip.", e);
+                        e.printStackTrace();
                     }
                 }
             }

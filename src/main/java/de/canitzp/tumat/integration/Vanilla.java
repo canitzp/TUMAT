@@ -48,21 +48,27 @@ public class Vanilla implements IWorldRenderer{
             String level = getHarvestLevel(state.getBlock().getHarvestLevel(state));
             String tool = getHarvestTool(state);
             if(tool != null){
-                String color = getTextColorTool(tool, player.getHeldItemMainhand());
-                component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
-                if(level != null && color.equals(TextFormatting.GREEN.toString())){
-                    color = getTextColorLevel(state, player.getHeldItemMainhand());
-                    component.addOneLineRenderer(new TextComponent("Harvest Level: " + color + level));
+                ItemStack stack = player.getHeldItemMainhand();
+                if(stack != null){
+                    String color = getTextColorTool(tool, stack);
+                    component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
+                    if(level != null && color.equals(TextFormatting.GREEN.toString())){
+                        color = getTextColorLevel(state, player.getHeldItemMainhand());
+                        component.addOneLineRenderer(new TextComponent("Harvest Level: " + color + level));
+                    }
                 }
             }
         }
 
-        if(state.getBlock() instanceof BlockRedstoneWire) {
-            component.clear();
-            component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
-            if(Config.showSpecialAbilities)
-                component.addOneLineRenderer(new TextComponent("Power: " + state.getValue(BlockRedstoneWire.POWER)));
-            component.setModName(InfoUtil.getModNameFromBlock(state.getBlock()));
+        //Redstone
+        if(Config.showSpecialAbilities){
+            int power = state.getWeakPower(world, pos, side);
+            if(power > 0 || state.getBlock() instanceof BlockRedstoneWire){
+                component.clear();
+                component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
+                component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.DARK_RED + power));
+                component.setModName(InfoUtil.getModNameFromBlock(state.getBlock()));
+            }
         }
 
         return component;

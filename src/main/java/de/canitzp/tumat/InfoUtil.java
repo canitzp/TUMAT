@@ -37,7 +37,7 @@ public class InfoUtil {
         if(itemBlock != null){
             ItemStack stack = new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state));
             String name = getNameFromStack(stack);
-            return name != null ? name : getItemName(stack);
+            return name != null ? stack.getRarity().rarityColor + name : getItemName(stack);
         } else {
             return state.getBlock().getLocalizedName();
         }
@@ -51,7 +51,7 @@ public class InfoUtil {
             //Maybe add this later if I know how to remove and readd this at last/first render tick
             //stack.setStackDisplayName(displayString);
         }
-        return displayString;
+        return stack.getRarity().rarityColor + displayString;
     }
 
     public static String[] getDescription(ItemStack stack){
@@ -98,7 +98,7 @@ public class InfoUtil {
     public static Triple<String, String, String[]> getName(ItemStack stack, ReMapper<ItemStack, String, String, String[]> remapper){
         for(ItemStack s : remapper.getKeys()){
             if(ItemStack.areItemsEqual(s, stack)){
-                return remapper.getValue(s);
+                return  remapper.getValue(s);
             }
         }
         return Triple.of(null, null, null);

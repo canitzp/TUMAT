@@ -24,7 +24,7 @@ archivesBaseName = "tumat"
 minecraft {
     version = "1.10.2-12.18.1.2073"
     runDir = "run"
-    mappings = "snapshot_20160826"
+    mappings = "snapshot_20160829"
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
 }

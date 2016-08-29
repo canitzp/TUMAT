@@ -4,6 +4,8 @@ import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.network.NetworkHandler;
+import de.canitzp.tumat.network.PacketUpdateEnergy;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.darkhax.tesla.lib.TeslaUtils;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -28,6 +30,9 @@ public class Tesla implements IWorldRenderer{
         if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side)){
             long currentEnergy = tileEntity.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getStoredPower();
             long capacity = tileEntity.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getCapacity();
+            if(world.getTotalWorldTime() % 20 == 0){
+                NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
+            }
             if(capacity > 0){
                 component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA + TeslaUtils.getDisplayableTeslaCount(currentEnergy) + "/" + TeslaUtils.getDisplayableTeslaCount(capacity)));
             }
