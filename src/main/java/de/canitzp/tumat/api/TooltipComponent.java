@@ -30,7 +30,7 @@ public class TooltipComponent{
 
     private TextComponent modName;
 
-    public TooltipComponent addRenderer(IComponentRender render){
+    private TooltipComponent addRenderer(IComponentRender render){
         this.currentObjects.add(render);
         return this;
     }

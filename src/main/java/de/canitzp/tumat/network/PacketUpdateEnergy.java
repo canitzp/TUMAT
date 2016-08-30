@@ -1,10 +1,8 @@
 package de.canitzp.tumat.network;
 
 import cofh.api.energy.IEnergyHandler;
-import de.canitzp.tumat.integration.Tesla;
+import de.canitzp.tumat.TUMAT;
 import io.netty.buffer.ByteBuf;
-import net.darkhax.tesla.api.ITeslaConsumer;
-import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.darkhax.tesla.lib.TeslaUtils;
 import net.minecraft.client.Minecraft;
@@ -14,21 +12,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModAPIManager;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.io.IOException;
 
 /**
  * @author canitzp
@@ -64,16 +55,23 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
     public IMessage onMessage(PacketUpdateEnergy message, MessageContext ctx){
         World world = ctx.getServerHandler().playerEntity.worldObj;
         TileEntity tile = world.getTileEntity(message.tilePos);
-        if(tile != null){
-            if(Loader.isModLoaded("tesla")){
-                if(TeslaUtils.isTeslaHolder(tile, message.side)){
-                    return new PacketUpdateEnergyClient(message.tilePos, message.side, TeslaUtils.getStoredPower(tile, side));
+        if(tile != null && message.side != null){
+            try{
+                if(Loader.isModLoaded("tesla")){
+                    if(TeslaUtils.isTeslaHolder(tile, message.side)){
+                        return new PacketUpdateEnergyClient(message.tilePos, message.side, TeslaUtils.getStoredPower(tile, message.side));
+                    }
+                } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
+                    if(tile instanceof IEnergyHandler){
+                        NBTTagCompound nbt = new NBTTagCompound();
+                        tile.readFromNBT(nbt);
+                        return new PacketUpdateEnergyClient(message.tilePos, message.side, nbt.getInteger("Energy"));
+                    }
                 }
-            } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                if(tile instanceof IEnergyHandler){
-                    NBTTagCompound nbt = new NBTTagCompound();
-                    tile.readFromNBT(nbt);
-                    return new PacketUpdateEnergyClient(message.tilePos, message.side, nbt.getInteger("Energy"));
+            } catch(NullPointerException e){
+                if(world.getTotalWorldTime() % 100 == 0){
+                    TUMAT.logger.error("An error occurred while requesting the energy", e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -114,18 +112,24 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketUpdateEnergyClient message, MessageContext ctx){
-            World world = Minecraft.getMinecraft().theWorld;
-            TileEntity tile = world.getTileEntity(message.tilePos);
-            if(tile != null){
-                if(Loader.isModLoaded("tesla")){
-                    TeslaUtils.givePower(tile, message.side, message.energy, false);
-                } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                    NBTTagCompound old = new NBTTagCompound();
-                    tile.readFromNBT(old);
-                    old.setInteger("Energy", (int) message.energy);
-                    tile.writeToNBT(old);
+            Minecraft.getMinecraft().addScheduledTask(new Runnable(){
+                @Override
+                public void run(){
+                    World world = Minecraft.getMinecraft().theWorld;
+                    TileEntity tile = world.getTileEntity(message.tilePos);
+                    if(tile != null){
+                        if(Loader.isModLoaded("tesla")){
+                            if(tile.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side)){
+                                tile.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side).givePower(message.energy, false);
+                            }
+                        } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
+                            NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
+                            old.setInteger("Energy", (int) message.energy);
+                            tile.readFromNBT(old);
+                        }
+                    }
                 }
-            }
+            });
             return null;
         }
     }

@@ -4,6 +4,8 @@ import cofh.api.energy.IEnergyHandler;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.network.NetworkHandler;
+import de.canitzp.tumat.network.PacketUpdateEnergy;
 import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -25,6 +27,7 @@ public class RedstoneFlux implements IWorldRenderer{
             }
         }
         if(tileEntity instanceof IEnergyHandler){
+            NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
             int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
             int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
             if(max > 0){

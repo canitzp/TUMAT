@@ -16,12 +16,12 @@ public class TextComponent implements IComponentRender{
     private String displayString;
 
     public TextComponent(String displayString){
-        this.displayString = TextFormatting.RESET + displayString;
+        this.displayString = displayString;
     }
 
     @Override
     public void render(FontRenderer fontRenderer, int x, int y, int color){
-        TooltipComponent.drawCenteredString(fontRenderer, this.displayString, x, y, color);
+        TooltipComponent.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, color);
     }
 
 }
