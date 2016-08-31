@@ -14,6 +14,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 
+import java.lang.reflect.Executable;
+
 /**
  * @author canitzp
  */
@@ -28,10 +30,14 @@ public class RedstoneFlux implements IWorldRenderer{
         }
         if(tileEntity instanceof IEnergyHandler){
             NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
-            int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
-            int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
-            if(max > 0){
-                component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max));
+            try{
+                int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
+                int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
+                if(max > 0){
+                    component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max));
+                }
+            } catch(Exception e){
+                e.printStackTrace();
             }
         }
         return component;

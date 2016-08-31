@@ -19,6 +19,13 @@ public class TextComponent implements IComponentRender{
         this.displayString = displayString;
     }
 
+    public TextComponent setFormat(TextFormatting... formatting){
+        for(TextFormatting format : formatting){
+            this.displayString = format.toString() + this.displayString;
+        }
+        return this;
+    }
+
     @Override
     public void render(FontRenderer fontRenderer, int x, int y, int color){
         TooltipComponent.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, color);

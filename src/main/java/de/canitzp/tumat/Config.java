@@ -43,8 +43,8 @@ public class Config{
         showEnergy = config.getBoolean("ShowEnergy", cat, true, "Should the tooltip shows the energy of the block or item");
         showSpecialAbilities = config.getBoolean("ShowSpecialAbilities", cat, false, "Should the tooltip shows special information about the block or item.");
         showHarvestTooltip = config.getBoolean("ShowHarvestability", cat, false, "Should the tooltip shows the harvest tool for the block you're looking at.");
-        x = config.getFloat("XOffset", cat, 0, -4000, 4000, "The x offset for the tooltip. Can be changed via the ingame Gui");
-        y = config.getFloat("YOffset", cat, 5, -4000, 4000, "The y offset for the tooltip. Can be changed via the ingame Gui");
+        x = config.getFloat("XOffset", cat, 50, 0, 100, "The x offset for the tooltip. Can be changed via the ingame Gui");
+        y = config.getFloat("YOffset", cat, 1.5F, 0, 100, "The y offset for the tooltip. Can be changed via the ingame Gui");
         scale = config.getFloat("Scale", cat, 1.0F, 0F, 5F, "The scale factor for the tooltip. Can be changed via the ingame Gui");
 
         markDirtyCheck();

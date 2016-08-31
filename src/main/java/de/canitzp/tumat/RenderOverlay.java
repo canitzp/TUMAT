@@ -88,7 +88,7 @@ public class RenderOverlay{
                     break;
                 }
             }
-            renderComponents(fontRenderer, (resolution.getScaledWidth() / 2) + Math.round(Config.x), Math.round(Config.y), componentsForRendering);
+            renderComponents(fontRenderer, resolution, (resolution.getScaledWidth() / 2) + Math.round(Config.x), Math.round(Config.y), componentsForRendering);
         }
     }
 
@@ -173,21 +173,22 @@ public class RenderOverlay{
         return component;
     }
 
-    public static void renderComponents(FontRenderer fontRenderer, int x, int y, List<TooltipComponent> lines){
+    public static void renderComponents(FontRenderer fontRenderer, ScaledResolution res, int x, int y, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
+                int y2 = GuiTUMAT.getYFromPercantage(Config.y);
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
                     if(lists != null){
                         for(IComponentRender component : lists){
                             if(component != null){
                                 GlStateManager.pushMatrix();
                                 GlStateManager.scale(Config.scale, Config.scale, Config.scale);
-                                component.render(fontRenderer, x, y, 0xFFFFFF);
+                                component.render(fontRenderer, GuiTUMAT.getXFromPercantage(Config.x), y2, 0xFFFFFF);
                                 GlStateManager.popMatrix();
                             }
                         }
                     }
-                    y += 10;
+                    y2 += 10;
                 }
             }
         }

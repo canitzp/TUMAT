@@ -22,9 +22,9 @@ group= "de.canizp.tumat"
 archivesBaseName = "tumat"
 
 minecraft {
-    version = "1.10.2-12.18.1.2073"
+    version = "1.10.2-12.18.1.2076"
     runDir = "run"
-    mappings = "snapshot_20160829"
+    mappings = "snapshot_20160831"
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
 }
@@ -39,8 +39,8 @@ repositories {
 }
 
 dependencies {
-    compile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.42"
-    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r60"
+    compile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r60:dev"
 }
 
 processResources

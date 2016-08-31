@@ -164,7 +164,7 @@ public class TUMAT{
     @SubscribeEvent
     public static void openInventory(GuiScreenEvent.InitGuiEvent event){
         if(event.getGui().getClass().equals(GuiInventory.class) || event.getGui().getClass().equals(GuiContainerCreative.class)){
-            String s = "Configure TUMAT";
+            String s = "TUMAT";
             event.getButtonList().add(new GuiButton(963, 0, 0, Minecraft.getMinecraft().fontRendererObj.getStringWidth(s) + 20, 20, s));
         }
     }

@@ -5,6 +5,7 @@ import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -37,9 +38,12 @@ public class Vanilla implements IWorldRenderer{
         if(state.getBlock() instanceof IPlantable){
             IBlockState plant = ((IPlantable) state.getBlock()).getPlant(world, pos);
             if(plant != null){
-                component.clear();
-                component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(plant)));
-                component.setModName(InfoUtil.getModNameFromBlock(plant.getBlock()));
+                if(plant.getBlock() instanceof BlockCrops){
+                    int plantStatus = plant.getValue(BlockCrops.AGE);
+                    float growStatus = Math.round((plantStatus / 7F * 100F) * 100.00F) / 100.00F;
+                    component.addOneLineRenderer(new TextComponent("Grow status: " + growStatus + "%").setFormat(TextFormatting.YELLOW));
+                    //component.setModName(InfoUtil.getModNameFromBlock(plant.getBlock()));
+                }
             }
         }
 
@@ -64,10 +68,10 @@ public class Vanilla implements IWorldRenderer{
         if(Config.showSpecialAbilities){
             int power = state.getWeakPower(world, pos, side);
             if(power > 0 || state.getBlock() instanceof BlockRedstoneWire){
-                component.clear();
-                component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
+                //component.clear();
+                //component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
                 component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.DARK_RED + power));
-                component.setModName(InfoUtil.getModNameFromBlock(state.getBlock()));
+                //component.setModName(InfoUtil.getModNameFromBlock(state.getBlock()));
             }
         }
 
