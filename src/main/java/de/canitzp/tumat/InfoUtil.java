@@ -58,7 +58,11 @@ public class InfoUtil {
         String[] strings = getDescriptionFromStack(stack);
         if(stack != null && stack.getItem() != null && (strings == null || strings.length == 0)){
             List<String> tooltip = new ArrayList<>();
-            stack.getItem().addInformation(stack, null, tooltip, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+            try{
+                stack.getItem().addInformation(stack, null, tooltip, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
             if(!tooltip.isEmpty()){
                 strings = tooltip.toArray(new String[]{});
             }

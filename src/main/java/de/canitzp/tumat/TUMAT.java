@@ -2,10 +2,7 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.integration.ActuallyAdditions;
-import de.canitzp.tumat.integration.RedstoneFlux;
-import de.canitzp.tumat.integration.Tesla;
-import de.canitzp.tumat.integration.Vanilla;
+import de.canitzp.tumat.integration.*;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
@@ -68,6 +65,7 @@ public class TUMAT{
     @SideOnly(Side.CLIENT)
     private void loadIntegrations(){
         TUMATApi.registerRenderComponent(Vanilla.class);
+        TUMATApi.registerRenderComponent(FluidHandler.class);
         if(Loader.isModLoaded("tesla")){
             logger.info("[Integration] Loading Tesla integration");
             TUMATApi.registerRenderComponent(Tesla.class);

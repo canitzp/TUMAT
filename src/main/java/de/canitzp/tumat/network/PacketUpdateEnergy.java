@@ -3,7 +3,6 @@ package de.canitzp.tumat.network;
 import cofh.api.energy.IEnergyHandler;
 import de.canitzp.tumat.TUMAT;
 import io.netty.buffer.ByteBuf;
-import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.darkhax.tesla.lib.TeslaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -119,9 +118,19 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
                     TileEntity tile = world.getTileEntity(message.tilePos);
                     if(tile != null){
                         if(Loader.isModLoaded("tesla")){
+                            long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
+                            if(toStore >= 0){
+                                TeslaUtils.givePower(tile, message.side, toStore, false);
+                            } else {
+                                TeslaUtils.takePower(tile, message.side, toStore, false);
+                            }
+
+
+                            /*
                             if(tile.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side)){
                                 tile.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side).givePower(message.energy, false);
-                            }
+                            }*/
+
                         } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
                             NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
                             old.setInteger("Energy", (int) message.energy);

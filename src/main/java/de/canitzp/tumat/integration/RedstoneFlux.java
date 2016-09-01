@@ -29,12 +29,12 @@ public class RedstoneFlux implements IWorldRenderer{
             }
         }
         if(tileEntity instanceof IEnergyHandler){
-            NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
+            //NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
             try{
                 int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
                 int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
                 if(max > 0){
-                    component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max));
+                    component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max + "RF"));
                 }
             } catch(Exception e){
                 e.printStackTrace();
