@@ -81,6 +81,19 @@ public class TUMAT{
         if(Loader.isModLoaded("tconstruct")){
             Vanilla.isTinkersConstructLoaded = true;
         }
+        //TODO
+        /*
+        if(Loader.isModLoaded("reborncore")){
+            TUMATApi.registerRenderComponent(RebornCore.class);
+        }
+        if(Loader.isModLoaded("techreborn")){
+
+        }
+        */
+        if(Loader.isModLoaded("IC2") || Loader.isModLoaded("reborncore")){
+            logger.info("[Integration] Loading IndustrialCraft 2 integration");
+            TUMATApi.registerRenderComponent(IndustrialCraft2.class);
+        }
     }
 
     @SideOnly(Side.CLIENT)

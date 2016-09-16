@@ -20,8 +20,10 @@ public class TextComponent implements IComponentRender{
     }
 
     public TextComponent setFormat(TextFormatting... formatting){
-        for(TextFormatting format : formatting){
-            this.displayString = format.toString() + this.displayString;
+        if(formatting != null){
+            for(TextFormatting format : formatting){
+                this.displayString = format.toString() + this.displayString;
+            }
         }
         return this;
     }
