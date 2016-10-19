@@ -1,0 +1,4 @@
+ideas:
+    -cooling for tcon smelting
+    -show how many slots are used in a IInventory
+    -transparent background layer

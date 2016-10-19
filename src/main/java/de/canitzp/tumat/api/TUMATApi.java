@@ -1,8 +1,6 @@
 package de.canitzp.tumat.api;
 
-import de.canitzp.tumat.integration.Tesla;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -15,8 +13,8 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class TUMATApi{
 
-    private static List<IWorldRenderer> registeredComponents = new ArrayList<>();
     public static List<Class<? extends GuiScreen>> allowedGuis = new ArrayList<>();
+    private static List<IWorldRenderer> registeredComponents = new ArrayList<>();
 
     @SafeVarargs
     public static void registerRenderComponent(Class<? extends IWorldRenderer>... components){

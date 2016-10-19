@@ -33,4 +33,9 @@ public class TextComponent implements IComponentRender{
         TooltipComponent.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, color);
     }
 
+    @Override
+    public int getLength(FontRenderer fontRenderer){
+        return fontRenderer.getStringWidth(this.displayString);
+    }
+
 }

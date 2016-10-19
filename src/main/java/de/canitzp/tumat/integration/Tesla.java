@@ -37,7 +37,7 @@ public class Tesla implements IWorldRenderer{
                 component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA + TeslaUtils.getDisplayableTeslaCount(currentEnergy) + "/" + TeslaUtils.getDisplayableTeslaCount(capacity)));
             }
         } else {
-            for (EnumFacing facing : EnumFacing.values()){
+            for(EnumFacing facing : EnumFacing.values()){
                 if(facing != side){
                     if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, facing)){
                         component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA + "Found Tesla holder at side " + StringUtils.capitalize(facing.getName())));

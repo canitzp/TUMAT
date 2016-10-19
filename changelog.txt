@@ -1,0 +1,18 @@
+1.4.0:
+    -Added Chisels&Bits integration
+    -Fixed IC2 Block names
+    -Added 'Needs Wrench' to IC2 machines
+    -Added 'ForgeUnit' integration
+    -Rearranged Energy text
+    -Added Light level to the tooltip (Needs config special abilities)
+    -Double plants are now show the correct name
+    -Rewrote the GuiTUMAT and moved the open button to the ESC Menu
+    -Fixed some '<ERROR>' messages if a mod does not override vanilla blocks correct
+    -Added a minimum forge version
+
+
+    -API:
+        -Added getLength(FontRenderer) to the IComponentRender interface
+        -Reformat code
+        -Moved Harvestability to it's own class
+        -Moved EventsTUMAT to it's own class and used @EventBusSubscriber

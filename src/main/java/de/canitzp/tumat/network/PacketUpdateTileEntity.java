@@ -7,8 +7,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -25,7 +23,8 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
     private BlockPos pos;
     private String[] nbtKeys;
 
-    public PacketUpdateTileEntity(){}
+    public PacketUpdateTileEntity(){
+    }
 
     public PacketUpdateTileEntity(BlockPos pos, String... nbtKeys){
         this.pos = pos;
@@ -45,16 +44,6 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        PacketBuffer buffer = new PacketBuffer(buf);
-        buffer.writeBlockPos(this.pos);
-        buffer.writeInt(this.nbtKeys.length);
-        for(String s : this.nbtKeys){
-            buffer.writeString(s);
-        }
-    }
-
-    @Override
     public IMessage onMessage(PacketUpdateTileEntity message, MessageContext ctx){
         if(message.pos != null){
             World world = ctx.getServerHandler().playerEntity.getEntityWorld();
@@ -71,6 +60,14 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
             }
         }
         return null;
+    }    @Override
+    public void toBytes(ByteBuf buf){
+        PacketBuffer buffer = new PacketBuffer(buf);
+        buffer.writeBlockPos(this.pos);
+        buffer.writeInt(this.nbtKeys.length);
+        for(String s : this.nbtKeys){
+            buffer.writeString(s);
+        }
     }
 
     public static class PacketTileEntityToClient implements IMessage, IMessageHandler<PacketTileEntityToClient, IMessage>{
@@ -78,7 +75,8 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
         private BlockPos pos;
         private NBTTagCompound nbt;
 
-        public PacketTileEntityToClient(){}
+        public PacketTileEntityToClient(){
+        }
 
         public PacketTileEntityToClient(BlockPos pos, NBTTagCompound nbt){
             this.pos = pos;
@@ -106,19 +104,18 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketTileEntityToClient message, MessageContext ctx){
-            Minecraft.getMinecraft().addScheduledTask(new Runnable(){
-                @Override
-                public void run(){
-                    World world = Minecraft.getMinecraft().theWorld;
-                    TileEntity tileEntity = world.getTileEntity(message.pos);
-                    if(tileEntity != null){
-                        NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());
-                        oldNBT.merge(message.nbt);
-                        tileEntity.readFromNBT(oldNBT);
-                    }
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                World world = Minecraft.getMinecraft().theWorld;
+                TileEntity tileEntity = world.getTileEntity(message.pos);
+                if(tileEntity != null){
+                    NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());
+                    oldNBT.merge(message.nbt);
+                    tileEntity.readFromNBT(oldNBT);
                 }
             });
             return null;
         }
     }
+
+
 }

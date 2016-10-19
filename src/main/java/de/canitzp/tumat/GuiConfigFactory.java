@@ -13,9 +13,11 @@ import java.util.Set;
 /**
  * @author canitzp
  */
+@SuppressWarnings("deprecation")
 public class GuiConfigFactory implements IModGuiFactory{
     @Override
-    public void initialize(Minecraft minecraftInstance){}
+    public void initialize(Minecraft minecraftInstance){
+    }
 
     @Override
     public Class<? extends GuiScreen> mainConfigGuiClass(){
@@ -36,6 +38,7 @@ public class GuiConfigFactory implements IModGuiFactory{
         public GuiConfig(GuiScreen parentScreen){
             super(parentScreen, getConfigElements(), TUMAT.MODID, false, false, TUMAT.MODNAME);
         }
+
         private static List<IConfigElement> getConfigElements(){
             List<IConfigElement> list = new ArrayList<>();
             for(String catName : Config.config.getCategoryNames()){

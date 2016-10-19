@@ -1,9 +1,8 @@
 package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.ReMapper;
-import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.TextComponent;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -12,13 +11,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.tuple.Triple;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author canitzp
  */
-public class InfoUtil {
+public class InfoUtil{
 
     private static String getNameFromStack(ItemStack stack){
         return getName(stack, RenderOverlay.remaped).getLeft();
@@ -61,7 +61,6 @@ public class InfoUtil {
             try{
                 stack.getItem().addInformation(stack, Minecraft.getMinecraft().thePlayer, tooltip, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
             } catch(Exception ignore){
-
             }
             if(!tooltip.isEmpty()){
                 strings = tooltip.toArray(new String[]{});
@@ -74,8 +73,12 @@ public class InfoUtil {
     }
 
     public static String getModNameFromBlock(Block block){
-        if(block != null){
-            return RenderOverlay.modNameFormat + RenderOverlay.getModName(block.getRegistryName().getResourceDomain());
+        if(block != null && block.getRegistryName() != null){
+            try{
+                return RenderOverlay.modNameFormat + RenderOverlay.getModName(block.getRegistryName().getResourceDomain());
+            } catch(NullPointerException e){
+                return "An Error occurred while rendering " + block.toString();
+            }
         }
         return "<Unknown>";
     }
@@ -88,10 +91,10 @@ public class InfoUtil {
         return modName != null ? RenderOverlay.modNameFormat + modName : null;
     }
 
-    public static String getModName(Entity entity) {
+    public static String getModName(Entity entity){
         String entityName = EntityList.getEntityString(entity);
         String[] array = entityName.split("\\.");
-        if (array.length >= 2) {
+        if(array.length >= 2){
             entityName = RenderOverlay.getModName(array[0]);
         } else {
             entityName = "Minecraft";
@@ -102,12 +105,14 @@ public class InfoUtil {
     public static Triple<String, String, String[]> getName(ItemStack stack, ReMapper<ItemStack, String, String, String[]> remapper){
         for(ItemStack s : remapper.getKeys()){
             if(ItemStack.areItemsEqual(s, stack)){
-                return  remapper.getValue(s);
+                return remapper.getValue(s);
             }
         }
         return Triple.of(null, null, null);
     }
 
-
+    public static boolean hasProperty(IBlockState state, IProperty<?> property){
+        return state.getProperties().get(property) != null;
+    }
 
 }

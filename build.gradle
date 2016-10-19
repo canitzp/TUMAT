@@ -17,12 +17,12 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.3.0"
+version = "1.4.0"
 group= "de.canizp.tumat"
 archivesBaseName = "tumat"
 
 minecraft {
-    version = "1.10.2-12.18.1.2076"
+    version = "1.10.2-12.18.2.2097"
     runDir = "run"
     mappings = "snapshot_20160909"
     replaceIn "TUMAT.java"
@@ -40,13 +40,26 @@ repositories {
         name = "Modmuss50"
         url = "http://maven.modmuss50.me/"
     }
+    maven {
+        name 'DVS1 Maven FS'
+        url 'http://dvs1.progwml6.com/files/maven'
+    }
+    maven {
+        name = "ic2"
+        url = "http://maven.ic2.player.to/"
+    }
 }
 
 dependencies {
-    deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.49:deobf"
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r62:dev"
-    deobfCompile "RebornCore:RebornCore-1.10.2:+:dev"
-    deobfCompile "TechReborn:TechReborn-1.10.2:+:dev"
+    deobfCompile "net.darkhax.tesla:Tesla:+:deobf"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:+"
+    //deobfCompile "RebornCore:RebornCore-1.10.2:+:universal"
+    //deobfCompile "TechReborn:TechReborn-1.10.2:+:universal"
+    deobfCompile "slimeknights.mantle:Mantle:1.10.2-1.+"
+    deobfCompile "slimeknights:TConstruct:1.10.2-2.+"
+    compile 'net.industrial-craft:industrialcraft-2:2.6.58-ex110:api'
+    deobfCompile 'mod.chiselsandbits:chiselsandbits:+'
+    compile fileTree("/run/mods/")
 }
 
 processResources

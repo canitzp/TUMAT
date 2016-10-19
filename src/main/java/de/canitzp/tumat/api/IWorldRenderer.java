@@ -5,16 +5,13 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * @author canitzp
@@ -46,8 +43,11 @@ public interface IWorldRenderer{
         return component;
     }
 
-    default void remap(ReMapper<ItemStack, String, String, String[]> reMapper){}
+    default void remap(ReMapper<ItemStack, String, String, String[]> reMapper){
+    }
 
-    default boolean shouldBeActive(){return true;}
+    default boolean shouldBeActive(){
+        return true;
+    }
 
 }

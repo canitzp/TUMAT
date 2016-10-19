@@ -23,4 +23,9 @@ public class EnergyComponent implements IComponentRender{
     public void render(FontRenderer fontRenderer, int x, int y, int color){
         this.text.render(fontRenderer, x, y, color);
     }
+
+    @Override
+    public int getLength(FontRenderer fontRenderer){
+        return this.text.getLength(fontRenderer);
+    }
 }

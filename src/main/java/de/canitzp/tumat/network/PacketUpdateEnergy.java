@@ -44,13 +44,6 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        PacketBuffer buffer = new PacketBuffer(buf);
-        buffer.writeBlockPos(this.tilePos);
-        buffer.writeInt(this.side.ordinal());
-    }
-
-    @Override
     public IMessage onMessage(PacketUpdateEnergy message, MessageContext ctx){
         World world = ctx.getServerHandler().playerEntity.worldObj;
         TileEntity tile = world.getTileEntity(message.tilePos);
@@ -75,6 +68,11 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
             }
         }
         return null;
+    }    @Override
+    public void toBytes(ByteBuf buf){
+        PacketBuffer buffer = new PacketBuffer(buf);
+        buffer.writeBlockPos(this.tilePos);
+        buffer.writeInt(this.side.ordinal());
     }
 
     public static class PacketUpdateEnergyClient implements IMessage, IMessageHandler<PacketUpdateEnergyClient, IMessage>{
@@ -111,35 +109,34 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketUpdateEnergyClient message, MessageContext ctx){
-            Minecraft.getMinecraft().addScheduledTask(new Runnable(){
-                @Override
-                public void run(){
-                    World world = Minecraft.getMinecraft().theWorld;
-                    TileEntity tile = world.getTileEntity(message.tilePos);
-                    if(tile != null){
-                        if(Loader.isModLoaded("tesla")){
-                            long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
-                            if(toStore >= 0){
-                                TeslaUtils.givePower(tile, message.side, toStore, false);
-                            } else {
-                                TeslaUtils.takePower(tile, message.side, toStore, false);
-                            }
-
-
-                            /*
-                            if(tile.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side)){
-                                tile.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side).givePower(message.energy, false);
-                            }*/
-
-                        } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                            NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
-                            old.setInteger("Energy", (int) message.energy);
-                            tile.readFromNBT(old);
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                World world = Minecraft.getMinecraft().theWorld;
+                TileEntity tile = world.getTileEntity(message.tilePos);
+                if(tile != null){
+                    if(Loader.isModLoaded("tesla")){
+                        long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
+                        if(toStore >= 0){
+                            TeslaUtils.givePower(tile, message.side, toStore, false);
+                        } else {
+                            TeslaUtils.takePower(tile, message.side, toStore, false);
                         }
+
+
+                        /*
+                        if(tile.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side)){
+                            tile.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side).givePower(message.energy, false);
+                        }*/
+
+                    } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
+                        NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
+                        old.setInteger("Energy", (int) message.energy);
+                        tile.readFromNBT(old);
                     }
                 }
             });
             return null;
         }
     }
+
+
 }

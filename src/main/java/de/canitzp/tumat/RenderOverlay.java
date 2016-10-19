@@ -11,11 +11,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -27,18 +25,16 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author canitzp
@@ -46,13 +42,13 @@ import java.util.*;
 @SideOnly(Side.CLIENT)
 public class RenderOverlay{
 
-    private static RayTraceResult savedTrace;
-    private static Map<String, ModContainer> modMap;
     public static String modNameFormat;
     //                Block/Item,       Name,   ModName, block/item desc
     public static ReMapper<ItemStack, String, String, String[]> remaped;
+    private static RayTraceResult savedTrace;
+    private static Map<String, ModContainer> modMap;
 
-    static {
+    static{
         modMap = Loader.instance().getIndexedModList();
         modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
         ReMapper<ItemStack, String, String, String[]> reMapper = new ReMapper<>();
@@ -73,7 +69,7 @@ public class RenderOverlay{
             trace = savedTrace;
         }
         if(trace != null){
-            List<TooltipComponent> componentsForRendering = new ArrayList<TooltipComponent>();
+            List<TooltipComponent> componentsForRendering = new ArrayList<>();
             switch(trace.typeOfHit){
                 case BLOCK:{
                     addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
@@ -122,7 +118,7 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + " * " + ((EntityItem) entity).getEntityItem().stackSize));
+            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().stackSize));
             String[] desc = InfoUtil.getDescription(((EntityItem) entity).getEntityItem());
             if(desc != null){
                 for(String s : desc){
@@ -203,13 +199,13 @@ public class RenderOverlay{
     private static RayTraceResult createRayTraceForDistance(World world, EntityPlayer player, double maxDistance, float partialTicks){
         Entity pointedEntity;
         RayTraceResult traceResult = null;
-        if (player != null){
-            if (world != null){
+        if(player != null){
+            if(world != null){
                 traceResult = player.rayTrace(maxDistance, partialTicks);
                 Vec3d eyeVec = player.getPositionEyes(partialTicks);
                 double currentDistance = maxDistance;
 
-                if (traceResult != null){
+                if(traceResult != null){
                     currentDistance = traceResult.hitVec.distanceTo(eyeVec);
                 }
 
@@ -217,9 +213,7 @@ public class RenderOverlay{
                 Vec3d lookingEyeVec = eyeVec.addVector(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance);
                 pointedEntity = null;
                 Vec3d calcVec = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> {
-                    return entity != null && !(entity instanceof EntityItem) || Config.showEntityItems;
-                });
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || Config.showEntityItems);
                 double d2 = currentDistance;
 
                 for(Entity entity : list){
@@ -249,7 +243,7 @@ public class RenderOverlay{
                         }
                     }
                 }
-                if (pointedEntity != null && (d2 < currentDistance || traceResult == null)){
+                if(pointedEntity != null && (d2 < currentDistance || traceResult == null)){
                     traceResult = new RayTraceResult(pointedEntity, calcVec);
                 }
             }

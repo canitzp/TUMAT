@@ -1,6 +1,5 @@
 package de.canitzp.tumat.integration;
 
-import cofh.api.energy.IEnergyHandler;
 import de.canitzp.tumat.Config;
 import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.api.IWorldRenderer;
@@ -12,15 +11,16 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.energy.CapabilityEnergy;
 
 /**
  * @author canitzp
  */
-public class RedstoneFlux implements IWorldRenderer{
+public class ForgeUnits implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        if(TUMAT.Energy.mainEnergy.equals(TUMAT.Energy.TESLA)){
+        if(TUMAT.Energy.TESLA.isActive){
             if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_PRODUCER, side)){
                 return component;
             }
@@ -30,18 +30,20 @@ public class RedstoneFlux implements IWorldRenderer{
                 return component;
             }
         }
-        if(tileEntity instanceof IEnergyHandler){
-            //NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
-            try{
-                int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
-                int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
-                if(max > 0){
-                    component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max + "RF"));
-                }
-            } catch(Exception e){
-                e.printStackTrace();
+        if(TUMAT.Energy.RF.isActive){
+            if(tileEntity instanceof cofh.api.energy.IEnergyHandler){
+                return component;
             }
         }
+
+        if(tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)){
+            int energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side).getEnergyStored();
+            int cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, side).getMaxEnergyStored();
+            if(cap > 0){
+                component.addOneLineRenderer(new TextComponent(energy + " ForgeUnits /" + cap + " ForgeUnits").setFormat(TextFormatting.RED));
+            }
+        }
+
         return component;
     }
 

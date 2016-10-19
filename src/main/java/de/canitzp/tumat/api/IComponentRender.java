@@ -12,4 +12,6 @@ public interface IComponentRender{
     @SideOnly(Side.CLIENT)
     void render(FontRenderer fontRenderer, int x, int y, int color);
 
+    int getLength(FontRenderer fontRenderer);
+
 }

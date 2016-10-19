@@ -1,24 +1,18 @@
 package de.canitzp.tumat.api;
 
-import de.canitzp.tumat.RenderOverlay;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketUpdateTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author canitzp
@@ -27,11 +21,17 @@ public class TooltipComponent{
 
     private List<List<IComponentRender>> objects = new ArrayList<>();
     private List<IComponentRender> currentObjects = new ArrayList<>();
+    private int length = 0;
 
     private TextComponent modName;
 
     private TooltipComponent addRenderer(IComponentRender render){
-        this.currentObjects.add(render);
+        if(render != null){
+            if(this.length < render.getLength(Minecraft.getMinecraft().fontRendererObj)){
+                this.length = render.getLength(Minecraft.getMinecraft().fontRendererObj);
+            }
+            this.currentObjects.add(render);
+        }
         return this;
     }
 
@@ -68,6 +68,15 @@ public class TooltipComponent{
         return this;
     }
 
+    public int getLength(){
+        return this.length;
+    }
+
+    public TooltipComponent setFirst(List<IComponentRender> components){
+        this.objects.set(0, components);
+        return this;
+    }
+
     /**
      * Renders the specified text to the screen, center-aligned. Args : renderer, string, x, y, color
      */
@@ -82,7 +91,7 @@ public class TooltipComponent{
         String defaultName = entity.getName();
         if(defaultName.endsWith(".name")){
             String[] array = defaultName.split("\\.");
-            defaultName = StringUtils.capitalize(array[array.length-2]);
+            defaultName = StringUtils.capitalize(array[array.length - 2]);
         }
         return defaultName;
     }
@@ -98,12 +107,9 @@ public class TooltipComponent{
         String s1 = ")";
 
         int i = Item.getIdFromItem(stack.getItem());
-        if (stack.getHasSubtypes())
-        {
+        if(stack.getHasSubtypes()){
             s = s + String.format("#%04d/%d%s", i, stack.getItemDamage(), s1);
-        }
-        else
-        {
+        } else {
             s = s + String.format("#%04d%s", i, s1);
         }
         return s;
