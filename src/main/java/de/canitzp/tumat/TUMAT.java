@@ -68,9 +68,13 @@ public class TUMAT{
             Energy.set(Energy.RF);
             TUMATApi.registerRenderComponent(RedstoneFlux.class);
         }
-        if(Loader.isModLoaded("IC2") || isClassLoaded("ic2/api/tile/IEnergyStorage")){
-            logger.info("[Integration] Loading IndustrialCraft 2 integration");
+        if(isClassLoaded("ic2/api/tile/IEnergyStorage")){
+            logger.info("[Integration] Loading ElectricalUnit integration");
             Energy.set(Energy.EU);
+            TUMATApi.registerRenderComponent(ElectricalUnits.class);
+        }
+        if(Loader.isModLoaded("IC2")){
+            logger.info("[Integration] Loading IndustrialCraft 2 integration");
             TUMATApi.registerRenderComponent(IndustrialCraft2.class);
         }
 
@@ -96,8 +100,7 @@ public class TUMAT{
         try{
             Class.forName(className.replace("/", "."));
             return true;
-        } catch(ClassNotFoundException e){
-        }
+        } catch(ClassNotFoundException ignored){}
         return false;
     }
 

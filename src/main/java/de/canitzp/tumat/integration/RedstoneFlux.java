@@ -20,17 +20,15 @@ public class RedstoneFlux implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        if(TUMAT.Energy.mainEnergy.equals(TUMAT.Energy.TESLA)){
+        if(TUMAT.Energy.TESLA.isActive){
             if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_PRODUCER, side)){
                 return component;
             }
-        }
-        if(TUMAT.Energy.EU.isActive){
+        } else if(TUMAT.Energy.EU.isActive){
             if(tileEntity instanceof ic2.api.tile.IEnergyStorage){
                 return component;
             }
-        }
-        if(tileEntity instanceof IEnergyHandler){
+        } else if(tileEntity instanceof IEnergyHandler){
             //NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
             try{
                 int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);

@@ -14,21 +14,25 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 /**
  * @author canitzp
  */
+@SuppressWarnings("ConstantConditions")
 public class FluidHandler implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)){
             IFluidHandler handler = tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
-            IFluidTankProperties[] props = handler.getTankProperties();
-            if(props != null){
-                for(IFluidTankProperties tank : props){
-                    if(tank != null && tank.getContents() != null){
-                        component.addOneLineRenderer(new TextComponent(tank.getContents().amount + "mB/" + tank.getCapacity() + "mB " + tank.getContents().getLocalizedName()));
+            if(handler != null){
+                IFluidTankProperties[] props = handler.getTankProperties();
+                if(props != null){
+                    for(IFluidTankProperties tank : props){
+                        if(tank != null && tank.getContents() != null){
+                            component.addOneLineRenderer(new TextComponent(tank.getContents().amount + "mB / " + tank.getCapacity() + "mB " + tank.getContents().getLocalizedName()));
+                        }
                     }
                 }
             }
         }
         return component;
     }
+
 }

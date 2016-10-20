@@ -40,7 +40,7 @@ public class ForgeUnits implements IWorldRenderer{
             int energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side).getEnergyStored();
             int cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, side).getMaxEnergyStored();
             if(cap > 0){
-                component.addOneLineRenderer(new TextComponent(energy + " ForgeUnits /" + cap + " ForgeUnits").setFormat(TextFormatting.RED));
+                component.addOneLineRenderer(new TextComponent(energy + " ForgeUnits / " + cap + " ForgeUnits").setFormat(TextFormatting.RED));
             }
         }
 
