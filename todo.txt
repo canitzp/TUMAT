@@ -2,3 +2,4 @@ ideas:
     -cooling for tcon smelting
     -show how many slots are used in a IInventory
     -transparent background layer
+    -ctrl pressing in a inventory shows the slot id's

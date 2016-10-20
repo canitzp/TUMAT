@@ -17,14 +17,14 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.4.0"
+version = "1.4.1"
 group= "de.canizp.tumat"
 archivesBaseName = "tumat"
 
 minecraft {
-    version = "1.10.2-12.18.2.2097"
+    version = "1.10.2-12.18.2.2099"
     runDir = "run"
-    mappings = "snapshot_20160909"
+    mappings = "snapshot_20161020"
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
 }
@@ -52,11 +52,9 @@ repositories {
 
 dependencies {
     deobfCompile "net.darkhax.tesla:Tesla:+:deobf"
-    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:+"
-    //deobfCompile "RebornCore:RebornCore-1.10.2:+:universal"
-    //deobfCompile "TechReborn:TechReborn-1.10.2:+:universal"
-    deobfCompile "slimeknights.mantle:Mantle:1.10.2-1.+"
-    deobfCompile "slimeknights:TConstruct:1.10.2-2.+"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r67"
+    deobfCompile "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
+    deobfCompile "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
     compile 'net.industrial-craft:industrialcraft-2:2.6.58-ex110:api'
     deobfCompile 'mod.chiselsandbits:chiselsandbits:+'
     compile fileTree("/run/mods/")

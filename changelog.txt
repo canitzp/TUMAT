@@ -1,3 +1,6 @@
+1.4.1:
+    -Fixed IC2 integration if tech reborn is present without ic2
+
 1.4.0:
     -Added Chisels&Bits integration
     -Fixed IC2 Block names

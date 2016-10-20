@@ -8,3 +8,6 @@
 /.gradle/
 /TUMAT.iml
 /out/
+java_pid8366.hprof
+src/api/
+src/test/
