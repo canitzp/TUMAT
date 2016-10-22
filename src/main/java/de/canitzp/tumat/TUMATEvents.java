@@ -7,6 +7,7 @@ import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextFormatting;
@@ -15,6 +16,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -50,14 +53,16 @@ public class TUMATEvents{
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEvent(ItemTooltipEvent event){
-        String s = InfoUtil.getItemName(event.getItemStack());
-        if(s != null){
-            event.getToolTip().clear();
-            event.getToolTip().add(s + (Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? TextFormatting.RESET + TooltipComponent.getAdvancedName(event.getItemStack()) : ""));
-            String[] desc = InfoUtil.getDescription(event.getItemStack());
-            if(desc != null){
-                for(String desc1 : desc){
-                    event.getToolTip().add(TextFormatting.GRAY + desc1);
+        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
+            String s = InfoUtil.getItemName(event.getItemStack());
+            if(s != null){
+                event.getToolTip().clear();
+                event.getToolTip().add(s + (Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? TextFormatting.RESET + TooltipComponent.getAdvancedName(event.getItemStack()) : ""));
+                String[] desc = InfoUtil.getDescription(event.getItemStack());
+                if(desc != null){
+                    for(String desc1 : desc){
+                        event.getToolTip().add(TextFormatting.GRAY + desc1);
+                    }
                 }
             }
         }
@@ -66,11 +71,13 @@ public class TUMATEvents{
     @SubscribeEvent(priority = EventPriority.LOWEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEventModName(ItemTooltipEvent event){
-        String s = InfoUtil.getModName(event.getItemStack());
-        if(s == null){
-            s = RenderOverlay.getModName(event.getItemStack().getItem().getRegistryName().getResourceDomain());
+        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
+            String s = InfoUtil.getModName(event.getItemStack());
+            if(s == null){
+                s = RenderOverlay.getModName(event.getItemStack().getItem().getRegistryName().getResourceDomain());
+            }
+            event.getToolTip().add(RenderOverlay.modNameFormat + s);
         }
-        event.getToolTip().add(RenderOverlay.modNameFormat + s);
     }
 
     @SideOnly(Side.SERVER)
@@ -115,7 +122,7 @@ public class TUMATEvents{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void buttonPressInventory(GuiScreenEvent.ActionPerformedEvent event){
-        if(event.getGui().getClass().equals(GuiIngameMenu.class)){
+        if(event.getGui().getClass().equals(GuiOptions.class)){
             if(event.getButton().id == 963){
                 Minecraft.getMinecraft().displayGuiScreen(new GuiTUMAT());
             }

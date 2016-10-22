@@ -9,6 +9,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
@@ -19,6 +21,13 @@ import java.util.List;
  * @author canitzp
  */
 public class InfoUtil{
+
+    private static Triple<String, String, String[]> getName(ItemStack stack){
+        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
+            return getName(stack, RenderOverlay.remaped);
+        }
+        return Triple.of(null, null, null);
+    }
 
     private static String getNameFromStack(ItemStack stack){
         return getName(stack, RenderOverlay.remaped).getLeft();

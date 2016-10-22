@@ -42,21 +42,18 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class RenderOverlay{
 
-    public static String modNameFormat;
+    public static String modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
     //                Block/Item,       Name,   ModName, block/item desc
-    public static ReMapper<ItemStack, String, String, String[]> remaped;
+    public static ReMapper<ItemStack, String, String, String[]> remaped = new ReMapper<>();
     private static RayTraceResult savedTrace;
     private static Map<String, ModContainer> modMap;
 
     static{
         modMap = Loader.instance().getIndexedModList();
-        modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
-        ReMapper<ItemStack, String, String, String[]> reMapper = new ReMapper<>();
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-            renderer.remap(reMapper);
+            renderer.remap(remaped);
         }
-        new JsonReader(new File(Config.config.getConfigFile().getParentFile() + File.separator + "tumat_rename.json")).data.remap(reMapper);
-        remaped = reMapper;
+        new JsonReader(new File(Config.config.getConfigFile().getParentFile() + File.separator + "tumat_rename.json")).data.remap(remaped);
     }
 
     public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){

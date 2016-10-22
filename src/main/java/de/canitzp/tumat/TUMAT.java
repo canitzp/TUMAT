@@ -20,12 +20,13 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author canitzp
  */
-@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.GuiConfigFactory")
+@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.GuiConfigFactory", dependencies = TUMAT.DEPENDENCIES)
 public class TUMAT{
 
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
+    public static final String DEPENDENCIES = "required-before:HardcoreQuesting;";
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
