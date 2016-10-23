@@ -104,13 +104,17 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketTileEntityToClient message, MessageContext ctx){
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                World world = Minecraft.getMinecraft().theWorld;
-                TileEntity tileEntity = world.getTileEntity(message.pos);
-                if(tileEntity != null){
-                    NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());
-                    oldNBT.merge(message.nbt);
-                    tileEntity.readFromNBT(oldNBT);
+            Minecraft.getMinecraft().addScheduledTask(new Runnable(){
+                @SideOnly(Side.CLIENT)
+                @Override
+                public void run(){
+                    World world = Minecraft.getMinecraft().theWorld;
+                    TileEntity tileEntity = world.getTileEntity(message.pos);
+                    if(tileEntity != null){
+                        NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());
+                        oldNBT.merge(message.nbt);
+                        tileEntity.readFromNBT(oldNBT);
+                    }
                 }
             });
             return null;

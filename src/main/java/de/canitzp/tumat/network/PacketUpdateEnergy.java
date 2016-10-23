@@ -109,34 +109,30 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PacketUpdateEnergyClient message, MessageContext ctx){
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                World world = Minecraft.getMinecraft().theWorld;
-                TileEntity tile = world.getTileEntity(message.tilePos);
-                if(tile != null){
-                    if(Loader.isModLoaded("tesla")){
-                        long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
-                        if(toStore >= 0){
-                            TeslaUtils.givePower(tile, message.side, toStore, false);
-                        } else {
-                            TeslaUtils.takePower(tile, message.side, toStore, false);
+            Minecraft.getMinecraft().addScheduledTask(new Runnable(){
+                @SideOnly(Side.CLIENT)
+                @Override
+                public void run(){
+                    World world = Minecraft.getMinecraft().theWorld;
+                    TileEntity tile = world.getTileEntity(message.tilePos);
+                    if(tile != null){
+                        if(Loader.isModLoaded("tesla")){
+                            long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
+                            if(toStore >= 0){
+                                TeslaUtils.givePower(tile, message.side, toStore, false);
+                            } else {
+                                TeslaUtils.takePower(tile, message.side, toStore, false);
+                            }
+                        } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
+                            NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
+                            old.setInteger("Energy", (int) message.energy);
+                            tile.readFromNBT(old);
                         }
-
-
-                        /*
-                        if(tile.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side)){
-                            tile.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, message.side).givePower(message.energy, false);
-                        }*/
-
-                    } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                        NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
-                        old.setInteger("Energy", (int) message.energy);
-                        tile.readFromNBT(old);
                     }
                 }
             });
             return null;
         }
     }
-
 
 }

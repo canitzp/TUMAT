@@ -26,7 +26,7 @@ public class TUMAT{
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
-    public static final String DEPENDENCIES = "required-before:HardcoreQuesting;";
+    public static final String DEPENDENCIES = "before:HardcoreQuesting;";
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
