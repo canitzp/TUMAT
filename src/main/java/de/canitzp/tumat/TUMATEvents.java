@@ -5,11 +5,15 @@ import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiOptions;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Slot;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -22,8 +26,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
+
+import java.lang.reflect.Field;
 
 /**
  * @author canitzp
@@ -50,7 +58,7 @@ public class TUMATEvents{
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    //@SubscribeEvent(priority = EventPriority.HIGHEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEvent(ItemTooltipEvent event){
         if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
@@ -125,6 +133,28 @@ public class TUMATEvents{
         if(event.getGui().getClass().equals(GuiOptions.class)){
             if(event.getButton().id == 963){
                 Minecraft.getMinecraft().displayGuiScreen(new GuiTUMAT());
+            }
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @SubscribeEvent()
+    public static void renderGuiContainer(GuiScreenEvent.DrawScreenEvent.Post event){
+        if(event.getGui() instanceof GuiContainer){
+            if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)){
+                FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
+                GuiContainer gui = (GuiContainer) event.getGui();
+                int guiLeft = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 4)) - 1;
+                int guiTop = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 5)) - 1;
+                GlStateManager.pushAttrib();
+                GlStateManager.pushMatrix();
+                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                for(Slot slot : gui.inventorySlots.inventorySlots){
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                    renderer.drawString(String.valueOf(slot.getSlotIndex()), 2 * (slot.xDisplayPosition + guiLeft), 2 * (slot.yDisplayPosition + guiTop), 0xFFFFFF, false);
+                }
+                GlStateManager.popAttrib();
+                GlStateManager.popMatrix();
             }
         }
     }

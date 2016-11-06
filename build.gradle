@@ -57,7 +57,7 @@ dependencies {
     deobfCompile "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
     compile 'net.industrial-craft:industrialcraft-2:2.6.58-ex110:api'
     deobfCompile 'mod.chiselsandbits:chiselsandbits:+'
-    compile fileTree("/run/mods/")
+    compile fileTree("./run/mods/")
 }
 
 processResources

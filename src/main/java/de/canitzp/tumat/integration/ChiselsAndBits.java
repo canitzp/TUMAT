@@ -22,6 +22,7 @@ public class ChiselsAndBits implements IWorldRenderer{
         if(state.getBlock() instanceof IMultiStateBlock){
             component.clear();
             component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
+            component.addOneLineRenderer(new TextComponent("Base Block: " + InfoUtil.getBlockName(((IMultiStateBlock) state.getBlock()).getPrimaryState(world, pos))));
         }
         return component;
     }

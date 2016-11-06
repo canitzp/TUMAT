@@ -1,3 +1,12 @@
+1.5.0:
+    -Show more information at Chisel&Bits blocks
+    -Fixed RF is not displayed
+    -Added syncing for RF and EU
+    -Beetroots are now shoe their Growth status
+    -Fixed Light source only show if it stand on the ground
+    -Disabled complete description overwriting, mod names are still shown
+    -Pressing CTRL in a inventory shows up all slot numbers
+
 1.4.3:
     -Fixed hardcoded HQM dependency
     -Fixed server crash on startup

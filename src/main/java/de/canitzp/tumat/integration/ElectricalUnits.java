@@ -10,6 +10,7 @@ import ic2.api.tile.IWrenchable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +24,7 @@ public class ElectricalUnits implements IWorldRenderer{
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(Config.showEnergy && tileEntity instanceof IEnergyStorage){
+            TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
             int current = ((IEnergyStorage) tileEntity).getStored();
             int capacity = ((IEnergyStorage) tileEntity).getCapacity();
             if(capacity > 0){

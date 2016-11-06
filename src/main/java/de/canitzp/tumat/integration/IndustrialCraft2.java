@@ -17,6 +17,7 @@ import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -49,14 +50,21 @@ public class IndustrialCraft2 implements IWorldRenderer{
         }
         if(Config.showEnergy){
             if(tileEntity instanceof TileEntityBaseGenerator){
+                TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
                 Energy energy = ReflectionHelper.getPrivateValue(TileEntityBaseGenerator.class, (TileEntityBaseGenerator) tileEntity, "energy");
                 if(energy.getCapacity() > 0){
                     component.addOneLineRenderer(new EnergyComponent((int)energy.getEnergy(), (int)energy.getCapacity(), "EU"));
                 }
             } else if(tileEntity instanceof TileEntityElectricMachine){
+                TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
                 Energy energy = ReflectionHelper.getPrivateValue(TileEntityElectricMachine.class, (TileEntityElectricMachine) tileEntity, "energy");
-                if(energy.getCapacity() > 0){
-                    component.addOneLineRenderer(new EnergyComponent((int)energy.getEnergy(), (int)energy.getCapacity(), "EU"));
+                int stored = (int) energy.getEnergy();
+                int cap = (int) energy.getCapacity();
+                if(cap > 0){
+                    if(cap < stored){
+                        cap = stored;
+                    }
+                    component.addOneLineRenderer(new EnergyComponent(stored, cap, "EU"));
                 }
             }
         }

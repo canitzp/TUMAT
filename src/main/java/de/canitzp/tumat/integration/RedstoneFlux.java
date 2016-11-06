@@ -24,20 +24,24 @@ public class RedstoneFlux implements IWorldRenderer{
             if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_PRODUCER, side)){
                 return component;
             }
-        } else if(TUMAT.Energy.EU.isActive){
+        }
+        if(TUMAT.Energy.EU.isActive){
             if(tileEntity instanceof ic2.api.tile.IEnergyStorage){
                 return component;
             }
-        } else if(tileEntity instanceof IEnergyHandler){
-            //NetworkHandler.network.sendToServer(new PacketUpdateEnergy(tileEntity.getPos(), side));
-            try{
-                int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
-                int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
-                if(max > 0){
-                    component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max + "RF"));
+        }
+        if(TUMAT.Energy.RF.isActive) {
+            if (tileEntity instanceof IEnergyHandler) {
+                TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "Energy");
+                try {
+                    int stored = ((IEnergyHandler) tileEntity).getEnergyStored(side);
+                    int max = ((IEnergyHandler) tileEntity).getMaxEnergyStored(side);
+                    if (max > 0) {
+                        component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + stored + "/" + max + "RF"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch(Exception e){
-                e.printStackTrace();
             }
         }
         return component;
