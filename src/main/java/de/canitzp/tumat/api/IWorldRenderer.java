@@ -1,6 +1,7 @@
 package de.canitzp.tumat.api;
 
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -49,5 +50,9 @@ public interface IWorldRenderer{
     default boolean shouldBeActive(){
         return true;
     }
+
+    default int getGuiLeftOffset(GuiContainer gui){return 0;}
+
+    default int getGuiTopOffset(GuiContainer gui){return 0;}
 
 }

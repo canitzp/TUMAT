@@ -72,7 +72,20 @@ public class InfoUtil{
             } catch(Exception ignore){
             }
             if(!tooltip.isEmpty()){
-                strings = tooltip.toArray(new String[]{});
+                List<String> s = new ArrayList<>();
+                for(String s1 : tooltip){
+                    s.addAll(Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(s1, 200));
+                }
+                if(s.size() > 5){
+                    List<String> cached = new ArrayList<>();
+                    for(int i = 0; i <= 5; i++){
+                        cached.add(s.get(i));
+                    }
+                    cached.add("To many information to show.");
+                    s.clear();
+                    s.addAll(cached);
+                }
+                strings = s.toArray(new String[]{});
             }
         }
         if(strings != null && strings.length > 0){
@@ -102,9 +115,13 @@ public class InfoUtil{
 
     public static String getModName(Entity entity){
         String entityName = EntityList.getEntityString(entity);
-        String[] array = entityName.split("\\.");
-        if(array.length >= 2){
-            entityName = RenderOverlay.getModName(array[0]);
+        if(entityName != null){
+            String[] array = entityName.split("\\.");
+            if(array.length >= 2) {
+                entityName = RenderOverlay.getModName(array[0]);
+            } else {
+                entityName = "Minecraft";
+            }
         } else {
             entityName = "Minecraft";
         }

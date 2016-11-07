@@ -85,12 +85,16 @@ public class TUMAT{
         //More:
         TUMATApi.registerRenderComponent(Vanilla.class);
         if(Loader.isModLoaded("actuallyadditions")){
-            logger.info("[Integration] Loading ActuallyAdditions integration");
+            logger.info("[Integration] Loading Actually Additions integration");
             TUMATApi.registerRenderComponent(ActuallyAdditions.class);
         }
         if(Loader.isModLoaded("chiselsandbits")){
             logger.info("[Integration] Loading ChiselAndBits integration");
             TUMATApi.registerRenderComponent(ChiselsAndBits.class);
+        }
+        if(Loader.isModLoaded("tconstruct")){
+            logger.info("[Integration] Loading Tinkers Construct integration");
+            TUMATApi.registerRenderComponent(TinkersConstruct.class);
         }
 
         //Harvestability:

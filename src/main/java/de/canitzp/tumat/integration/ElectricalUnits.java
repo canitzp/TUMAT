@@ -28,7 +28,7 @@ public class ElectricalUnits implements IWorldRenderer{
             int current = ((IEnergyStorage) tileEntity).getStored();
             int capacity = ((IEnergyStorage) tileEntity).getCapacity();
             if(capacity > 0){
-                component.addOneLineRenderer(new EnergyComponent(current, capacity, "EU"));
+                component.addOneLineRenderer(new EnergyComponent(current, capacity, "EU", TextFormatting.YELLOW));
             }
         }
         return component;
@@ -38,7 +38,7 @@ public class ElectricalUnits implements IWorldRenderer{
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         IBlockState state = world.getBlockState(pos);
         if(Config.showHarvestTooltip && state.getBlock() instanceof IWrenchable){
-            component.addOneLineRenderer(new TextComponent(TextFormatting.RED + "Needs a Wrench"));
+            component.addOneLineRenderer(new TextComponent(TextFormatting.GOLD + "IC2 Wrenchable"));
         }
         return component;
     }

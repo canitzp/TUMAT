@@ -6,6 +6,10 @@
     -Fixed Light source only show if it stand on the ground
     -Disabled complete description overwriting, mod names are still shown
     -Pressing CTRL in a inventory shows up all slot numbers
+    -Fixed the error message if you look at a player
+    -Fixed offset '<Error>' message
+    -Fixed TUMAT Gui button doesn't work and moved it to the Options screen
+    -Changed color for some IC2 tooltips
 
 1.4.3:
     -Fixed hardcoded HQM dependency

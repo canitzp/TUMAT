@@ -13,7 +13,9 @@ import ic2.core.block.comp.Energy;
 import ic2.core.block.generator.tileentity.TileEntityBaseGenerator;
 import ic2.core.block.machine.tileentity.TileEntityElectricMachine;
 import ic2.core.init.Localization;
+import ic2.core.ref.MetaTeBlock;
 import net.darkhax.tesla.capability.TeslaCapabilities;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -21,6 +23,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 /**
@@ -33,8 +36,9 @@ public class IndustrialCraft2 implements IWorldRenderer{
         IBlockState state = world.getBlockState(pos);
         if(state.getBlock() instanceof BlockTileEntity){
             if(InfoUtil.hasProperty(state, ((BlockTileEntity) state.getBlock()).typeProperty)){
+                IProperty<MetaTeBlock> property = ((BlockTileEntity) state.getBlock()).typeProperty;
                 IBlockState actualState = state.getActualState(world, pos);
-                String unlocalized = "ic2.te." + ((BlockTileEntity) state.getBlock()).typeProperty.getName(actualState.getValue(((BlockTileEntity) state.getBlock()).typeProperty)).replace("_active", "");
+                String unlocalized = "ic2.te." + property.getName(actualState.getValue(property)).replace("_active", "");
                 component.setFirst(Lists.newArrayList(new TextComponent(Localization.translate(unlocalized))));
             }
         }
@@ -53,7 +57,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
                 Energy energy = ReflectionHelper.getPrivateValue(TileEntityBaseGenerator.class, (TileEntityBaseGenerator) tileEntity, "energy");
                 if(energy.getCapacity() > 0){
-                    component.addOneLineRenderer(new EnergyComponent((int)energy.getEnergy(), (int)energy.getCapacity(), "EU"));
+                    component.addOneLineRenderer(new EnergyComponent((int)energy.getEnergy(), (int)energy.getCapacity(), "EU", TextFormatting.YELLOW));
                 }
             } else if(tileEntity instanceof TileEntityElectricMachine){
                 TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
@@ -64,7 +68,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
                     if(cap < stored){
                         cap = stored;
                     }
-                    component.addOneLineRenderer(new EnergyComponent(stored, cap, "EU"));
+                    component.addOneLineRenderer(new EnergyComponent(stored, cap, "EU", TextFormatting.YELLOW));
                 }
             }
         }

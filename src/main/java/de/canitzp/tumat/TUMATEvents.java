@@ -1,5 +1,6 @@
 package de.canitzp.tumat;
 
+import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.network.NetworkHandler;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
@@ -48,7 +50,7 @@ public class TUMATEvents{
                 try{
                     RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
-                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", event.getResolution().getScaledWidth() / 2 + GuiTUMAT.getXFromPercantage(Config.x), GuiTUMAT.getYFromPercantage(Config.y), 0xFFFFFF);
+                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(Config.x), GuiTUMAT.getYFromPercantage(Config.y), 0xFFFFFF);
                     if(mc.theWorld.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();
@@ -99,7 +101,6 @@ public class TUMATEvents{
         }
     }
 
-
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event){
@@ -121,7 +122,7 @@ public class TUMATEvents{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void openInventory(GuiScreenEvent.InitGuiEvent event){
-        if(event.getGui().getClass().equals(GuiIngameMenu.class)){
+        if(event.getGui().getClass().equals(GuiOptions.class)){
             String s = "TUMAT";
             event.getButtonList().add(new GuiButton(963, 0, 0, Minecraft.getMinecraft().fontRendererObj.getStringWidth(s) + 20, 20, s));
         }
@@ -137,6 +138,7 @@ public class TUMATEvents{
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @SuppressWarnings("ConstantConditions")
     @SubscribeEvent()
     public static void renderGuiContainer(GuiScreenEvent.DrawScreenEvent.Post event){
@@ -144,15 +146,35 @@ public class TUMATEvents{
             if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)){
                 FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
                 GuiContainer gui = (GuiContainer) event.getGui();
-                int guiLeft = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 4)) - 1;
-                int guiTop = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 5)) - 1;
+                int guiLeft = 0;
+                int guiTop = 0;
+                for(IWorldRenderer rend : TUMATApi.getRegisteredComponents()){
+                    int i = rend.getGuiLeftOffset(gui);
+                    if(i != 0){
+                        guiLeft = i;
+                    }
+                    int j = rend.getGuiTopOffset(gui);
+                    if(j != 0){
+                        guiTop = j;
+                    }
+                }
+                if(guiLeft == 0){
+                    guiLeft = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 4)) - 1;
+                }
+                if(guiTop == 0){
+                    guiTop = ((int)ReflectionHelper.getPrivateValue(GuiContainer.class, gui, 5)) - 1;
+                }
                 GlStateManager.pushAttrib();
                 GlStateManager.pushMatrix();
+                GlStateManager.disableBlend();
+                RenderHelper.disableStandardItemLighting();
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
                 for(Slot slot : gui.inventorySlots.inventorySlots){
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     renderer.drawString(String.valueOf(slot.getSlotIndex()), 2 * (slot.xDisplayPosition + guiLeft), 2 * (slot.yDisplayPosition + guiTop), 0xFFFFFF, false);
                 }
+                RenderHelper.enableStandardItemLighting();
+                GlStateManager.enableBlend();
                 GlStateManager.popAttrib();
                 GlStateManager.popMatrix();
             }
