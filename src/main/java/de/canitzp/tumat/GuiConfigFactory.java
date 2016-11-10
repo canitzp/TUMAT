@@ -1,5 +1,7 @@
 package de.canitzp.tumat;
 
+import de.canitzp.tumat.configuration.ConfigHandler;
+import de.canitzp.tumat.configuration.cats.ConfigCats;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
@@ -15,6 +17,7 @@ import java.util.Set;
  */
 @SuppressWarnings("deprecation")
 public class GuiConfigFactory implements IModGuiFactory{
+
     @Override
     public void initialize(Minecraft minecraftInstance){
     }
@@ -41,8 +44,10 @@ public class GuiConfigFactory implements IModGuiFactory{
 
         private static List<IConfigElement> getConfigElements(){
             List<IConfigElement> list = new ArrayList<>();
-            for(String catName : Config.config.getCategoryNames()){
-                list.addAll(new ConfigElement(Config.config.getCategory(catName)).getChildElements());
+            for(int i = 0; i < ConfigCats.values().length; i++){
+                ConfigCats cat = ConfigCats.values()[i];
+                ConfigHandler.config.setCategoryComment(cat.name, cat.desc);
+                list.add(new ConfigElement(ConfigHandler.config.getCategory(cat.name)));
             }
             return list;
         }

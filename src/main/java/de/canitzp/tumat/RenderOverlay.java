@@ -2,7 +2,6 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.*;
 import de.canitzp.tumat.api.components.TextComponent;
-import de.canitzp.tumat.json.JsonReader;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -53,7 +52,6 @@ public class RenderOverlay{
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
             renderer.remap(remaped);
         }
-        new JsonReader(new File(Config.config.getConfigFile().getParentFile() + File.separator + "tumat_rename.json")).data.remap(remaped);
     }
 
     public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){

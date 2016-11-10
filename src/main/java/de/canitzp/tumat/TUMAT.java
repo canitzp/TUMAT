@@ -1,6 +1,7 @@
 package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.integration.*;
 import de.canitzp.tumat.network.NetworkHandler;
 import net.minecraft.client.gui.GuiChat;
@@ -35,7 +36,10 @@ public class TUMAT{
     public void preInit(FMLPreInitializationEvent event){
         logger.info("[PreInit] Started " + MODNAME + " Version " + MODVERSION);
         logger.info("[PreInit] Load config");
-        Config.init(event);
+        //TODO
+        //Config.init(event);
+        ConfigHandler.preInit(event);
+
         NetworkHandler.init();
         if(event.getSide().isClient()){
             logger.info("[PreInit] Load client stuff");
