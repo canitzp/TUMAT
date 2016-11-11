@@ -56,7 +56,7 @@ public class GuiTUMAT extends GuiScreen{
         for(PutItHere directMover : this.directMove){
             directMover.render(this.mc.fontRendererObj);
         }
-        RenderOverlay.renderComponents(this.mc.fontRendererObj, new ScaledResolution(this.mc), this.width / 2 + getXFromPercantage(Config.x), getYFromPercantage(Config.y), Collections.singletonList(this.component));
+        RenderOverlay.renderComponents(this.mc.fontRendererObj, Collections.singletonList(this.component));
         this.mc.fontRendererObj.drawString("?", 2, 2, 0xFFFFFF);
         if(mouseX <= 7 && mouseY <= 11){
             this.drawHoveringText(helpHovering, mouseX + 2, mouseY + 18);
@@ -94,17 +94,6 @@ public class GuiTUMAT extends GuiScreen{
             }
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    public void initGui(){
-        super.initGui();
-        /*
-        int resetWidth = mc.fontRendererObj.getStringWidth("" +  mc.fontRendererObj.getStringWidth(GuiUtils.RESET_CHAR) * 2 + 20);
-        addButton(new GuiButton(0, this.width/2 - 40, this.height/2 - 10, 20, 20, "+"));
-        addButton(new GuiButton(1, this.width/2 + 20, this.height/2 - 10, 20, 20, "-"));
-        addButton(new GuiUnicodeGlyphButton(2, 0, 0, resetWidth, 20, "", GuiUtils.RESET_CHAR, 2.0F));
-        */
     }
 
     @Override

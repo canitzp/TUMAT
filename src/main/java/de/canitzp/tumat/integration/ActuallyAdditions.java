@@ -4,6 +4,7 @@ import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntityAtomicReconstructor;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntityCompost;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntityDisplayStand;
@@ -55,6 +56,6 @@ public class ActuallyAdditions implements IWorldRenderer{
 
     @Override
     public boolean shouldBeActive(){
-        return Config.showSpecialAbilities;
+        return ConfigBoolean.SHOW_SPECIAL_TILE_STATS.value;
     }
 }

@@ -2,6 +2,7 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.*;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -67,7 +68,9 @@ public class RenderOverlay{
             List<TooltipComponent> componentsForRendering = new ArrayList<>();
             switch(trace.typeOfHit){
                 case BLOCK:{
-                    addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
+                    if(ConfigBoolean.SHOW_BLOCKS.value){
+                        addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
+                    }
                     break;
                 }
                 case ENTITY:{
@@ -75,11 +78,13 @@ public class RenderOverlay{
                     break;
                 }
                 case MISS:{
-                    addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, calculate));
+                    if(ConfigBoolean.SHOW_FLUIDS.value){
+                        addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, calculate));
+                    }
                     break;
                 }
             }
-            renderComponents(fontRenderer, resolution, (resolution.getScaledWidth() / 2) + Math.round(Config.x), Math.round(Config.y), componentsForRendering);
+            renderComponents(fontRenderer, componentsForRendering);
         }
     }
 
@@ -98,7 +103,7 @@ public class RenderOverlay{
             TileEntity tile = world.getTileEntity(pos);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
-                    if(tile != null){
+                    if(ConfigBoolean.SHOW_TILES.value && tile != null){
                         renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
                     }
                     renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
@@ -112,7 +117,7 @@ public class RenderOverlay{
 
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
-        if(entity instanceof EntityItem){
+        if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
             component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().stackSize));
             String[] desc = InfoUtil.getDescription(((EntityItem) entity).getEntityItem());
             if(desc != null){
@@ -126,7 +131,7 @@ public class RenderOverlay{
                 }
             }
             component.setModName(InfoUtil.getModName(new ItemStack(((EntityItem) entity).getEntityItem().getItem(), 1, ((EntityItem) entity).getEntityItem().getItemDamage())));
-        } else if(entity instanceof EntityLivingBase){
+        } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -135,7 +140,7 @@ public class RenderOverlay{
                 }
             }
             component.setModName(InfoUtil.getModName(entity));
-        } else {
+        } else if(ConfigBoolean.SHOW_ENTITIES.value){
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
@@ -153,7 +158,7 @@ public class RenderOverlay{
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
                 component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
-                component.addOneLineRenderer(new TextComponent(modNameFormat + getModName(state.getBlock().getRegistryName().getResourceDomain())));
+                component.addOneLineRenderer(new TextComponent(modNameFormat + InfoUtil.getModNameFromBlock(state.getBlock())));
             }
         }
         for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -164,7 +169,7 @@ public class RenderOverlay{
         return component;
     }
 
-    public static void renderComponents(FontRenderer fontRenderer, ScaledResolution res, int x, int y, List<TooltipComponent> lines){
+    public static void renderComponents(FontRenderer fontRenderer, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
                 int y2 = GuiTUMAT.getYFromPercantage(Config.y);

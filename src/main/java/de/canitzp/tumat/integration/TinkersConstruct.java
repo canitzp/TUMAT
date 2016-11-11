@@ -3,6 +3,7 @@ package de.canitzp.tumat.integration;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -44,4 +45,8 @@ public class TinkersConstruct implements IWorldRenderer {
         return 0;
     }
 
+    @Override
+    public boolean shouldBeActive() {
+        return ConfigBoolean.SHOW_SPECIAL_TILE_STATS.value;
+    }
 }

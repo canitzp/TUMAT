@@ -3,6 +3,7 @@ package de.canitzp.tumat.integration;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
@@ -35,4 +36,8 @@ public class FluidHandler implements IWorldRenderer{
         return component;
     }
 
+    @Override
+    public boolean shouldBeActive() {
+        return ConfigBoolean.SHOW_FLUID_TANKS.value;
+    }
 }

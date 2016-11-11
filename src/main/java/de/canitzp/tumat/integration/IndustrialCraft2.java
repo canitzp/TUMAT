@@ -8,6 +8,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.EnergyComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import ic2.core.block.BlockTileEntity;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.generator.tileentity.TileEntityBaseGenerator;
@@ -52,7 +53,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 return component;
             }
         }
-        if(Config.showEnergy){
+        if(ConfigBoolean.SHOW_EU.value){
             if(tileEntity instanceof TileEntityBaseGenerator){
                 TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
                 Energy energy = ReflectionHelper.getPrivateValue(TileEntityBaseGenerator.class, (TileEntityBaseGenerator) tileEntity, "energy");

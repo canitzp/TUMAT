@@ -1,9 +1,9 @@
 package de.canitzp.tumat.integration;
 
-import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketUpdateEnergy;
 import net.darkhax.tesla.capability.TeslaCapabilities;
@@ -61,8 +61,7 @@ public class Tesla implements IWorldRenderer{
     }
 
     @Override
-    public boolean shouldBeActive(){
-        return Config.showEnergy;
+    public boolean shouldBeActive() {
+        return ConfigBoolean.SHOW_TESLA.value;
     }
-
 }

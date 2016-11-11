@@ -5,6 +5,7 @@ import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraft.block.BlockBeetroot;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockDoublePlant;
@@ -32,7 +33,7 @@ public class Vanilla implements IWorldRenderer{
         if(state.getBlock() instanceof IPlantable){
             IBlockState plant = ((IPlantable) state.getBlock()).getPlant(world, pos);
             if(plant != null){
-                if(plant.getBlock() instanceof BlockCrops && InfoUtil.hasProperty(plant, BlockCrops.AGE)){
+                if(ConfigBoolean.SHOW_PLANT_GROWTH_STATUS.value && plant.getBlock() instanceof BlockCrops && InfoUtil.hasProperty(plant, BlockCrops.AGE)){
                     int plantStatus = plant.getValue(BlockCrops.AGE);
                     float growStatus = Math.round((plantStatus / 7F * 100F) * 100.00F) / 100.00F;
                     component.addOneLineRenderer(new TextComponent("Grow status: " + growStatus + "%").setFormat(TextFormatting.YELLOW));
@@ -47,21 +48,20 @@ public class Vanilla implements IWorldRenderer{
                 }
             }
         }
-        if(state.getBlock() instanceof BlockBeetroot && InfoUtil.hasProperty(state, BlockBeetroot.BEETROOT_AGE)){
+        if(ConfigBoolean.SHOW_PLANT_GROWTH_STATUS.value && state.getBlock() instanceof BlockBeetroot && InfoUtil.hasProperty(state, BlockBeetroot.BEETROOT_AGE)){
             int plantStatus = state.getValue(BlockBeetroot.BEETROOT_AGE);
             float growStatus = Math.round((plantStatus / 3F * 100F) * 100.00F) / 100.00F;
             component.addOneLineRenderer(new TextComponent("Grow status: " + growStatus + "%").setFormat(TextFormatting.YELLOW));
         }
 
-
-        if(Config.showSpecialAbilities){
-            //Redstone
+        if(ConfigBoolean.SHOW_REDSTONE_STRENGTH.value) {
             int power = state.getWeakPower(world, pos, side);
-            if(power > 0 || state.getBlock() instanceof BlockRedstoneWire){
+            if (power > 0 || state.getBlock() instanceof BlockRedstoneWire) {
                 component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.DARK_RED + power));
             }
+        }
 
-            //Light level
+        if(ConfigBoolean.SHOW_LIGHT_LEVEL.value){
             boolean isBlockLightSource = state.getLightValue(world, pos) != 0;
             if(!isBlockLightSource && !world.getBlockState(pos.up()).isFullCube() && !world.getBlockState(pos.up()).isFullBlock()){
                 int lightLevel = world.getLightFor(EnumSkyBlock.BLOCK, pos.up());

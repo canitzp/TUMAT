@@ -1,9 +1,7 @@
 package de.canitzp.tumat.configuration;
 
-import com.google.common.collect.Maps;
 import de.canitzp.tumat.TUMAT;
-import de.canitzp.tumat.configuration.cats.ConfigBooleans;
-import de.canitzp.tumat.configuration.cats.ConfigCats;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -13,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +25,7 @@ public class ConfigHandler {
     public static Configuration config;
 
     public static void preInit(FMLPreInitializationEvent event){
-        compatibleConfigs.put("1", new String[]{"1", "4"});
+        compatibleConfigs.put("1", new String[]{"1"});
         config = new Configuration(event.getSuggestedConfigurationFile(), CONFIG_VERSION);
         if(!CONFIG_VERSION.equals(config.getLoadedConfigVersion())){
             String loaded = config.getLoadedConfigVersion();
@@ -64,7 +61,7 @@ public class ConfigHandler {
     }
 
     public static void defineValues(){
-        for(ConfigBooleans conf : ConfigBooleans.values()){
+        for(ConfigBoolean conf : ConfigBoolean.values()){
             conf.value = config.getBoolean(conf.name, conf.category.name, conf.defaultValue, conf.desc);
         }
     }

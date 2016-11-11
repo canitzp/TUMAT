@@ -4,6 +4,7 @@ import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -46,6 +47,11 @@ public class Harvestability implements IWorldRenderer{
             }
         }
         return component;
+    }
+
+    @Override
+    public boolean shouldBeActive() {
+        return ConfigBoolean.SHOW_HARVESTABILITY.value;
     }
 
     @Nullable

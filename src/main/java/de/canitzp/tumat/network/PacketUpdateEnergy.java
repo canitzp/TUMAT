@@ -47,28 +47,22 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
     public IMessage onMessage(PacketUpdateEnergy message, MessageContext ctx){
         World world = ctx.getServerHandler().playerEntity.worldObj;
         TileEntity tile = world.getTileEntity(message.tilePos);
-        if(tile != null && message.side != null){
-            try{
-                if(Loader.isModLoaded("tesla")){
-                    if(TeslaUtils.isTeslaHolder(tile, message.side)){
-                        return new PacketUpdateEnergyClient(message.tilePos, message.side, TeslaUtils.getStoredPower(tile, message.side));
-                    }
-                } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                    if(tile instanceof IEnergyHandler){
-                        NBTTagCompound nbt = new NBTTagCompound();
-                        tile.readFromNBT(nbt);
-                        return new PacketUpdateEnergyClient(message.tilePos, message.side, nbt.getInteger("Energy"));
-                    }
+        if(tile != null && message.side != null) {
+            try {
+                if (TeslaUtils.isTeslaHolder(tile, message.side)) {
+                    return new PacketUpdateEnergyClient(message.tilePos, message.side, TeslaUtils.getStoredPower(tile, message.side));
                 }
-            } catch(NullPointerException e){
-                if(world.getTotalWorldTime() % 100 == 0){
+            } catch (NullPointerException e) {
+                if (world.getTotalWorldTime() % 100 == 0) {
                     TUMAT.logger.error("An error occurred while requesting the energy", e);
                     e.printStackTrace();
                 }
             }
         }
         return null;
-    }    @Override
+    }
+
+    @Override
     public void toBytes(ByteBuf buf){
         PacketBuffer buffer = new PacketBuffer(buf);
         buffer.writeBlockPos(this.tilePos);
@@ -115,18 +109,12 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
                 public void run(){
                     World world = Minecraft.getMinecraft().theWorld;
                     TileEntity tile = world.getTileEntity(message.tilePos);
-                    if(tile != null){
-                        if(Loader.isModLoaded("tesla")){
-                            long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
-                            if(toStore >= 0){
-                                TeslaUtils.givePower(tile, message.side, toStore, false);
-                            } else {
-                                TeslaUtils.takePower(tile, message.side, toStore, false);
-                            }
-                        } else if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-                            NBTTagCompound old = tile.writeToNBT(new NBTTagCompound());
-                            old.setInteger("Energy", (int) message.energy);
-                            tile.readFromNBT(old);
+                    if(tile != null) {
+                        long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);
+                        if (toStore >= 0) {
+                            TeslaUtils.givePower(tile, message.side, toStore, false);
+                        } else {
+                            TeslaUtils.takePower(tile, message.side, toStore, false);
                         }
                     }
                 }

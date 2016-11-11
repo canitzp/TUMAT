@@ -3,13 +3,12 @@ package de.canitzp.tumat;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.configuration.cats.ConfigBooleans;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -34,8 +33,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
-import java.lang.reflect.Field;
-
 /**
  * @author canitzp
  */
@@ -45,7 +42,7 @@ public class TUMATEvents{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void gameOverlayRenderEvent(RenderGameOverlayEvent.Post event){
-        if(ConfigBooleans.SHOULD_TUMAT_RENDER.value && event.getType().equals(RenderGameOverlayEvent.ElementType.HOTBAR)){
+        if(ConfigBoolean.SHOULD_TUMAT_RENDER.value && event.getType().equals(RenderGameOverlayEvent.ElementType.HOTBAR)){
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
                 try{
@@ -94,7 +91,7 @@ public class TUMATEvents{
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public static void serverJoinEvent(EntityJoinWorldEvent event){
-        if(Config.serverControl){
+        if(ConfigBoolean.SERVER_CONTROL.value){
             Entity entity = event.getEntity();
             if(entity instanceof EntityPlayerMP){
                 NetworkHandler.network.sendTo(new PacketSendServerConfig(), (EntityPlayerMP) entity);
@@ -143,7 +140,7 @@ public class TUMATEvents{
     @SuppressWarnings("ConstantConditions")
     @SubscribeEvent()
     public static void renderGuiContainer(GuiScreenEvent.DrawScreenEvent.Post event){
-        if(ConfigBooleans.SHOW_SLOT_NUMBERS.value && event.getGui() instanceof GuiContainer){
+        if(ConfigBoolean.SHOW_SLOT_NUMBERS.value && event.getGui() instanceof GuiContainer){
             if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)){
                 FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
                 GuiContainer gui = (GuiContainer) event.getGui();
