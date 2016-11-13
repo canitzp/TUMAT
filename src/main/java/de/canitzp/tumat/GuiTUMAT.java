@@ -3,6 +3,8 @@ package de.canitzp.tumat;
 import com.google.common.collect.Lists;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.ConfigHandler;
+import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -68,16 +70,16 @@ public class GuiTUMAT extends GuiScreen{
         if(mouseX >= (width / 2 - 13) && mouseX <= (width / 2 - 13 + 27) && mouseY >= (height / 2 - 13) && mouseY <= (height / 2 - 13 + 27)){
             if(mouseY >= (height / 2 - 4) && mouseY <= (height / 2 + 4)){
                 if(mouseX <= (width / 2 - 4)){
-                    Config.x -= getMoveFactor();
+                    ConfigFloat.OFFSET_X.saveNewValue(ConfigFloat.OFFSET_X.value -= getMoveFactor());
                 } else if(mouseX >= (width / 2 + 4)){
-                    Config.x += getMoveFactor();
+                    ConfigFloat.OFFSET_X.saveNewValue(ConfigFloat.OFFSET_X.value += getMoveFactor());
                 }
             }
             if(mouseX >= (width / 2 - 4) && mouseX <= (width / 2 + 4)){
                 if(mouseY <= (height / 2 - 4)){
-                    Config.y -= getMoveFactor();
+                    ConfigFloat.OFFSET_Y.saveNewValue(ConfigFloat.OFFSET_Y.value -= getMoveFactor());
                 } else if(mouseY >= (height / 2 + 4)){
-                    Config.y += getMoveFactor();
+                    ConfigFloat.OFFSET_Y.saveNewValue(ConfigFloat.OFFSET_Y.value += getMoveFactor());
                 }
             }
         } else {
@@ -89,8 +91,8 @@ public class GuiTUMAT extends GuiScreen{
                 }
             }
             if(intray != null){
-                Config.x = getPercentageX(intray[0]);
-                Config.y = getPercentageY(intray[1]);
+                ConfigFloat.OFFSET_X.saveNewValue(getPercentageX(intray[0]));
+                ConfigFloat.OFFSET_Y.saveNewValue(getPercentageY(intray[1]));
             }
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -98,10 +100,7 @@ public class GuiTUMAT extends GuiScreen{
 
     @Override
     public void onGuiClosed(){
-        Config.toSaveX = Config.x;
-        Config.toSaveY = Config.y;
-        Config.toSaveScale = Config.scale;
-        Config.markDirty = true;
+        ConfigHandler.defineConfigs();
         super.onGuiClosed();
     }
 
@@ -117,12 +116,12 @@ public class GuiTUMAT extends GuiScreen{
         return (int) (y / (Minecraft.getMinecraft().displayHeight * 1.0F) * 100) * new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
     }
 
-    public static int getXFromPercantage(float percantage){
-        return (int) ((percantage / 100.00F) * Minecraft.getMinecraft().displayWidth) / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
+    public static int getXFromPercantage(){
+        return (int) ((ConfigFloat.OFFSET_X.value / 100.00F) * Minecraft.getMinecraft().displayWidth) / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
     }
 
-    public static int getYFromPercantage(float percantage){
-        return (int) (percantage / 100F * Minecraft.getMinecraft().displayHeight) / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
+    public static int getYFromPercantage(){
+        return (int) (ConfigFloat.OFFSET_Y.value / 100F * Minecraft.getMinecraft().displayHeight) / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
     }
 
     public static class PutItHere extends Gui{

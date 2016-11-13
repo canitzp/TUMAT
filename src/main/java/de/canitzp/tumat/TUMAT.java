@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author canitzp
  */
-@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.GuiConfigFactory", dependencies = TUMAT.DEPENDENCIES)
+@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.configuration.GuiFact", dependencies = TUMAT.DEPENDENCIES)
 public class TUMAT{
 
     public static final String MODNAME = "TUMAT";
@@ -37,7 +37,6 @@ public class TUMAT{
     public void preInit(FMLPreInitializationEvent event){
         logger.info("[PreInit] Started " + MODNAME + " Version " + MODVERSION);
         logger.info("[PreInit] Load config");
-        Config.init(event);
         ConfigHandler.preInit(event);
 
         NetworkHandler.init();

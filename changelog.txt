@@ -1,6 +1,7 @@
 1.6.0:
     -Removed JSON-Name-Remapper
     -Reworked config system (old config file aren't compatible)
+    -Better IC2 integration
 
 1.5.0:
     -Show more information at Chisel&Bits blocks

@@ -1,5 +1,6 @@
 ideas:
     -show how many slots are used in a IInventory
     -transparent background layer
+    -botania integration
 
     -rework config (i'm on it)

@@ -1,7 +1,6 @@
 package de.canitzp.tumat.integration;
 
 import cofh.api.energy.IEnergyHandler;
-import de.canitzp.tumat.Config;
 import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;

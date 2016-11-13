@@ -1,6 +1,5 @@
 package de.canitzp.tumat.integration;
 
-import de.canitzp.tumat.Config;
 import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
@@ -18,7 +17,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.IPlantable;
 
 /**

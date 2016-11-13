@@ -1,6 +1,5 @@
 package de.canitzp.tumat.integration;
 
-import de.canitzp.tumat.Config;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
@@ -29,20 +28,18 @@ public class Harvestability implements IWorldRenderer{
     private static String[] tinkerHarvestLevel = {"Stone", "Iron", "Diamond", "Obsidian", "Cobalt"};
 
     @Override
-    public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        if(Config.showHarvestTooltip){
-            IBlockState state = world.getBlockState(pos);
-            String level = getHarvestLevel(state.getBlock().getHarvestLevel(state));
-            String tool = getHarvestTool(state);
-            if(tool != null){
-                ItemStack stack = player.getHeldItemMainhand();
-                if(stack != null){
-                    String color = getTextColorTool(tool, stack);
-                    component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
-                    if(!isTinkersConstructLoaded && "pickaxe".equals(tool) && level != null && color.equals(TextFormatting.GREEN.toString())){
-                        color = getTextColorLevel(state, player.getHeldItemMainhand());
-                        component.addOneLineRenderer(new TextComponent("Harvest Level: " + color + level));
-                    }
+    public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate) {
+        IBlockState state = world.getBlockState(pos);
+        String level = getHarvestLevel(state.getBlock().getHarvestLevel(state));
+        String tool = getHarvestTool(state);
+        if (tool != null) {
+            ItemStack stack = player.getHeldItemMainhand();
+            if (stack != null) {
+                String color = getTextColorTool(tool, stack);
+                component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
+                if (!isTinkersConstructLoaded && "pickaxe".equals(tool) && level != null && color.equals(TextFormatting.GREEN.toString())) {
+                    color = getTextColorLevel(state, player.getHeldItemMainhand());
+                    component.addOneLineRenderer(new TextComponent("Harvest Level: " + color + level));
                 }
             }
         }

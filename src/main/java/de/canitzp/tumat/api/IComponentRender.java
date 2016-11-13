@@ -14,4 +14,6 @@ public interface IComponentRender{
 
     int getLength(FontRenderer fontRenderer);
 
+    default int getLines(FontRenderer fontRenderer){return 1;}
+
 }

@@ -3,7 +3,9 @@ package de.canitzp.tumat;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
+import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
@@ -48,7 +50,7 @@ public class TUMATEvents{
                 try{
                     RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
-                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(Config.x), GuiTUMAT.getYFromPercantage(Config.y), 0xFFFFFF);
+                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
                     if(mc.theWorld.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();
@@ -58,7 +60,7 @@ public class TUMATEvents{
         }
     }
 
-    //@SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEvent(ItemTooltipEvent event){
         if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
@@ -101,19 +103,9 @@ public class TUMATEvents{
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event){
-        if(event.getModID().equals(TUMAT.MODID)){
-            Config.init();
-            Config.config.save();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
     public static void onLoggout(PlayerEvent.PlayerLoggedOutEvent event){
         if(event.player.isServerWorld()){
-            Config.config.load();
-            Config.init();
+            ConfigHandler.defineConfigs();
         }
     }
 

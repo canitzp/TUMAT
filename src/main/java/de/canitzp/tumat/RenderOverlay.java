@@ -1,14 +1,19 @@
 package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.*;
+import de.canitzp.tumat.api.components.DescriptionComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -59,7 +64,30 @@ public class RenderOverlay{
         boolean calculate = savedTrace == null || shouldCalculate;
         RayTraceResult trace;
         if(calculate){
-            float distance = player.isCreative() ? Config.distanceToRenderCreative : Config.distanceToRenderSurvival;
+            float distance = 0F;
+            if(player.capabilities.isCreativeMode){
+                NetHandlerPlayClient clientHandler = Minecraft.getMinecraft().getConnection();
+                if(clientHandler != null){
+                    switch (clientHandler.getPlayerInfo(player.getGameProfile().getId()).getGameType()){
+                        case CREATIVE:{
+                            distance = ConfigFloat.DISTANCE_CREATIVE.value;
+                            break;
+                        }
+                        default: case NOT_SET: case SURVIVAL:  {
+                            distance = ConfigFloat.DISTANCE_SURVIVAL.value;
+                            break;
+                        }
+                        case ADVENTURE:{
+                            distance = ConfigFloat.DISTANCE_ADVENTURE.value;
+                            break;
+                        }
+                        case SPECTATOR:{
+                            distance = ConfigFloat.DISTANCE_SPECTATOR.value;
+                            break;
+                        }
+                    }
+                }
+            }
             trace = savedTrace = createRayTraceForDistance(world, player, distance, partialTicks);
         } else {
             trace = savedTrace;
@@ -94,12 +122,7 @@ public class RenderOverlay{
             IBlockState state = world.getBlockState(pos);
             //component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T"));
             component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
-            String[] desc = InfoUtil.getDescription(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
-            if(desc != null){
-                for(String s : desc){
-                    component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
-                }
-            }
+            component.addOneLineRenderer(new DescriptionComponent(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state))));
             TileEntity tile = world.getTileEntity(pos);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
@@ -172,19 +195,21 @@ public class RenderOverlay{
     public static void renderComponents(FontRenderer fontRenderer, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
-                int y2 = GuiTUMAT.getYFromPercantage(Config.y);
+                int y2 = GuiTUMAT.getYFromPercantage();
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
+                    int lineAmount = 0;
                     if(lists != null){
                         for(IComponentRender component : lists){
                             if(component != null){
                                 GlStateManager.pushMatrix();
-                                GlStateManager.scale(Config.scale, Config.scale, Config.scale);
-                                component.render(fontRenderer, GuiTUMAT.getXFromPercantage(Config.x), y2, 0xFFFFFF);
+                                GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
+                                component.render(fontRenderer, GuiTUMAT.getXFromPercantage(), y2, 0xFFFFFF);
+                                lineAmount = component.getLines(fontRenderer);
                                 GlStateManager.popMatrix();
                             }
                         }
                     }
-                    y2 += 10;
+                    y2 += 10*lineAmount;
                 }
             }
         }
@@ -213,7 +238,7 @@ public class RenderOverlay{
                 Vec3d lookingEyeVec = eyeVec.addVector(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance);
                 pointedEntity = null;
                 Vec3d calcVec = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || Config.showEntityItems);
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value);
                 double d2 = currentDistance;
 
                 for(Entity entity : list){

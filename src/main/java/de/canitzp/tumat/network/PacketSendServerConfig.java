@@ -1,6 +1,6 @@
 package de.canitzp.tumat.network;
 
-import de.canitzp.tumat.Config;
+import de.canitzp.tumat.configuration.ConfigHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +19,7 @@ public class PacketSendServerConfig implements IMessage, IMessageHandler<PacketS
     private NBTTagCompound values;
 
     public PacketSendServerConfig(){
-        this.values = Config.sendConfigToClient();
+        this.values = ConfigHandler.writeToNBT();
     }
 
     @Override
@@ -35,7 +35,13 @@ public class PacketSendServerConfig implements IMessage, IMessageHandler<PacketS
     @SideOnly(Side.CLIENT)
     @Override
     public IMessage onMessage(PacketSendServerConfig message, MessageContext ctx){
-        Minecraft.getMinecraft().addScheduledTask(() -> Config.loadConfigFromServer(message.values));
+        Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+            @SideOnly(Side.CLIENT)
+            @Override
+            public void run() {
+                ConfigHandler.readFromServerNBT(message.values);
+            }
+        });
         return null;
     }
 }

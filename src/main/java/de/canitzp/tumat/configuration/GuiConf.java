@@ -1,8 +1,7 @@
 package de.canitzp.tumat.configuration;
 
-import de.canitzp.tumat.Config;
-import de.canitzp.tumat.GuiConfigFactory;
 import de.canitzp.tumat.TUMAT;
+import de.canitzp.tumat.configuration.cats.ConfigCats;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
@@ -22,8 +21,10 @@ public class GuiConf extends GuiConfig {
 
     private static List<IConfigElement> getConfigElements(){
         List<IConfigElement> list = new ArrayList<>();
-        for(String catName : Config.config.getCategoryNames()){
-            list.addAll(new ConfigElement(Config.config.getCategory(catName)).getChildElements());
+        for(int i = 0; i < ConfigCats.values().length; i++){
+            ConfigCats cat = ConfigCats.values()[i];
+            ConfigHandler.config.setCategoryComment(cat.name, cat.desc);
+            list.add(new ConfigElement(ConfigHandler.config.getCategory(cat.name)));
         }
         return list;
     }

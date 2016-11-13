@@ -52,7 +52,8 @@ repositories {
 
 dependencies {
     deobfCompile "net.darkhax.tesla:Tesla:+:deobf"
-    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r67"
+    //compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r67"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions-unstable:1.10.2-r70-256"
     deobfCompile "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
     deobfCompile "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
     compile 'net.industrial-craft:industrialcraft-2:2.6.58-ex110:api'
