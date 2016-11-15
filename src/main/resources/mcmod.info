@@ -2,16 +2,16 @@
 {
   "modid": "tumat",
   "name": "TUMAT",
-  "description": "Tell us more about this.",
+  "description": "TUMAT 'Tell us more about this' is a lightweight in-world tooltip mod.\nIt looks easy and it is easy, also for the performance,\nbut it has a lot of config options to check out.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
+  "url": "https://minecraft.curseforge.com/projects/tumat",
+  "updateUrl": "https://minecraft.curseforge.com/projects/tumat",
   "authorList": ["canitzp"],
-  "credits": "",
+  "credits": "Author: canitzp",
   "logoFile": "",
   "screenshots": [],
-  "requiredMods": ["Forge@[12.18.2.2097,)"],
-  "dependencies": ["Forge@[12.18.2.2097,)"]
+  "requiredMods": ["Forge@[12.18.2.2099,)"],
+  "dependencies": ["Forge@[12.18.2.2099,)"]
 }
 ]

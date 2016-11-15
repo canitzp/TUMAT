@@ -1,6 +1,7 @@
 package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.ReMapper;
+import de.canitzp.tumat.configuration.cats.ConfigString;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -17,68 +18,50 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 
 /**
  * @author canitzp
  */
+@SuppressWarnings("ConstantConditions")
 public class InfoUtil{
 
-    private static Triple<String, String, String[]> getName(ItemStack stack){
-        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
-            return getName(stack, RenderOverlay.remaped);
-        }
-        return Triple.of(null, null, null);
-    }
-
-    private static String getNameFromStack(ItemStack stack){
-        return getName(stack, RenderOverlay.remaped).getLeft();
-    }
-
-    private static String getModNameFromStack(ItemStack stack){
-        return getName(stack, RenderOverlay.remaped).getMiddle();
-    }
-
-    private static String[] getDescriptionFromStack(ItemStack stack){
-        return getName(stack, RenderOverlay.remaped).getRight();
-    }
+    private static final HashMap<String, String> cachedModNames = new HashMap<>();
 
     public static String getBlockName(IBlockState state){
         Item itemBlock = Item.getItemFromBlock(state.getBlock());
         if(itemBlock != null){
-            ItemStack stack = new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state));
-            String name = getNameFromStack(stack);
-            return name != null ? stack.getRarity().rarityColor + name : getItemName(stack);
+            return getItemName(new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state)));
         } else {
             return state.getBlock().getLocalizedName();
         }
     }
 
     public static String getItemName(ItemStack stack){
-        String displayString = getNameFromStack(stack);
-        if(displayString == null){
-            displayString = stack.getDisplayName();
-        }
-        return stack.getRarity().rarityColor + getDebugAddition(stack, displayString);
+        return stack != null ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
-    public static String[] getDescription(ItemStack stack){
-        String[] strings = getDescriptionFromStack(stack);
-        if(stack != null && stack.getItem() != null && (strings == null || strings.length == 0)){
-            List<String> tooltip = new ArrayList<>();
+    public static List<String> getDescription(ItemStack stack){
+        if(stack != null && stack.getItem() != null){
+            List<String> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
-                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().thePlayer, tooltip, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().thePlayer, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                 } catch(Exception ignore){}
             }
-            tooltip.addAll(getDescriptionAddition(stack));
-            if(!tooltip.isEmpty()){
+            desc.addAll(getDescriptionAddition(stack));
+            if(!desc.isEmpty()){
                 List<String> s = new ArrayList<>();
-                for(String s1 : tooltip){
+                for(String s1 : desc){
                     s.addAll(Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(s1, 200));
                 }
                 if(s.size() > 5){
@@ -90,32 +73,36 @@ public class InfoUtil{
                     s.clear();
                     s.addAll(cached);
                 }
-                strings = s.toArray(new String[]{});
+                return s;
             }
         }
-        if(strings != null && strings.length > 0){
-            return strings;
-        }
-        return null;
+        return Collections.emptyList();
     }
 
-    public static String getModNameFromBlock(Block block){
-        if(block != null && block.getRegistryName() != null){
-            try{
-                return RenderOverlay.modNameFormat + RenderOverlay.getModName(block.getRegistryName().getResourceDomain());
-            } catch(NullPointerException e){
-                return "An Error occurred while rendering " + block.toString();
+    private static String getModName(String modid){
+        if (cachedModNames.containsKey(modid)) {
+            return cachedModNames.get(modid);
+        } else {
+            if("minecraft".equals(modid) || "Minecraft".equals(modid)){
+                return "Minecraft";
             }
+            for(ModContainer mod : Loader.instance().getActiveModList()){
+                if(mod.getModId().toLowerCase().equals(modid)){
+                    String name = mod.getName();
+                    cachedModNames.put(modid, name);
+                    return name;
+                }
+            }
+            cachedModNames.put(modid, StringUtils.capitalize(modid));
+            return StringUtils.capitalize(modid);
         }
-        return "<Unknown>";
     }
 
-    public static String getModName(ItemStack stack){
-        String modName = InfoUtil.getModNameFromStack(stack);
-        if(modName == null && stack != null && stack.getItem() != null){
-            modName = RenderOverlay.getModName(stack.getItem().getRegistryName().getResourceDomain());
+    public static String getModName(IForgeRegistryEntry entry){
+        if(entry != null && entry.getRegistryName() != null) {
+            return ConfigString.MOD_NAME_FORMAT.value + getModName(entry.getRegistryName().getResourceDomain());
         }
-        return modName != null ? RenderOverlay.modNameFormat + modName : null;
+        return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
     }
 
     public static String getModName(Entity entity){
@@ -123,23 +110,14 @@ public class InfoUtil{
         if(entityName != null){
             String[] array = entityName.split("\\.");
             if(array.length >= 2) {
-                entityName = RenderOverlay.getModName(array[0]);
+                entityName = getModName(array[0]);
             } else {
                 entityName = "Minecraft";
             }
         } else {
             entityName = "Minecraft";
         }
-        return RenderOverlay.modNameFormat + RenderOverlay.getModName(entityName);
-    }
-
-    public static Triple<String, String, String[]> getName(ItemStack stack, ReMapper<ItemStack, String, String, String[]> remapper){
-        for(ItemStack s : remapper.getKeys()){
-            if(ItemStack.areItemsEqual(s, stack)){
-                return remapper.getValue(s);
-            }
-        }
-        return Triple.of(null, null, null);
+        return ConfigString.MOD_NAME_FORMAT.value + getModName(entityName);
     }
 
     public static boolean hasProperty(IBlockState state, IProperty<?> property){

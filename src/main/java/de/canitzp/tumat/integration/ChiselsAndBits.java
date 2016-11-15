@@ -27,5 +27,4 @@ public class ChiselsAndBits implements IWorldRenderer{
         return component;
     }
 
-
 }

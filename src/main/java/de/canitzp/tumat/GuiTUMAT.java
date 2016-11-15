@@ -45,7 +45,7 @@ public class GuiTUMAT extends GuiScreen{
         component = new TooltipComponent();
         component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(block.getDefaultState())));
         component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.RED + "6"));
-        component.addOneLineRenderer(new TextComponent(InfoUtil.getModNameFromBlock(block)));
+        component.addOneLineRenderer(new TextComponent(InfoUtil.getModName(block)));
         //directMove.add(new PutItHere(15, 15));
     }
 

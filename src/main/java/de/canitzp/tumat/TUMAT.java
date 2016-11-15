@@ -19,6 +19,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @author canitzp
  */
@@ -84,6 +87,9 @@ public class TUMAT{
 
         //Tanks:
         TUMATApi.registerRenderComponent(FluidHandler.class);
+
+        //Inventory
+        TUMATApi.registerRenderComponent(Inventory.class);
 
         //More:
         TUMATApi.registerRenderComponent(Vanilla.class);

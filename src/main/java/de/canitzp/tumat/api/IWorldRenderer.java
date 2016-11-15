@@ -44,6 +44,10 @@ public interface IWorldRenderer{
         return component;
     }
 
+    /**
+     * @deprecated This has been deleted, cause it wasn't used. Gets removed in 1.11
+     */
+    @Deprecated
     default void remap(ReMapper<ItemStack, String, String, String[]> reMapper){
     }
 

@@ -5,16 +5,19 @@ import de.canitzp.tumat.api.components.DescriptionComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
+import de.canitzp.tumat.configuration.cats.ConfigString;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -34,7 +37,9 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,44 +52,31 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class RenderOverlay{
 
-    public static String modNameFormat = TextFormatting.BLUE.toString() + TextFormatting.ITALIC.toString();
-    //                Block/Item,       Name,   ModName, block/item desc
-    public static ReMapper<ItemStack, String, String, String[]> remaped = new ReMapper<>();
     private static RayTraceResult savedTrace;
-    private static Map<String, ModContainer> modMap;
 
-    static{
-        modMap = Loader.instance().getIndexedModList();
-        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-            renderer.remap(remaped);
-        }
-    }
-
-    public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate){
+    public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate) {
         boolean calculate = savedTrace == null || shouldCalculate;
         RayTraceResult trace;
-        if(calculate){
+        if (calculate) {
             float distance = 0F;
-            if(player.capabilities.isCreativeMode){
-                NetHandlerPlayClient clientHandler = Minecraft.getMinecraft().getConnection();
-                if(clientHandler != null){
-                    switch (clientHandler.getPlayerInfo(player.getGameProfile().getId()).getGameType()){
-                        case CREATIVE:{
-                            distance = ConfigFloat.DISTANCE_CREATIVE.value;
-                            break;
-                        }
-                        default: case NOT_SET: case SURVIVAL:  {
-                            distance = ConfigFloat.DISTANCE_SURVIVAL.value;
-                            break;
-                        }
-                        case ADVENTURE:{
-                            distance = ConfigFloat.DISTANCE_ADVENTURE.value;
-                            break;
-                        }
-                        case SPECTATOR:{
-                            distance = ConfigFloat.DISTANCE_SPECTATOR.value;
-                            break;
-                        }
+            NetHandlerPlayClient clientHandler = Minecraft.getMinecraft().getConnection();
+            if (clientHandler != null) {
+                switch (clientHandler.getPlayerInfo(player.getGameProfile().getId()).getGameType()) {
+                    case CREATIVE: {
+                        distance = ConfigFloat.DISTANCE_CREATIVE.value;
+                        break;
+                    }
+                    case SURVIVAL: {
+                        distance = ConfigFloat.DISTANCE_SURVIVAL.value;
+                        break;
+                    }
+                    case ADVENTURE: {
+                        distance = ConfigFloat.DISTANCE_ADVENTURE.value;
+                        break;
+                    }
+                    case SPECTATOR: {
+                        distance = ConfigFloat.DISTANCE_SPECTATOR.value;
+                        break;
                     }
                 }
             }
@@ -92,21 +84,21 @@ public class RenderOverlay{
         } else {
             trace = savedTrace;
         }
-        if(trace != null){
+        if (trace != null) {
             List<TooltipComponent> componentsForRendering = new ArrayList<>();
-            switch(trace.typeOfHit){
-                case BLOCK:{
-                    if(ConfigBoolean.SHOW_BLOCKS.value){
+            switch (trace.typeOfHit) {
+                case BLOCK: {
+                    if (ConfigBoolean.SHOW_BLOCKS.value) {
                         addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
                     }
                     break;
                 }
-                case ENTITY:{
+                case ENTITY: {
                     addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.entityHit, calculate));
                     break;
                 }
-                case MISS:{
-                    if(ConfigBoolean.SHOW_FLUIDS.value){
+                case MISS: {
+                    if (ConfigBoolean.SHOW_FLUIDS.value) {
                         addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, calculate));
                     }
                     break;
@@ -123,17 +115,17 @@ public class RenderOverlay{
             //component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T"));
             component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
             component.addOneLineRenderer(new DescriptionComponent(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state))));
-            TileEntity tile = world.getTileEntity(pos);
+            String modName = InfoUtil.getModName(state.getBlock());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
+                    TileEntity tile = world.getTileEntity(pos);
                     if(ConfigBoolean.SHOW_TILES.value && tile != null){
                         renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
                     }
                     renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
                 }
             }
-            String modName = InfoUtil.getModName(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
-            component.setModName(modName != null ? modName : InfoUtil.getModNameFromBlock(state.getBlock()));
+            component.setModName(modName);
         }
         return component;
     }
@@ -142,35 +134,33 @@ public class RenderOverlay{
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
             component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().stackSize));
-            String[] desc = InfoUtil.getDescription(((EntityItem) entity).getEntityItem());
-            if(desc != null){
-                for(String s : desc){
-                    component.addOneLineRenderer(new TextComponent(TextFormatting.GRAY + s));
-                }
-            }
+            component.addOneLineRenderer(new DescriptionComponent(((EntityItem) entity).getEntityItem()));
+            String modname = InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
                 }
             }
-            component.setModName(InfoUtil.getModName(new ItemStack(((EntityItem) entity).getEntityItem().getItem(), 1, ((EntityItem) entity).getEntityItem().getItemDamage())));
+            component.setModName(modname);
         } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
             component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
+            String modName = InfoUtil.getModName(entity);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
                 }
             }
-            component.setModName(InfoUtil.getModName(entity));
+            component.setModName(modName);
         } else if(ConfigBoolean.SHOW_ENTITIES.value){
             component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
+            String modName = InfoUtil.getModName(entity);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntity(world, player, entity, component, shouldCalculate);
                 }
             }
-            component.setModName(InfoUtil.getModName(entity));
+            component.setModName(modName);
         }
         return component;
     }
@@ -181,12 +171,12 @@ public class RenderOverlay{
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
                 component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
-                component.addOneLineRenderer(new TextComponent(modNameFormat + InfoUtil.getModNameFromBlock(state.getBlock())));
+                component.addOneLineRenderer(new TextComponent(InfoUtil.getModName(state.getBlock())));
             }
-        }
-        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-            if(renderer.shouldBeActive()){
-                renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+            for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+                if(renderer.shouldBeActive()){
+                    renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+                }
             }
         }
         return component;
@@ -196,22 +186,46 @@ public class RenderOverlay{
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
                 int y2 = GuiTUMAT.getYFromPercantage();
+                GlStateManager.pushMatrix();
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
                     int lineAmount = 0;
                     if(lists != null){
                         for(IComponentRender component : lists){
                             if(component != null){
-                                GlStateManager.pushMatrix();
+                                int x = GuiTUMAT.getXFromPercantage();
+                                lineAmount = component.getLines(fontRenderer);
+                                renderBackground(x, y2, tooltipComponent.getLength(), lineAmount);
                                 GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
                                 component.render(fontRenderer, GuiTUMAT.getXFromPercantage(), y2, 0xFFFFFF);
-                                lineAmount = component.getLines(fontRenderer);
-                                GlStateManager.popMatrix();
                             }
                         }
                     }
                     y2 += 10*lineAmount;
                 }
+                GlStateManager.popMatrix();
             }
+        }
+    }
+
+    private static void renderBackground(int x, int y, int width, int lines){
+        if(ConfigBoolean.SHOW_BACKGROUND.value){
+            long color = 0x806A9BC3;
+            String hexConf = ConfigString.BACKGROUND_COLOR.value;
+            if(hexConf.length() == 10){
+                try {
+                    color = Long.parseLong(hexConf.substring(2, 10), 16);
+                } catch (Exception e){
+                    if(Minecraft.getMinecraft().theWorld != null && Minecraft.getMinecraft().theWorld.getTotalWorldTime() % 150 == 0){
+                        TUMAT.logger.error("There is a error with the background hex code! The correct format is AARRGGBB with a '0x' in front of the code");
+                    }
+                }
+            } else{
+                if(Minecraft.getMinecraft().theWorld != null && Minecraft.getMinecraft().theWorld.getTotalWorldTime() % 150 == 0){
+                    TUMAT.logger.error("There is a error with the background hex code! The correct format is AARRGGBB with a '0x' in front of the code");
+                }
+            }
+            x = x - width/2;
+            Gui.drawRect(x - 3, y - 1, x + width + 3, y + 10 * lines - 1, (int) color);
         }
     }
 
@@ -274,17 +288,6 @@ public class RenderOverlay{
             }
         }
         return traceResult;
-    }
-
-    public static String getModName(String modid){
-        if(!modid.equals("minecraft")){
-            for(ModContainer mod : modMap.values()){
-                if(mod.getModId().toLowerCase().equals(modid)){
-                    return StringUtils.capitalize(mod.getName());
-                }
-            }
-        }
-        return StringUtils.capitalize(modid);
     }
 
 }

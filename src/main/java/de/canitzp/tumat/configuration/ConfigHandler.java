@@ -4,6 +4,7 @@ import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.configuration.cats.ConfigCats;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
+import de.canitzp.tumat.configuration.cats.ConfigString;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -23,7 +24,6 @@ import java.util.Map;
 /**
  * @author canitzp
  */
-@Mod.EventBusSubscriber
 public class ConfigHandler {
 
     public static final String CONFIG_VERSION = "1";
@@ -81,6 +81,9 @@ public class ConfigHandler {
                 config.getCategory(conf.category.name).put(conf.name, new Property(conf.name, Float.toString(conf.value), Property.Type.STRING));
             }
         }
+        for(ConfigString conf : ConfigString.values()){
+            conf.value = config.getString(conf.name, conf.category.name, conf.defaultValue, conf.desc);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -91,30 +94,17 @@ public class ConfigHandler {
                     conf.value = nbt.getBoolean(conf.name);
                 }
             }
-            for(ConfigFloat conf : ConfigFloat.values()){
-                if(nbt.hasKey(conf.name, 5)){
-                    conf.value = nbt.getFloat(conf.name);
-                }
-            }
         }
     }
 
     public static NBTTagCompound writeToNBT(){
         NBTTagCompound nbt = new NBTTagCompound();
         for(ConfigBoolean conf : ConfigBoolean.values()){
-            nbt.setBoolean(conf.name, conf.value);
-        }
-        for(ConfigFloat conf : ConfigFloat.values()){
-            nbt.setFloat(conf.name, conf.value);
+            if(conf.shouldSync){
+                nbt.setBoolean(conf.name, conf.value);
+            }
         }
         return nbt;
-    }
-
-    @SubscribeEvent
-    public static void onConfigSave(ConfigChangedEvent.OnConfigChangedEvent event){
-        if(TUMAT.MODID.equals(event.getModID())){
-            defineConfigs();
-        }
     }
 
 }

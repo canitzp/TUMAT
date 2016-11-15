@@ -4,25 +4,28 @@ buildscript {
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
-
         }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.5.0"
-group= "de.canizp.tumat"
-archivesBaseName = "tumat"
+version =  getDate() //"1.?.0"
+group = "de.canizp.tumat"
+archivesBaseName = "TUMAT"
 
 minecraft {
-    version = "1.10.2-12.18.2.2099"
+    version = "1.10.2-12.18.2.2125"
     runDir = "run"
     mappings = "snapshot_20161020"
     replaceIn "TUMAT.java"
@@ -31,33 +34,40 @@ minecraft {
 
 repositories {
     maven {
-        url 'http://maven.epoxide.xyz'
-        }
-    maven {
-        url 'http://maven.chaosfield.at'
+        name = "Tesla"
+        url = "http://maven.epoxide.xyz"
     }
     maven {
-        name = "Modmuss50"
-        url = "http://maven.modmuss50.me/"
+        name = "Actually Additions"
+        url = "http://maven.chaosfield.at"
     }
     maven {
-        name 'DVS1 Maven FS'
-        url 'http://dvs1.progwml6.com/files/maven'
+        name = "Tinkers Construct"
+        url = "http://dvs1.progwml6.com/files/maven"
     }
     maven {
-        name = "ic2"
+        name = "IndustrialCraft 2"
         url = "http://maven.ic2.player.to/"
+    }
+    maven {
+        name = "Refined Storage"
+        url = "http://dl.bintray.com/raoulvdberge/dev"
+    }
+    maven {
+        name = "MCMultiPart"
+        url = "http://maven.amadornes.com/"
     }
 }
 
 dependencies {
-    deobfCompile "net.darkhax.tesla:Tesla:+:deobf"
-    //compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r67"
-    compile "de.ellpeck.actuallyadditions:ActuallyAdditions-unstable:1.10.2-r70-256"
-    deobfCompile "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
-    deobfCompile "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
-    compile 'net.industrial-craft:industrialcraft-2:2.6.58-ex110:api'
-    deobfCompile 'mod.chiselsandbits:chiselsandbits:+'
+    compile "net.darkhax.tesla:Tesla:+:deobf"
+    compile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.10.2-r71"
+    compile "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
+    compile "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
+    compile "net.industrial-craft:industrialcraft-2:2.6.58-ex110:api"
+    compile "mod.chiselsandbits:chiselsandbits:+"
+    compile "refinedstorage:refinedstorage:1.2.5-555"
+    compile "MCMultiPart:MCMultiPart:1.3.0:universal"
     compile fileTree("./run/mods/")
 }
 
@@ -70,8 +80,14 @@ processResources
         include 'mcmod.info'
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-       
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+static def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyMMddHHmm')
+    return formattedDate
 }

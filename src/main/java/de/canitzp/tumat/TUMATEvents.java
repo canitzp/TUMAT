@@ -48,6 +48,15 @@ public class TUMATEvents{
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
                 try{
+                    if(mc.currentScreen == null && !TUMAT.MODVERSION.contains(".") && ConfigBoolean.SHOW_FU.value){
+                        String tumat = TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T" + TextFormatting.RESET.toString();
+                        String buildText = tumat + " build " + TUMAT.MODVERSION;
+                        GlStateManager.pushMatrix();
+                        GlStateManager.scale(0.4F, 0.4F, 0.4F);
+                        GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
+                        Minecraft.getMinecraft().fontRendererObj.drawString(buildText, 2, 2, 0x80FFFFFF);
+                        GlStateManager.popMatrix();
+                    }
                     RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
                     TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
@@ -60,34 +69,17 @@ public class TUMATEvents{
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    @SideOnly(Side.CLIENT)
-    public static void tooltipRenderEvent(ItemTooltipEvent event){
-        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
-            String s = InfoUtil.getItemName(event.getItemStack());
-            if(s != null){
-                event.getToolTip().clear();
-                event.getToolTip().add(s + (Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? TextFormatting.RESET + TooltipComponent.getAdvancedName(event.getItemStack()) : ""));
-                String[] desc = InfoUtil.getDescription(event.getItemStack());
-                if(desc != null){
-                    for(String desc1 : desc){
-                        event.getToolTip().add(TextFormatting.GRAY + desc1);
-                    }
-                }
-            }
+    @SubscribeEvent
+    public static void onConfigSave(ConfigChangedEvent.OnConfigChangedEvent event){
+        if(TUMAT.MODID.equals(event.getModID())){
+            ConfigHandler.defineConfigs();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     @SideOnly(Side.CLIENT)
     public static void tooltipRenderEventModName(ItemTooltipEvent event){
-        if(Loader.instance().hasReachedState(LoaderState.AVAILABLE)){
-            String s = InfoUtil.getModName(event.getItemStack());
-            if(s == null){
-                s = RenderOverlay.getModName(event.getItemStack().getItem().getRegistryName().getResourceDomain());
-            }
-            event.getToolTip().add(RenderOverlay.modNameFormat + s);
-        }
+        event.getToolTip().add(InfoUtil.getModName(event.getItemStack().getItem()));
     }
 
     @SideOnly(Side.SERVER)

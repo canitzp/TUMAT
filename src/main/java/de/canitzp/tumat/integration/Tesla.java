@@ -64,4 +64,5 @@ public class Tesla implements IWorldRenderer{
     public boolean shouldBeActive() {
         return ConfigBoolean.SHOW_TESLA.value;
     }
+
 }

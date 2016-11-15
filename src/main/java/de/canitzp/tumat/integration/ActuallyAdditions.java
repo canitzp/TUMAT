@@ -57,4 +57,5 @@ public class ActuallyAdditions implements IWorldRenderer{
     public boolean shouldBeActive(){
         return ConfigBoolean.SHOW_SPECIAL_TILE_STATS.value;
     }
+
 }
