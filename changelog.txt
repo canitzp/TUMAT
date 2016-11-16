@@ -1,3 +1,6 @@
+1.7.0-BETA:
+    -Update to 1.11
+
 1.6.0:
     -Removed JSON-Name-Remapper
     -Reworked config system (old config file aren't compatible)

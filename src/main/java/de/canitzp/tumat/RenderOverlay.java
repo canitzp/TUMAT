@@ -133,7 +133,7 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().stackSize));
+            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().func_190916_E())); //TODO wait for mappings and change this to getStacksize();
             component.addOneLineRenderer(new DescriptionComponent(((EntityItem) entity).getEntityItem()));
             String modname = InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){

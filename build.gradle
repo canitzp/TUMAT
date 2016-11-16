@@ -20,14 +20,14 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version =  "1.6.0"
+version =  "1.7.0-BETA"
 group = "de.canizp.tumat"
 archivesBaseName = "TUMAT"
 
 minecraft {
-    version = "1.10.2-12.18.2.2125"
+    version = "1.11-13.19.0.2130"
     runDir = "run"
-    mappings = "snapshot_20161020"
+    mappings = "snapshot_20161111"
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
 }
