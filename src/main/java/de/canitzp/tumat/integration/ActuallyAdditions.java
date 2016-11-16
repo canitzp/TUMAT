@@ -43,7 +43,7 @@ public class ActuallyAdditions implements IWorldRenderer{
             component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + time + "/3000 Ticks"));
         } else if(tileEntity instanceof TileEntityDisplayStand){
             ItemStack stack = ((IInventory) tileEntity).getStackInSlot(0);
-            if(stack != null){
+            if(stack != ItemStack.field_190927_a){
                 component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + stack.getDisplayName()));
             }
         } else if(tileEntity instanceof TileEntitySmileyCloud){

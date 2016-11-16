@@ -20,7 +20,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version =  "1.7.0-BETA"
+version =  "1.7.0-BETA-2"
 group = "de.canizp.tumat"
 archivesBaseName = "TUMAT"
 

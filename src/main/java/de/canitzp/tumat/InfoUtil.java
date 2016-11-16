@@ -47,11 +47,11 @@ public class InfoUtil{
     }
 
     public static String getItemName(ItemStack stack){
-        return stack != null ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+        return stack != ItemStack.field_190927_a ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
     public static List<String> getDescription(ItemStack stack){
-        if(stack != null && stack.getItem() != null){
+        if(stack != ItemStack.field_190927_a && stack.getItem() != null){
             List<String> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
