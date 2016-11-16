@@ -20,7 +20,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version =  getDate() //"1.?.0"
+version =  "1.6.0"
 group = "de.canizp.tumat"
 archivesBaseName = "TUMAT"
 
