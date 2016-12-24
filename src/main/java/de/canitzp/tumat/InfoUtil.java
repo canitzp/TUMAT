@@ -1,27 +1,30 @@
 package de.canitzp.tumat;
 
-import de.canitzp.tumat.api.ReMapper;
 import de.canitzp.tumat.configuration.cats.ConfigString;
-import net.minecraft.block.Block;
+import de.canitzp.tumat.network.NetworkHandler;
+import de.canitzp.tumat.network.PacketUpdateTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +42,7 @@ public class InfoUtil{
 
     public static String getBlockName(IBlockState state){
         Item itemBlock = Item.getItemFromBlock(state.getBlock());
-        if(itemBlock != null){
+        if(itemBlock != null && itemBlock != Items.AIR){
             return getItemName(new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state)));
         } else {
             return state.getBlock().getLocalizedName();
@@ -47,15 +50,15 @@ public class InfoUtil{
     }
 
     public static String getItemName(ItemStack stack){
-        return stack != ItemStack.field_190927_a ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+        return stack != ItemStack.EMPTY ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
     public static List<String> getDescription(ItemStack stack){
-        if(stack != ItemStack.field_190927_a && stack.getItem() != null){
+        if(stack != ItemStack.EMPTY && stack.getItem() != null){
             List<String> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
-                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().thePlayer, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().player, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                 } catch(Exception ignore){}
             }
             desc.addAll(getDescriptionAddition(stack));
@@ -64,12 +67,12 @@ public class InfoUtil{
                 for(String s1 : desc){
                     s.addAll(Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(s1, 200));
                 }
-                if(s.size() > 5){
+                if(s.size() > 2 && !Minecraft.getMinecraft().player.isSneaking()){
                     List<String> cached = new ArrayList<>();
-                    for(int i = 0; i <= 5; i++){
+                    for(int i = 0; i <= 1; i++){
                         cached.add(s.get(i));
                     }
-                    cached.add("To many information to show.");
+                    cached.add("<Sneak to show more>");
                     s.clear();
                     s.addAll(cached);
                 }
@@ -184,6 +187,38 @@ public class InfoUtil{
             }
         }
         return strings;
+    }
+
+    public static ItemStack getItemStackInSlot(TileEntity inventory, EnumFacing side, int slot){
+        if(inventory.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)){
+            return inventory.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).getStackInSlot(slot);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    /**
+     * Renders the specified text to the screen, center-aligned.
+     */
+    public static void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color){
+        if(text == null){
+            text = "TUMAT NPE Error";
+        }
+        fontRendererIn.drawStringWithShadow(text, (float) (x - fontRendererIn.getStringWidth(text) / 2), (float) y, color);
+    }
+
+    public static String getEntityName(Entity entity){
+        String defaultName = entity.getName();
+        if(defaultName.endsWith(".name")){
+            String[] array = defaultName.split("\\.");
+            defaultName = StringUtils.capitalize(array[array.length - 2]);
+        }
+        return defaultName;
+    }
+
+    public static void syncTileEntity(TileEntity tile, boolean shouldCalculate, String... nbtKeys){
+        if(shouldCalculate){
+            NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
+        }
     }
 
 }

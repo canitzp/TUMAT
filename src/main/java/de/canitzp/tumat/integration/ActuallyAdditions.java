@@ -1,16 +1,15 @@
 package de.canitzp.tumat.integration;
 
+import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import de.ellpeck.actuallyadditions.mod.tile.TileEntityAtomicReconstructor;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntityCompost;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntityDisplayStand;
 import de.ellpeck.actuallyadditions.mod.tile.TileEntitySmileyCloud;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -18,6 +17,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -28,22 +29,13 @@ public class ActuallyAdditions implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        if(tileEntity instanceof TileEntityAtomicReconstructor){
-            ItemStack lens = ((IInventory) tileEntity).getStackInSlot(0);
-            String s;
-            if(lens != null){
-                s = "Lens: " + lens.getDisplayName();
-            } else {
-                s = "No Lens";
-            }
-            component.addOneLineRenderer(new TextComponent(TextFormatting.YELLOW + s));
-        } else if(tileEntity instanceof TileEntityCompost){
-            TooltipComponent.syncTileEntity(tileEntity, shouldCalculate && ((IInventory) tileEntity).getStackInSlot(0) != null, "ConversionTime");
+        if(tileEntity instanceof TileEntityCompost){
+            InfoUtil.syncTileEntity(tileEntity, shouldCalculate && InfoUtil.getItemStackInSlot(tileEntity, side, 0) != ItemStack.EMPTY, "ConversionTime");
             int time = ((TileEntityCompost) tileEntity).conversionTime;
             component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + time + "/3000 Ticks"));
         } else if(tileEntity instanceof TileEntityDisplayStand){
-            ItemStack stack = ((IInventory) tileEntity).getStackInSlot(0);
-            if(stack != ItemStack.field_190927_a){
+            ItemStack stack = InfoUtil.getItemStackInSlot(tileEntity, side, 0);
+            if(stack != ItemStack.EMPTY){
                 component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + stack.getDisplayName()));
             }
         } else if(tileEntity instanceof TileEntitySmileyCloud){
@@ -56,6 +48,13 @@ public class ActuallyAdditions implements IWorldRenderer{
     @Override
     public boolean shouldBeActive(){
         return ConfigBoolean.SHOW_SPECIAL_TILE_STATS.value;
+    }
+
+    @Override
+    public Map<String, String> getEnergyColor(){
+        Map<String, String> map = new HashMap<>();
+        map.put("actuallyadditions", "CF");
+        return map;
     }
 
 }

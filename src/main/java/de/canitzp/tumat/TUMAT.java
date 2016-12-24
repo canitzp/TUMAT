@@ -1,27 +1,22 @@
 package de.canitzp.tumat;
 
+import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.configuration.ConfigHandler;
-import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.integration.*;
 import de.canitzp.tumat.network.NetworkHandler;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModAPIManager;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author canitzp
@@ -32,7 +27,7 @@ public class TUMAT{
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
-    public static final String DEPENDENCIES = "before:HardcoreQuesting;";
+    public static final String DEPENDENCIES = "before:hardcorequesting;";
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
@@ -42,15 +37,23 @@ public class TUMAT{
         logger.info("[PreInit] Started " + MODNAME + " Version " + MODVERSION);
         logger.info("[PreInit] Load config");
         ConfigHandler.preInit(event);
-
+        logger.info("[PreInit] Load network stuff");
         NetworkHandler.init();
         if(event.getSide().isClient()){
-            logger.info("[PreInit] Load client stuff");
+            logger.info("[PreInit] Load integrations");
             loadIntegrations();
             TUMATApi.allowGuiToRenderOverlay(GuiInventory.class, GuiContainerCreative.class, GuiIngameMenu.class, GuiChat.class);
         }
-        MinecraftForge.EVENT_BUS.register(TUMAT.class);
         logger.info("[PreInit] Completed loading");
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event){
+        logger.info("[PostInit] Initializing all IWorldRenderer");
+        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+            renderer.init();
+        }
+        logger.info("[PostInit] Completed loading");
     }
 
     /**
@@ -66,15 +69,11 @@ public class TUMAT{
     private void loadIntegrations(){
         //Energy:
         Energy.FU.isActive = true;
+        TUMATApi.registerRenderComponent(ForgeUnits.class);
         if(Loader.isModLoaded("tesla")){
             logger.info("[Integration] Loading Tesla integration");
             Energy.set(Energy.TESLA);
             TUMATApi.registerRenderComponent(Tesla.class);
-        }
-        if(ModAPIManager.INSTANCE.hasAPI("CoFHAPI|energy")){
-            logger.info("[Integration] Loading RedstoneFlux integration");
-            Energy.set(Energy.RF);
-            TUMATApi.registerRenderComponent(RedstoneFlux.class);
         }
         if(isClassLoaded("ic2/api/tile/IEnergyStorage")){
             logger.info("[Integration] Loading ElectricalUnit integration");
@@ -109,6 +108,8 @@ public class TUMAT{
 
         //Harvestability:
         TUMATApi.registerRenderComponent(Harvestability.class);
+
+        TUMATApi.registerRenderComponent(EnergyColors.class);
     }
 
     private static boolean isClassLoaded(String className){
@@ -120,9 +121,8 @@ public class TUMAT{
     }
 
     public enum Energy{
-        TESLA,
-        RF,
         FU,
+        TESLA,
         EU;
 
         public static Energy mainEnergy = FU;
@@ -130,7 +130,7 @@ public class TUMAT{
 
         public static void set(Energy energy){
             energy.isActive = true;
-            if(mainEnergy.ordinal() < energy.ordinal()){
+            if(mainEnergy.ordinal() > energy.ordinal()){
                 mainEnergy = energy;
             }
         }

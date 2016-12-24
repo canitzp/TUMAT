@@ -16,7 +16,6 @@ public enum ConfigBoolean {
     SHOW_DESCRIPTION("ShowDescription", "If true TUMAT shows the normal item description for Blocks.", true, ConfigCats.GENERAL, true),
 
     SHOW_TESLA("ShowEnergyTesla", "If true TUMAT will try to show Tesla energy.", true, ConfigCats.MODULE, true),
-    SHOW_RF("ShowEnergyRF", "If true TUMAT will try to show RF (Redstone Flux) energy.", true, ConfigCats.MODULE, true),
     SHOW_EU("ShowEnergyEU", "If true TUMAT will try to show EU (Energy Units) energy.", true, ConfigCats.MODULE, true),
     SHOW_FU("ShowEnergyFU", "If true TUMAT will try to show FU (Forge Units) energy.", true, ConfigCats.MODULE, true),
 
@@ -26,7 +25,7 @@ public enum ConfigBoolean {
     SHOW_PLANT_GROWTH_STATUS("ShowPlantGrowthStatus", "If true TUMAT shows the growth status of plants.", true, ConfigCats.MODULE, true),
     SHOW_HARVESTABILITY("ShowHarvestability", "If true TUMAT shows the harvestability tooltip.", false, ConfigCats.MODULE, true),
     SHOW_FLUID_TANKS("ShowFluidTanks", "If true TUMAT shows the content of fluid tanks.", true, ConfigCats.MODULE, true),
-    SHOW_INVENTORY_STATUS("ShowStateOfInventores", "Active this and TUMAT displays how many slots of a inventory are free.", false, ConfigCats.MODULE, true),
+    SHOW_INVENTORY_STATUS("ShowStateOfInventories", "Active this and TUMAT displays how many slots of a inventory are free.", false, ConfigCats.MODULE, true),
 
     SHOW_SLOT_NUMBERS("ShowSlotNumbers", "If true TUMAT shows the slot numbers in inventories while pressing ctrl.", true, ConfigCats.MODULE),
     SHOW_BACKGROUND("ShowBackground", "Activate this to enable the background for the TUMAT tooltip.", false, ConfigCats.RENDERING);

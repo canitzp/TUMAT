@@ -38,7 +38,7 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
         int size = buffer.readInt();
         String[] nbtKeys = new String[size];
         for(int i = 0; i < size; i++){
-            nbtKeys[i] = buffer.readStringFromBuffer(Short.MAX_VALUE);
+            nbtKeys[i] = buffer.readString(Short.MAX_VALUE);
         }
         this.nbtKeys = nbtKeys;
     }
@@ -60,7 +60,9 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
             }
         }
         return null;
-    }    @Override
+    }
+
+    @Override
     public void toBytes(ByteBuf buf){
         PacketBuffer buffer = new PacketBuffer(buf);
         buffer.writeBlockPos(this.pos);
@@ -88,7 +90,7 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
             PacketBuffer buffer = new PacketBuffer(buf);
             this.pos = buffer.readBlockPos();
             try{
-                this.nbt = buffer.readNBTTagCompoundFromBuffer();
+                this.nbt = buffer.readCompoundTag();
             } catch(IOException e){
                 e.printStackTrace();
             }
@@ -98,7 +100,7 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
         public void toBytes(ByteBuf buf){
             PacketBuffer buffer = new PacketBuffer(buf);
             buffer.writeBlockPos(this.pos);
-            buffer.writeNBTTagCompoundToBuffer(this.nbt);
+            buffer.writeCompoundTag(this.nbt);
         }
 
         @SideOnly(Side.CLIENT)
@@ -108,7 +110,7 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
                 @SideOnly(Side.CLIENT)
                 @Override
                 public void run(){
-                    World world = Minecraft.getMinecraft().theWorld;
+                    World world = Minecraft.getMinecraft().world;
                     TileEntity tileEntity = world.getTileEntity(message.pos);
                     if(tileEntity != null){
                         NBTTagCompound oldNBT = tileEntity.writeToNBT(new NBTTagCompound());

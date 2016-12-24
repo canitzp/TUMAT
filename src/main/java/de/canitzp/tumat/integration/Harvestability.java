@@ -34,7 +34,7 @@ public class Harvestability implements IWorldRenderer{
         String tool = getHarvestTool(state);
         if (tool != null) {
             ItemStack stack = player.getHeldItemMainhand();
-            if (stack != ItemStack.field_190927_a) {
+            if (stack != ItemStack.EMPTY) {
                 String color = getTextColorTool(tool, stack);
                 component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
                 if (!isTinkersConstructLoaded && "pickaxe".equals(tool) && level != null && color.equals(TextFormatting.GREEN.toString())) {

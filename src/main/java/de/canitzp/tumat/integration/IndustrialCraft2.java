@@ -69,7 +69,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
         }
 
         if (tileEntity instanceof TileEntityBlock) {
-            TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
+            InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "components");
             if (((TileEntityBlock) tileEntity).hasComponent(Energy.class)) {
                 Energy energy = ((TileEntityBlock) tileEntity).getComponent(Energy.class);
                 List<String> desc = new ArrayList<>();
@@ -98,7 +98,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
         }
         if (tileEntity instanceof TileEntityCable) {
             String text = "Cable";
-            TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "cableType", "insulation");
+            InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "cableType", "insulation");
             NBTTagCompound nbt = new NBTTagCompound();
             tileEntity.writeToNBT(nbt);
             if (!nbt.hasNoTags()) {

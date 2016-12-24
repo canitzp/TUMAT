@@ -2,10 +2,8 @@ package de.canitzp.tumat;
 
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
-import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
@@ -24,8 +22,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -57,10 +53,10 @@ public class TUMATEvents{
                         Minecraft.getMinecraft().fontRendererObj.drawString(buildText, 2, 2, 0x80FFFFFF);
                         GlStateManager.popMatrix();
                     }
-                    RenderOverlay.render(mc.theWorld, mc.thePlayer, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.theWorld.getTotalWorldTime() % 3 == 0);
+                    RenderOverlay.render(mc.world, mc.player, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
-                    TooltipComponent.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
-                    if(mc.theWorld.getTotalWorldTime() % 100 == 0){
+                    InfoUtil.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
+                    if(mc.world.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();
                     }
@@ -153,7 +149,7 @@ public class TUMATEvents{
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
                 for(Slot slot : gui.inventorySlots.inventorySlots){
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                    renderer.drawString(String.valueOf(slot.getSlotIndex()), 2 * (slot.xDisplayPosition + guiLeft), 2 * (slot.yDisplayPosition + guiTop), 0xFFFFFF, false);
+                    renderer.drawString(String.valueOf(slot.getSlotIndex()), 2 * (slot.xPos + guiLeft), 2 * (slot.yPos + guiTop), 0xFFFFFF, false);
                 }
                 RenderHelper.enableStandardItemLighting();
                 GlStateManager.enableBlend();

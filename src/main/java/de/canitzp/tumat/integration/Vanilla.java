@@ -64,7 +64,6 @@ public class Vanilla implements IWorldRenderer{
             if(!isBlockLightSource && !world.getBlockState(pos.up()).isFullCube() && !world.getBlockState(pos.up()).isFullBlock()){
                 int lightLevel = world.getLightFor(EnumSkyBlock.BLOCK, pos.up());
                 String canMobsSpawn = world.getWorldTime() % 24000 >= 13000 && lightLevel <= 7 && state.getBlock().canCreatureSpawn(state, world, pos, EntityLiving.SpawnPlacementType.ON_GROUND) ? TextFormatting.RED.toString() : TextFormatting.YELLOW.toString();
-                //TODO later check net.minecraftforge.common.ForgeModContainer.dayTicks
                 component.addOneLineRenderer(new TextComponent("Light: " + canMobsSpawn + lightLevel));
             }
             if(isBlockLightSource){

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class is for block or item descriptions.
  * @author canitzp
  */
 public class DescriptionComponent implements IComponentRender {

@@ -1,18 +1,14 @@
 package de.canitzp.tumat.network;
 
-import cofh.api.energy.IEnergyHandler;
 import de.canitzp.tumat.TUMAT;
 import io.netty.buffer.ByteBuf;
 import net.darkhax.tesla.lib.TeslaUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModAPIManager;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -45,7 +41,7 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
 
     @Override
     public IMessage onMessage(PacketUpdateEnergy message, MessageContext ctx){
-        World world = ctx.getServerHandler().playerEntity.worldObj;
+        World world = ctx.getServerHandler().playerEntity.getEntityWorld();
         TileEntity tile = world.getTileEntity(message.tilePos);
         if(tile != null && message.side != null) {
             try {
@@ -107,7 +103,7 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
                 @SideOnly(Side.CLIENT)
                 @Override
                 public void run(){
-                    World world = Minecraft.getMinecraft().theWorld;
+                    World world = Minecraft.getMinecraft().world;
                     TileEntity tile = world.getTileEntity(message.tilePos);
                     if(tile != null) {
                         long toStore = message.energy - TeslaUtils.getStoredPower(tile, message.side);

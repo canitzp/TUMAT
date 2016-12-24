@@ -2,16 +2,12 @@ package de.canitzp.tumat.configuration;
 
 import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import de.canitzp.tumat.configuration.cats.ConfigCats;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import de.canitzp.tumat.configuration.cats.ConfigString;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.io.FileUtils;

@@ -1,5 +1,6 @@
 package de.canitzp.tumat.integration;
 
+import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.EnergyComponent;
@@ -23,7 +24,7 @@ public class ElectricalUnits implements IWorldRenderer{
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(ConfigBoolean.SHOW_EU.value && tileEntity instanceof IEnergyStorage){
-            TooltipComponent.syncTileEntity(tileEntity, shouldCalculate, "components");
+            InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "components");
             int current = ((IEnergyStorage) tileEntity).getStored();
             int capacity = ((IEnergyStorage) tileEntity).getCapacity();
             if(capacity > 0){

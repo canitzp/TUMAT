@@ -5,6 +5,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextFormatting;
 
 /**
+ * This class is for a energy line, but is only used for IC2
  * @author canitzp
  */
 public class EnergyComponent implements IComponentRender{

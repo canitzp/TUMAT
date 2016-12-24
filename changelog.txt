@@ -1,3 +1,21 @@
+1.7.0:
+    -Removed RF compatibility, cause nobody uses it anymore
+    -Renamed ForgeUnits to Energy, cause every mod give it another name
+    -Fixed name for special ItemBlocks like doors, crops, ...
+    -Fixed inventory free slots tooltip
+    -Fixed typo inside of the conifg -> show inventory states have to be enabled again
+    -Activated ForgeUnits integration, cause I forgot to
+    -Fixed broken Actually Additions integration
+
+    -License change to LPGLv3
+
+
+    -API:
+        -Added java docs for all the api stuff
+        -Removed method remap from IWorldRenderer
+        -Added getEnergyColor() for mods that are supporting ForgeUnits
+        -Added a init method to IWorldRenderer
+
 1.7.0-BETA-2:
     -Actually fixed ItemStack null checks
 

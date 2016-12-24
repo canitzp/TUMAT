@@ -1,6 +1,9 @@
 package de.canitzp.tumat;
 
-import de.canitzp.tumat.api.*;
+import de.canitzp.tumat.api.IComponentRender;
+import de.canitzp.tumat.api.IWorldRenderer;
+import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.DescriptionComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
@@ -15,9 +18,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -33,18 +34,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author canitzp
@@ -112,7 +106,6 @@ public class RenderOverlay{
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
-            //component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T"));
             component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
             component.addOneLineRenderer(new DescriptionComponent(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state))));
             String modName = InfoUtil.getModName(state.getBlock());
@@ -133,7 +126,7 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().func_190916_E())); //TODO wait for mappings and change this to getStacksize();
+            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().getCount()));
             component.addOneLineRenderer(new DescriptionComponent(((EntityItem) entity).getEntityItem()));
             String modname = InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -143,7 +136,7 @@ public class RenderOverlay{
             }
             component.setModName(modname);
         } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
-            component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
+            component.addOneLineRenderer(new TextComponent(InfoUtil.getEntityName(entity)));
             component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
             String modName = InfoUtil.getModName(entity);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -153,7 +146,7 @@ public class RenderOverlay{
             }
             component.setModName(modName);
         } else if(ConfigBoolean.SHOW_ENTITIES.value){
-            component.addOneLineRenderer(new TextComponent(TooltipComponent.getEntityName(entity)));
+            component.addOneLineRenderer(new TextComponent(InfoUtil.getEntityName(entity)));
             String modName = InfoUtil.getModName(entity);
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
@@ -209,18 +202,19 @@ public class RenderOverlay{
 
     private static void renderBackground(int x, int y, int width, int lines){
         if(ConfigBoolean.SHOW_BACKGROUND.value){
+            World world = Minecraft.getMinecraft().world;
             long color = 0x806A9BC3;
             String hexConf = ConfigString.BACKGROUND_COLOR.value;
             if(hexConf.length() == 10){
                 try {
                     color = Long.parseLong(hexConf.substring(2, 10), 16);
                 } catch (Exception e){
-                    if(Minecraft.getMinecraft().theWorld != null && Minecraft.getMinecraft().theWorld.getTotalWorldTime() % 150 == 0){
+                    if(world != null && world.getTotalWorldTime() % 150 == 0){
                         TUMAT.logger.error("There is a error with the background hex code! The correct format is AARRGGBB with a '0x' in front of the code");
                     }
                 }
             } else{
-                if(Minecraft.getMinecraft().theWorld != null && Minecraft.getMinecraft().theWorld.getTotalWorldTime() % 150 == 0){
+                if(world != null && world.getTotalWorldTime() % 150 == 0){
                     TUMAT.logger.error("There is a error with the background hex code! The correct format is AARRGGBB with a '0x' in front of the code");
                 }
             }

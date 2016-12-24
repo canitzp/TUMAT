@@ -137,7 +137,7 @@ public class GuiTUMAT extends GuiScreen{
             GlStateManager.pushAttrib();
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.5, 0.5, 0.5);
-            TooltipComponent.drawCenteredString(renderer, "Click here for direct moving.", this.x + this.width + 9, this.y + this.height + 9, EnumDyeColor.GRAY.getMapColor().colorValue);
+            InfoUtil.drawCenteredString(renderer, "Click here for direct moving.", this.x + this.width + 9, this.y + this.height + 9, EnumDyeColor.GRAY.getMapColor().colorValue);
             GlStateManager.popMatrix();
             GlStateManager.popAttrib();
         }
