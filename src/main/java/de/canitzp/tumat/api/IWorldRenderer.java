@@ -1,6 +1,5 @@
 package de.canitzp.tumat.api;
 
-import com.sun.istack.internal.NotNull;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -15,6 +14,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,7 +128,7 @@ public interface IWorldRenderer{
     /**
      * @return a map of the modid and the color for the energy
      */
-    @NotNull
+    @Nonnull
     default Map<String, String> getEnergyColor(){return new HashMap<>();}
 
     /**
