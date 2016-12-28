@@ -17,6 +17,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -50,6 +51,7 @@ public class ActuallyAdditions implements IWorldRenderer{
         return ConfigBoolean.SHOW_SPECIAL_TILE_STATS.value;
     }
 
+    @Nonnull
     @Override
     public Map<String, String> getEnergyColor(){
         Map<String, String> map = new HashMap<>();

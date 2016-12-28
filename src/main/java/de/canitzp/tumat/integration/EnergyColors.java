@@ -2,6 +2,7 @@ package de.canitzp.tumat.integration;
 
 import de.canitzp.tumat.api.IWorldRenderer;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ public class EnergyColors implements IWorldRenderer{
         return false;
     }
 
+    @Nonnull
     @Override
     public Map<String, String> getEnergyColor(){
         Map<String, String> map = new HashMap<>();

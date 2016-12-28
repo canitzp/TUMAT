@@ -1,3 +1,6 @@
+1.7.1:
+    -Fix for a server startup crash
+
 1.7.0:
     -Removed RF compatibility, cause nobody uses it anymore
     -Renamed ForgeUnits to Energy, cause every mod give it another name

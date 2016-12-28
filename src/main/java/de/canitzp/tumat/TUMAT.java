@@ -49,9 +49,11 @@ public class TUMAT{
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event){
-        logger.info("[PostInit] Initializing all IWorldRenderer");
-        for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
-            renderer.init();
+        if(event.getSide().isClient()){
+            logger.info("[PostInit] Initializing all IWorldRenderer");
+            for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
+                renderer.init();
+            }
         }
         logger.info("[PostInit] Completed loading");
     }
