@@ -8,6 +8,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * If you override this, you can give a TooltipComponent the overridden class as custom renderer.
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public interface IComponentRender{
 
     /**
@@ -17,7 +18,6 @@ public interface IComponentRender{
      * @param y The y position of the text
      * @param color The color of the text, default is 0xFFFFFF
      */
-    @SideOnly(Side.CLIENT)
     void render(FontRenderer fontRenderer, int x, int y, int color);
 
     /**

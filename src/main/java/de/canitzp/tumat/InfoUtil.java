@@ -65,7 +65,7 @@ public class InfoUtil{
             if(!desc.isEmpty()){
                 List<String> s = new ArrayList<>();
                 for(String s1 : desc){
-                    s.addAll(Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(s1, 200));
+                    s.addAll(Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(s1, 200));
                 }
                 if(s.size() > 2 && !Minecraft.getMinecraft().player.isSneaking()){
                     List<String> cached = new ArrayList<>();

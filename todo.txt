@@ -1,2 +1,3 @@
 ideas:
-    -Keybind to enable/disable a defined module
+    -Fluids have the fluid color as text color
+    -Common Capabilities integration

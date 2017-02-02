@@ -50,12 +50,12 @@ public class TUMATEvents{
                         GlStateManager.pushMatrix();
                         GlStateManager.scale(0.4F, 0.4F, 0.4F);
                         GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
-                        Minecraft.getMinecraft().fontRendererObj.drawString(buildText, 2, 2, 0x80FFFFFF);
+                        Minecraft.getMinecraft().fontRenderer.drawString(buildText, 2, 2, 0x80FFFFFF);
                         GlStateManager.popMatrix();
                     }
-                    RenderOverlay.render(mc.world, mc.player, event.getResolution(), mc.fontRendererObj, event.getType(), event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
+                    RenderOverlay.render(mc.world, mc.player, event.getResolution(), mc.fontRenderer, event.getType(), event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
-                    InfoUtil.drawCenteredString(mc.fontRendererObj, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
+                    InfoUtil.drawCenteredString(mc.fontRenderer, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
                     if(mc.world.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();
@@ -102,7 +102,7 @@ public class TUMATEvents{
     public static void openInventory(GuiScreenEvent.InitGuiEvent event){
         if(event.getGui().getClass().equals(GuiOptions.class)){
             String s = "TUMAT";
-            event.getButtonList().add(new GuiButton(963, 0, 0, Minecraft.getMinecraft().fontRendererObj.getStringWidth(s) + 20, 20, s));
+            event.getButtonList().add(new GuiButton(963, 0, 0, Minecraft.getMinecraft().fontRenderer.getStringWidth(s) + 20, 20, s));
         }
     }
 
@@ -122,7 +122,7 @@ public class TUMATEvents{
     public static void renderGuiContainer(GuiScreenEvent.DrawScreenEvent.Post event){
         if(ConfigBoolean.SHOW_SLOT_NUMBERS.value && event.getGui() instanceof GuiContainer){
             if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)){
-                FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
+                FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
                 GuiContainer gui = (GuiContainer) event.getGui();
                 int guiLeft = 0;
                 int guiTop = 0;

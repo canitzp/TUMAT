@@ -2,6 +2,7 @@ package de.canitzp.tumat.api.components;
 
 import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IComponentRender;
+import de.canitzp.tumat.api.TooltipComponent;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,6 +37,10 @@ public class TextComponent implements IComponentRender{
     @Override
     public int getLength(FontRenderer fontRenderer){
         return fontRenderer.getStringWidth(this.displayString);
+    }
+
+    public static void createOneLine(TooltipComponent component, String displayString, TextFormatting... formatting){
+        component.addOneLineRenderer(new TextComponent(displayString).setFormat(formatting));
     }
 
 }

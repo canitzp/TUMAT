@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,24 +31,16 @@ public class ForgeUnits implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
-        if(ConfigBoolean.SHOW_TESLA.value && TUMAT.Energy.TESLA.isActive){
-            if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_PRODUCER, side)){
-                return component;
-            }
-        }
-        if(ConfigBoolean.SHOW_EU.value && TUMAT.Energy.EU.isActive){
-            if(tileEntity instanceof ic2.api.tile.IEnergyStorage){
-                return component;
-            }
-        }
-
         if(tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)){
-            int energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
-            int cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, side).getMaxEnergyStored();
-            String modid = world.getBlockState(tileEntity.getPos()).getBlock().getRegistryName().getResourceDomain();
-            String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + "Energy";
-            if(cap > 0){
-                this.render(component, modid, name, energy, cap);
+            IEnergyStorage storage = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
+            if(storage != null){
+                int energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
+                int cap = storage.getMaxEnergyStored();
+                String modid = world.getBlockState(tileEntity.getPos()).getBlock().getRegistryName().getResourceDomain();
+                String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + "Energy";
+                if(cap > 0){
+                    this.render(component, modid, name, energy, cap);
+                }
             }
         }
 
@@ -70,6 +63,8 @@ public class ForgeUnits implements IWorldRenderer{
         TextComponent text = new TextComponent(String.format("%d %s / %d %s", current, name, cap, name));
         if(modid.equals("actuallyadditions")){
             text = new ColoredText(text, InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery)));
+        } else {
+            text.setFormat(TextFormatting.RED);
         }
         return component.addOneLineRenderer(text);
     }

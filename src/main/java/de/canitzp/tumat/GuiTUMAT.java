@@ -56,10 +56,10 @@ public class GuiTUMAT extends GuiScreen{
         this.mc.getTextureManager().bindTexture(this.location);
         this.drawTexturedModalRect(width / 2 - 13, height / 2 - 13, 0, 0, 27, 27);
         for(PutItHere directMover : this.directMove){
-            directMover.render(this.mc.fontRendererObj);
+            directMover.render(this.mc.fontRenderer);
         }
-        RenderOverlay.renderComponents(this.mc.fontRendererObj, Collections.singletonList(this.component));
-        this.mc.fontRendererObj.drawString("?", 2, 2, 0xFFFFFF);
+        RenderOverlay.renderComponents(this.mc.fontRenderer, Collections.singletonList(this.component));
+        this.mc.fontRenderer.drawString("?", 2, 2, 0xFFFFFF);
         if(mouseX <= 7 && mouseY <= 11){
             this.drawHoveringText(helpHovering, mouseX + 2, mouseY + 18);
         }
@@ -85,7 +85,7 @@ public class GuiTUMAT extends GuiScreen{
         } else {
             int[] intray = null;
             for(PutItHere directMover : this.directMove){
-                intray = directMover.onMouseClick(this.mc.fontRendererObj, mouseX, mouseY, this.component.getLength());
+                intray = directMover.onMouseClick(this.mc.fontRenderer, mouseX, mouseY, this.component.getLength());
                 if(intray != null){
                     break;
                 }

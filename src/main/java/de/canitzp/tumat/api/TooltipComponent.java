@@ -20,8 +20,8 @@ public class TooltipComponent{
 
     private TooltipComponent addRenderer(IComponentRender render){
         if(render != null){
-            if(this.length < render.getLength(Minecraft.getMinecraft().fontRendererObj)){
-                this.length = render.getLength(Minecraft.getMinecraft().fontRendererObj);
+            if(this.length < render.getLength(Minecraft.getMinecraft().fontRenderer)){
+                this.length = render.getLength(Minecraft.getMinecraft().fontRenderer);
             }
             this.currentObjects.add(render);
         }

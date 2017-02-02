@@ -20,14 +20,18 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version =  "1.7.1"
+version =  "1.7.2"
 group = "de.canizp.tumat"
 archivesBaseName = "TUMAT"
 
+if(hasProperty('buildnumber')){
+    version = "${version}-${this.properties['buildnumber']}"
+}
+
 minecraft {
-    version = "1.11.2-13.20.0.2201"
+    version = "1.11.2-13.20.0.2224"
     runDir = "run"
-    mappings = "snapshot_20161227"
+    mappings = "snapshot_20170121"
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
 }
@@ -36,34 +40,38 @@ repositories {
     maven {
         url = "http://maven.epoxide.xyz"
     }
-    maven {
+    maven { // Actually Additions
         url = "http://maven.chaosfield.at"
     }
     maven {
         url = "http://dvs1.progwml6.com/files/maven"
     }
-    maven {
+    maven { // IC2
         url = "http://maven.ic2.player.to/"
     }
-    maven {
+    maven { // RefinedStorage
         url = "http://dl.bintray.com/raoulvdberge/dev"
     }
-    maven {
+    maven { // MCMultiPart
         url = "http://maven.amadornes.com/"
+    }
+    maven {
+        url "https://dl.bintray.com/cyclopsmc/dev/"
     }
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.11:4.1.1.207:api"
-    runtime "mezz.jei:jei_1.11:4.1.1.207"
+    deobfCompile "mezz.jei:jei_1.11.2:4.2.4.226:api"
+    runtime "mezz.jei:jei_1.11.2:4.2.4.226"
     deobfCompile "net.darkhax.tesla:Tesla:1.11-1.3.0.51"
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions-unstable:1.11.2-r92-487"
+    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions-unstable:1.11.2-r99-525"
     compileOnly "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
     compileOnly "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
     compileOnly "net.industrial-craft:industrialcraft-2:2.6.58-ex110:api"
     deobfCompile "mod.chiselsandbits:chiselsandbits:+"
     deobfCompile "refinedstorage:refinedstorage:1.3.5-718"
     compileOnly "MCMultiPart:MCMultiPart:1.3.0:universal"
+    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.11.2-1.3.0-81"
     compileOnly fileTree("./libs")
 }
 
@@ -86,4 +94,54 @@ static def getDate() {
     def date = new Date()
     def formattedDate = date.format('yyMMddHHmm')
     return formattedDate
+}
+
+jar {
+
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    from sourceSets.main.java
+    classifier = 'dev'
+}
+
+task apiJar(type: Jar) {
+    from sourceSets.main.output
+    from sourceSets.main.java
+    classifier = 'api'
+    include 'de/canitzp/tumat/api/**'
+}
+
+javadoc {
+    include 'de/canitzp/tumat/api/**'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from 'build/docs/javadoc'
+    classifier 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java
+    classifier = 'sources'
+}
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact apiJar
+            artifact javadocJar
+            artifact sourcesJar
+            artifact deobfJar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///srv/nginx/maven"
+        }
+    }
 }

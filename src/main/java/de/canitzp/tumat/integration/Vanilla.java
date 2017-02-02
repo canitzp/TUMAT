@@ -5,10 +5,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import net.minecraft.block.BlockBeetroot;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -56,6 +53,12 @@ public class Vanilla implements IWorldRenderer{
             int power = state.getWeakPower(world, pos, side);
             if (power > 0 || state.getBlock() instanceof BlockRedstoneWire) {
                 component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.DARK_RED + power));
+            }
+            if(state.getBlock() instanceof BlockRedstoneRepeater){
+                component.addOneLineRenderer(new TextComponent("Delay ticks: " + state.getValue(BlockRedstoneRepeater.DELAY)).setFormat(TextFormatting.RED));
+                if(state.getValue(BlockRedstoneRepeater.LOCKED)){
+                    component.addOneLineRenderer(new TextComponent("Locked").setFormat(TextFormatting.GRAY));
+                }
             }
         }
 

@@ -46,7 +46,7 @@ public class PacketUpdateTileEntity implements IMessage, IMessageHandler<PacketU
     @Override
     public IMessage onMessage(PacketUpdateTileEntity message, MessageContext ctx){
         if(message.pos != null){
-            World world = ctx.getServerHandler().playerEntity.getEntityWorld();
+            World world = ctx.getServerHandler().player.getEntityWorld();
             TileEntity tileEntity = world.getTileEntity(message.pos);
             if(tileEntity != null){
                 NBTTagCompound oldTileEntityNBT = tileEntity.writeToNBT(new NBTTagCompound());

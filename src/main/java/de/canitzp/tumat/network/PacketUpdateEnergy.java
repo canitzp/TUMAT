@@ -41,7 +41,7 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
 
     @Override
     public IMessage onMessage(PacketUpdateEnergy message, MessageContext ctx){
-        World world = ctx.getServerHandler().playerEntity.getEntityWorld();
+        World world = ctx.getServerHandler().player.getEntityWorld();
         TileEntity tile = world.getTileEntity(message.tilePos);
         if(tile != null && message.side != null) {
             try {

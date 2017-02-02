@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,10 @@ public class SyncUtil{
         }
         TileEntity tile = Minecraft.getMinecraft().world.getTileEntity(pos);
         if(tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, side)){
-            return tile.getCapability(CapabilityEnergy.ENERGY, side).getEnergyStored();
+            IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, side);
+            if(storage != null){
+                return storage.getEnergyStored();
+            }
         }
         return 0;
     }

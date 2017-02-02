@@ -21,13 +21,14 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author canitzp
  */
-@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.configuration.GuiFact", dependencies = TUMAT.DEPENDENCIES)
+@Mod(name = TUMAT.MODNAME, modid = TUMAT.MODID, version = TUMAT.MODVERSION, guiFactory = "de.canitzp.tumat.configuration.GuiFact", dependencies = TUMAT.DEPENDENCIES, acceptedMinecraftVersions = TUMAT.MCVERSION)
 public class TUMAT{
 
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
     public static final String DEPENDENCIES = "before:hardcorequesting;";
+    public static final String MCVERSION = "1.11,1.11.2";
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
@@ -89,6 +90,9 @@ public class TUMAT{
 
         //Tanks:
         TUMATApi.registerRenderComponent(FluidHandler.class);
+        if(Loader.isModLoaded("deepresonance")){
+            TUMATApi.registerRenderComponent(DeepResonance.class);
+        }
 
         //Inventory
         TUMATApi.registerRenderComponent(Inventory.class);
@@ -106,6 +110,10 @@ public class TUMAT{
         if(Loader.isModLoaded("tconstruct")){
             logger.info("[Integration] Loading Tinkers Construct integration");
             TUMATApi.registerRenderComponent(TinkersConstruct.class);
+        }
+        if(Loader.isModLoaded("commoncapabilities")){
+            logger.info("[Integration] Loading Common Capabilities integration");
+            TUMATApi.registerRenderComponent(CommonCapabilities.class);
         }
 
         //Harvestability:

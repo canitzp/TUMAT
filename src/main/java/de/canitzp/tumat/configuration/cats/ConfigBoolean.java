@@ -26,6 +26,8 @@ public enum ConfigBoolean {
     SHOW_HARVESTABILITY("ShowHarvestability", "If true TUMAT shows the harvestability tooltip.", false, ConfigCats.MODULE, true),
     SHOW_FLUID_TANKS("ShowFluidTanks", "If true TUMAT shows the content of fluid tanks.", true, ConfigCats.MODULE, true),
     SHOW_INVENTORY_STATUS("ShowStateOfInventories", "Active this and TUMAT displays how many slots of a inventory are free.", false, ConfigCats.MODULE, true),
+    SHOW_TEMPERATURE_COMMONCAPABILITIES("ShowCommonCapsTemp", "Active if you want to see the Temperature of things, works only with CommonCapabilities", false, ConfigCats.MODULE, true),
+    SHOW_WORK_COMMONCAPABILITIES("ShowCommonCapsWork", "Active if you want to see the work progress of things, only available with CommonCapabilities", false, ConfigCats.MODULE, true),
 
     SHOW_SLOT_NUMBERS("ShowSlotNumbers", "If true TUMAT shows the slot numbers in inventories while pressing ctrl.", true, ConfigCats.MODULE),
     SHOW_BACKGROUND("ShowBackground", "Activate this to enable the background for the TUMAT tooltip.", false, ConfigCats.RENDERING);

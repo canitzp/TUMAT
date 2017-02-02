@@ -1,3 +1,8 @@
+1.7.2:
+    -Fixed an <ERROR> with RFTools Powercells
+    -ForgeUnits are now the preferred Energy Unit
+    -Added the maven and jenkins stuff to the build.gradle
+
 1.7.1:
     -Fix for a server startup crash
 

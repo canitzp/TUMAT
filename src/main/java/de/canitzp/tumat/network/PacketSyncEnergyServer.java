@@ -42,8 +42,8 @@ public class PacketSyncEnergyServer implements IMessage, IMessageHandler<PacketS
 
     @Override
     public IMessage onMessage(PacketSyncEnergyServer message, MessageContext ctx){
-        if(ctx.getServerHandler().playerEntity.getEntityId() == message.playerID){
-            TileEntity tile = ctx.getServerHandler().playerEntity.getEntityWorld().getTileEntity(message.pos);
+        if(ctx.getServerHandler().player.getEntityId() == message.playerID){
+            TileEntity tile = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             if(tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, message.side)){
                 IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, message.side);
                 return new PacketSyncEnergyClient(message.pos, message.side, storage.getEnergyStored());

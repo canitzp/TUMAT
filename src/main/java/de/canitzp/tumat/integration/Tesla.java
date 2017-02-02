@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,10 @@ public class Tesla implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
+        if(tileEntity.hasCapability(CapabilityEnergy.ENERGY, side) && tileEntity.getCapability(CapabilityEnergy.ENERGY, side) != null){
+            return component;
+        }
+
         if(tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side)){
             long currentEnergy = tileEntity.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getStoredPower();
             long capacity = tileEntity.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getCapacity();
