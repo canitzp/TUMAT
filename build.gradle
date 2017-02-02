@@ -72,7 +72,7 @@ dependencies {
     deobfCompile "refinedstorage:refinedstorage:1.3.5-718"
     compileOnly "MCMultiPart:MCMultiPart:1.3.0:universal"
     deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.11.2-1.3.0-81"
-    compileOnly fileTree("./libs")
+    //compileOnly fileTree("./libs")
 }
 
 processResources
@@ -90,11 +90,11 @@ processResources
     }
 }
 
-static def getDate() {
-    def date = new Date()
-    def formattedDate = date.format('yyMMddHHmm')
-    return formattedDate
-}
+//static def getDate() {
+//    def date = new Date()
+//    def formattedDate = date.format('yyMMddHHmm')
+//    return formattedDate
+//}
 
 jar {
 
