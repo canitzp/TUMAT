@@ -20,7 +20,6 @@ import ic2.core.block.wiring.TileEntityTransformer;
 import ic2.core.init.Localization;
 import ic2.core.item.block.ItemCable;
 import ic2.core.ref.MetaTeBlock;
-import net.darkhax.tesla.capability.TeslaCapabilities;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -31,6 +30,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,11 +40,13 @@ import java.util.List;
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class IndustrialCraft2 implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         IBlockState state = world.getBlockState(pos);
+        /*
         if(state.getBlock() instanceof BlockTileEntity){
             if(InfoUtil.hasProperty(state, ((BlockTileEntity) state.getBlock()).typeProperty)){
                 IProperty<MetaTeBlock> property = ((BlockTileEntity) state.getBlock()).typeProperty;
@@ -57,18 +60,13 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 //component.addOneLineRenderer(new DescriptionComponent(((BlockTileEntity) state.getBlock()).getItemStack(teBlock.teBlock)));
             }
         }
+        */
         return component;
     }
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate) {
-        if (TUMAT.Energy.TESLA.isActive) {
-            if (tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side) || tileEntity.hasCapability(TeslaCapabilities.CAPABILITY_PRODUCER, side)) {
-                return component;
-            }
-        }
-
-        if (tileEntity instanceof TileEntityBlock) {
+        /*if (tileEntity instanceof TileEntityBlock) {
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "components");
             if (((TileEntityBlock) tileEntity).hasComponent(Energy.class)) {
                 Energy energy = ((TileEntityBlock) tileEntity).getComponent(Energy.class);
@@ -113,7 +111,8 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 }
             }
             component.setFirst(Collections.singletonList(new TextComponent(text)));
-        }
+        }*/
         return component;
     }
 }
+

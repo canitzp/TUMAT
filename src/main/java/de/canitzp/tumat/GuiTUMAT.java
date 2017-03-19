@@ -15,6 +15,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.Random;
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class GuiTUMAT extends GuiScreen{
 
     private static List<String> helpHovering = Lists.newArrayList(

@@ -9,16 +9,23 @@ import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class Vanilla implements IWorldRenderer{
 
     @Override
@@ -78,4 +85,12 @@ public class Vanilla implements IWorldRenderer{
         return component;
     }
 
+    @Override
+    public TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, TooltipComponent component, boolean shouldCalculate) {
+        if(entity instanceof EntityDragonPart){
+            component.clear();
+            component.addOneLineRenderer(new TextComponent(EntityList.getTranslationName(EntityList.getKey(EntityDragon.class))));
+        }
+        return component;
+    }
 }

@@ -10,6 +10,8 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.cyclops.commoncapabilities.api.capability.temperature.ITemperature;
 import org.cyclops.commoncapabilities.api.capability.work.IWorker;
 import org.cyclops.commoncapabilities.capability.temperature.TemperatureConfig;
@@ -18,6 +20,7 @@ import org.cyclops.commoncapabilities.capability.worker.WorkerConfig;
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class CommonCapabilities implements IWorldRenderer{
 
     @Override

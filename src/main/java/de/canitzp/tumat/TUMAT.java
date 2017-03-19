@@ -18,6 +18,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * @author canitzp
  */
@@ -27,14 +32,22 @@ public class TUMAT{
     public static final String MODNAME = "TUMAT";
     public static final String MODID = "tumat";
     public static final String MODVERSION = "@VERSION@";
+    public static final String BUILD_DATE = "@BUILD_DATE@";
     public static final String DEPENDENCIES = "before:hardcorequesting;";
     public static final String MCVERSION = "1.11,1.11.2";
+    public static boolean DEBUG = MODVERSION.contains("DEBUG");
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event){
+    public void preInit(FMLPreInitializationEvent event) {
+        if(!DEBUG){
+            DEBUG = MODVERSION.contains("SION@");
+        }
+        if(DEBUG){
+            logger.info("[PreInit] " + MODNAME + " was launched in debug mode! Build date: " + BUILD_DATE);
+        }
         logger.info("[PreInit] Started " + MODNAME + " Version " + MODVERSION);
         logger.info("[PreInit] Load config");
         ConfigHandler.preInit(event);
@@ -73,26 +86,26 @@ public class TUMAT{
         //Energy:
         Energy.FU.isActive = true;
         TUMATApi.registerRenderComponent(ForgeUnits.class);
+        /*
         if(Loader.isModLoaded("tesla")){
             logger.info("[Integration] Loading Tesla integration");
             Energy.set(Energy.TESLA);
             TUMATApi.registerRenderComponent(Tesla.class);
-        }
+        }*/
         if(isClassLoaded("ic2/api/tile/IEnergyStorage")){
-            logger.info("[Integration] Loading ElectricalUnit integration");
+            logger.info("[PreInit][Integration] Loading ElectricalUnit integration");
             Energy.set(Energy.EU);
             TUMATApi.registerRenderComponent(ElectricalUnits.class);
         }
+        /*
         if(Loader.isModLoaded("IC2")){
             logger.info("[Integration] Loading IndustrialCraft 2 integration");
             TUMATApi.registerRenderComponent(IndustrialCraft2.class);
         }
+        */
 
         //Tanks:
         TUMATApi.registerRenderComponent(FluidHandler.class);
-        if(Loader.isModLoaded("deepresonance")){
-            TUMATApi.registerRenderComponent(DeepResonance.class);
-        }
 
         //Inventory
         TUMATApi.registerRenderComponent(Inventory.class);
@@ -100,26 +113,26 @@ public class TUMAT{
         //More:
         TUMATApi.registerRenderComponent(Vanilla.class);
         if(Loader.isModLoaded("actuallyadditions")){
-            logger.info("[Integration] Loading Actually Additions integration");
+            logger.info("[PreInit][Integration] Loading Actually Additions integration");
             TUMATApi.registerRenderComponent(ActuallyAdditions.class);
         }
         if(Loader.isModLoaded("chiselsandbits")){
-            logger.info("[Integration] Loading ChiselAndBits integration");
+            logger.info("[PreInit][Integration] Loading ChiselAndBits integration");
             TUMATApi.registerRenderComponent(ChiselsAndBits.class);
         }
+        /*
         if(Loader.isModLoaded("tconstruct")){
             logger.info("[Integration] Loading Tinkers Construct integration");
             TUMATApi.registerRenderComponent(TinkersConstruct.class);
         }
+        */
         if(Loader.isModLoaded("commoncapabilities")){
-            logger.info("[Integration] Loading Common Capabilities integration");
+            logger.info("[PreInit][Integration] Loading Common Capabilities integration");
             TUMATApi.registerRenderComponent(CommonCapabilities.class);
         }
 
         //Harvestability:
         TUMATApi.registerRenderComponent(Harvestability.class);
-
-        TUMATApi.registerRenderComponent(EnergyColors.class);
     }
 
     private static boolean isClassLoaded(String className){

@@ -13,9 +13,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -31,14 +29,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.BossInfoLerping;
 import net.minecraft.world.World;
+import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author canitzp
@@ -106,7 +110,7 @@ public class RenderOverlay{
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
-            component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
+            component.addOneLineRenderer(TextComponent.createWithSensitiveName(world, player, savedTrace, pos, state));
             component.addOneLineRenderer(new DescriptionComponent(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state))));
             String modName = InfoUtil.getModName(state.getBlock());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
@@ -178,7 +182,7 @@ public class RenderOverlay{
     public static void renderComponents(FontRenderer fontRenderer, List<TooltipComponent> lines){
         for(TooltipComponent tooltipComponent : lines){
             if(tooltipComponent != null){
-                int y2 = GuiTUMAT.getYFromPercantage();
+                int y2 = GuiTUMAT.getYFromPercantage() + getBossBarOffset();
                 GlStateManager.pushMatrix();
                 for(List<IComponentRender> lists : tooltipComponent.endComponent()){
                     int lineAmount = 0;
@@ -227,6 +231,24 @@ public class RenderOverlay{
         if(object != null){
             list.add(object);
         }
+    }
+
+    private static int getBossBarOffset(){
+        if(GuiIngameForge.renderBossHealth){
+            GuiIngame guiIngame = Minecraft.getMinecraft().ingameGUI;
+            for(Field field : GuiIngame.class.getDeclaredFields()){
+                if(field.getType() == GuiBossOverlay.class){
+                    field.setAccessible(true);
+                    try {
+                        Map<UUID, BossInfoLerping> mapBossInfos = ReflectionHelper.getPrivateValue(GuiBossOverlay.class, (GuiBossOverlay) field.get(guiIngame), 2);
+                        return mapBossInfos.size() * (8 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return 0;
     }
 
     private static RayTraceResult createRayTraceForDistance(World world, EntityPlayer player, double maxDistance, float partialTicks){

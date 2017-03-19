@@ -1,6 +1,7 @@
 package de.canitzp.tumat.integration;
 
-import de.canitzp.tumat.TUMAT;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
@@ -9,7 +10,7 @@ import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.network.SyncUtil;
 import de.ellpeck.actuallyadditions.mod.items.InitItems;
-import net.darkhax.tesla.capability.TeslaCapabilities;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.item.ItemStack;
@@ -18,26 +19,46 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class ForgeUnits implements IWorldRenderer{
 
-    public static Map<String, String> names = new HashMap<>();
+    public static HashMap<String, String> names = new HashMap<String, String>(){{
+        put("refinedstorage", "RS");
+    }};
+
+    public static List<String> cableString = Lists.newArrayList("laserrelay", "cable", "conduit");
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)){
             IEnergyStorage storage = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             if(storage != null){
-                int energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
-                int cap = storage.getMaxEnergyStored();
-                String modid = world.getBlockState(tileEntity.getPos()).getBlock().getRegistryName().getResourceDomain();
+                IBlockState state = world.getBlockState(tileEntity.getPos());
+                String modid = state.getBlock().getRegistryName().getResourceDomain();
                 String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + "Energy";
+                int cap = storage.getMaxEnergyStored();
+                for(String s : cableString){
+                    String toComp = state.getBlock().getUnlocalizedName();
+                    if(toComp.contains("block_laser_relay")){
+                        component.addOneLineRenderer(new ColoredText("Max transfer: " + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))));
+                        return component;
+                    }
+                    if(toComp.contains(s)){
+                        component.addOneLineRenderer(new TextComponent("Max transfer: " + name).setFormat(TextFormatting.RED));
+                        return component;
+                    }
+                }
+                int energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
                 if(cap > 0){
                     this.render(component, modid, name, energy, cap);
                 }

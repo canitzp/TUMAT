@@ -23,6 +23,8 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +38,7 @@ import java.util.List;
  * @author canitzp
  */
 @SuppressWarnings("ConstantConditions")
+@SideOnly(Side.CLIENT)
 public class InfoUtil{
 
     private static final HashMap<String, String> cachedModNames = new HashMap<>();

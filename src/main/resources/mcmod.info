@@ -11,7 +11,7 @@
   "credits": "Author: canitzp",
   "logoFile": "",
   "screenshots": [],
-  "requiredMods": ["Forge@[12.18.2.2099,)"],
-  "dependencies": ["Forge@[12.18.2.2099,)"]
+  "requiredMods": [],
+  "dependencies": []
 }
 ]

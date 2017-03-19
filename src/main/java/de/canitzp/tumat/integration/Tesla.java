@@ -1,24 +1,8 @@
 package de.canitzp.tumat.integration;
 
 import de.canitzp.tumat.api.IWorldRenderer;
-import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.TextComponent;
-import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import de.canitzp.tumat.network.NetworkHandler;
-import de.canitzp.tumat.network.PacketUpdateEnergy;
-import net.darkhax.tesla.capability.TeslaCapabilities;
-import net.darkhax.tesla.lib.TeslaUtils;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author canitzp
@@ -26,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 @SideOnly(Side.CLIENT)
 public class Tesla implements IWorldRenderer{
 
+    /*
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(tileEntity.hasCapability(CapabilityEnergy.ENERGY, side) && tileEntity.getCapability(CapabilityEnergy.ENERGY, side) != null){
@@ -69,5 +54,6 @@ public class Tesla implements IWorldRenderer{
     public boolean shouldBeActive() {
         return ConfigBoolean.SHOW_TESLA.value;
     }
+    */
 
 }

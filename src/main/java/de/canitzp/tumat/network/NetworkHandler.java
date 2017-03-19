@@ -21,8 +21,8 @@ public class NetworkHandler{
         network.registerMessage(PacketUpdateTileEntity.class, PacketUpdateTileEntity.class, 1, Side.SERVER);
         network.registerMessage(PacketUpdateTileEntity.PacketTileEntityToClient.class, PacketUpdateTileEntity.PacketTileEntityToClient.class, 2, Side.CLIENT);
         //TODO remove these two old packet after tesla support is dropped
-        network.registerMessage(PacketUpdateEnergy.class, PacketUpdateEnergy.class, 3, Side.SERVER);
-        network.registerMessage(PacketUpdateEnergy.PacketUpdateEnergyClient.class, PacketUpdateEnergy.PacketUpdateEnergyClient.class, 4, Side.CLIENT);
+        //network.registerMessage(PacketUpdateEnergy.class, PacketUpdateEnergy.class, 3, Side.SERVER);
+        //network.registerMessage(PacketUpdateEnergy.PacketUpdateEnergyClient.class, PacketUpdateEnergy.PacketUpdateEnergyClient.class, 4, Side.CLIENT);
 
         network.registerMessage(PacketSyncEnergyClient.class, PacketSyncEnergyClient.class, 5, Side.CLIENT);
         network.registerMessage(PacketSyncEnergyServer.class, PacketSyncEnergyServer.class, 6, Side.SERVER);

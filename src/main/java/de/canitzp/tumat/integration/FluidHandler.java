@@ -8,14 +8,18 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author canitzp
  */
 @SuppressWarnings("ConstantConditions")
+@SideOnly(Side.CLIENT)
 public class FluidHandler implements IWorldRenderer{
 
     @Override
@@ -27,7 +31,8 @@ public class FluidHandler implements IWorldRenderer{
                 if(props != null){
                     for(IFluidTankProperties tank : props){
                         if(tank != null && tank.getContents() != null){
-                            component.addOneLineRenderer(new TextComponent(tank.getContents().amount + "mB / " + tank.getCapacity() + "mB " + tank.getContents().getLocalizedName()));
+                            FluidStack fluidStack = tank.getContents();
+                            component.addOneLineRenderer(new TextComponent(fluidStack.amount + "mB / " + tank.getCapacity() + "mB " + fluidStack.getLocalizedName()));
                         }
                     }
                 }

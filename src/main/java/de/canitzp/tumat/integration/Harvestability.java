@@ -14,6 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -21,6 +23,7 @@ import javax.annotation.Nullable;
 /**
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class Harvestability implements IWorldRenderer{
 
     public static boolean isTinkersConstructLoaded = Loader.isModLoaded("tconstruct");

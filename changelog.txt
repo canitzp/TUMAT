@@ -1,7 +1,12 @@
-1.7.2:
+1.8.0-RC1:
     -Fixed an <ERROR> with RFTools Powercells
     -ForgeUnits are now the preferred Energy Unit
     -Added the maven and jenkins stuff to the build.gradle
+    -Disabled IC2, TCon, Tesla integration
+    -Removed DeepResonance
+    -Added a y offset if a boss bar gets rendered
+    -TUMAT now tries more to find a valid name for a block
+    -Cable are now showing their max transfer rate
 
 1.7.1:
     -Fix for a server startup crash

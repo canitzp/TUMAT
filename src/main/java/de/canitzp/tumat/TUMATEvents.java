@@ -44,9 +44,9 @@ public class TUMATEvents{
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.currentScreen == null || TUMATApi.getAllowedGuis().contains(mc.currentScreen.getClass())){
                 try{
-                    if(mc.currentScreen == null && !TUMAT.MODVERSION.contains(".") && ConfigBoolean.SHOW_FU.value){
+                    if(TUMAT.DEBUG){
                         String tumat = TextFormatting.AQUA.toString() + "T" + TextFormatting.GREEN.toString() + "U" + TextFormatting.RED.toString() + "M" + TextFormatting.YELLOW.toString() + "A" + TextFormatting.AQUA.toString() + "T" + TextFormatting.RESET.toString();
-                        String buildText = tumat + " build " + TUMAT.MODVERSION;
+                        String buildText = tumat + " build " + TUMAT.BUILD_DATE;
                         GlStateManager.pushMatrix();
                         GlStateManager.scale(0.4F, 0.4F, 0.4F);
                         GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);

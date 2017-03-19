@@ -2,6 +2,8 @@ package de.canitzp.tumat.api;
 
 import de.canitzp.tumat.api.components.TextComponent;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
  * This is the main collection for all things that get rendered with TUMAT
  * @author canitzp
  */
+@SideOnly(Side.CLIENT)
 public class TooltipComponent{
 
     private List<List<IComponentRender>> objects = new ArrayList<>();
@@ -18,7 +21,7 @@ public class TooltipComponent{
 
     private TextComponent modName;
 
-    private TooltipComponent addRenderer(IComponentRender render){
+    public TooltipComponent addRenderer(IComponentRender render){
         if(render != null){
             if(this.length < render.getLength(Minecraft.getMinecraft().fontRenderer)){
                 this.length = render.getLength(Minecraft.getMinecraft().fontRenderer);

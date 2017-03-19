@@ -2,7 +2,6 @@ package de.canitzp.tumat.network;
 
 import de.canitzp.tumat.TUMAT;
 import io.netty.buffer.ByteBuf;
-import net.darkhax.tesla.lib.TeslaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -15,10 +14,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-
 /**
  * @author canitzp
  */
+/*
 public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdateEnergy, IMessage>{
 
     BlockPos tilePos;
@@ -120,3 +119,4 @@ public class PacketUpdateEnergy implements IMessage, IMessageHandler<PacketUpdat
     }
 
 }
+*/

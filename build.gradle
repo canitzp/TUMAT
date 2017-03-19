@@ -20,30 +20,31 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version =  "1.7.2"
+version = project.tumat_version
 group = "de.canizp.tumat"
-archivesBaseName = "TUMAT"
+archivesBaseName = "TUMAT-" + project.tumat_version
 
 if(hasProperty('buildnumber')){
     version = "${version}-${this.properties['buildnumber']}"
 }
 
 minecraft {
-    version = "1.11.2-13.20.0.2224"
+    version = project.minecraft_version + "-" + project.forge_version
     runDir = "run"
-    mappings = "snapshot_20170121"
+    mappings = project.forge_mappings
     replaceIn "TUMAT.java"
     replace "@VERSION@", project.version.toString()
+    replace "@BUILD_DATE@", new Date().format("yyMMddHHmm")
 }
 
 repositories {
-    maven {
+    maven { // Tesla
         url = "http://maven.epoxide.xyz"
     }
     maven { // Actually Additions
         url = "http://maven.chaosfield.at"
     }
-    maven {
+    maven { // JEI
         url = "http://dvs1.progwml6.com/files/maven"
     }
     maven { // IC2
@@ -55,23 +56,27 @@ repositories {
     maven { // MCMultiPart
         url = "http://maven.amadornes.com/"
     }
-    maven {
+    maven { // CommonCapabilities
         url "https://dl.bintray.com/cyclopsmc/dev/"
     }
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.11.2:4.2.4.226:api"
-    runtime "mezz.jei:jei_1.11.2:4.2.4.226"
-    deobfCompile "net.darkhax.tesla:Tesla:1.11-1.3.0.51"
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions-unstable:1.11.2-r99-525"
-    compileOnly "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
-    compileOnly "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
-    compileOnly "net.industrial-craft:industrialcraft-2:2.6.58-ex110:api"
+    deobfCompile "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version + ":api"
+    runtime "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
+    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:" + project.minecraft_version + "-" + project.actadd_version
     deobfCompile "mod.chiselsandbits:chiselsandbits:+"
-    deobfCompile "refinedstorage:refinedstorage:1.3.5-718"
-    compileOnly "MCMultiPart:MCMultiPart:1.3.0:universal"
-    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.11.2-1.3.0-81"
+    deobfCompile "refinedstorage:refinedstorage:" + project.refinedstorage_version + "-+"
+    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:" + project.minecraft_version + "-" + project.commoncaps_version + "-+"
+    compileOnly "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ":dev"
+    runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ":dev"
+    compileOnly "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
+    runtime "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
+
+    //No Tesla support anymore deobfCompile "net.darkhax.tesla:Tesla:1.11-1.3.0.51"
+    //compileOnly "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
+    //compileOnly "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
+    //compileOnly "MCMultiPart:MCMultiPart:1.3.0:universal"
     //compileOnly fileTree("./libs")
 }
 
@@ -89,12 +94,6 @@ processResources
         exclude 'mcmod.info'
     }
 }
-
-//static def getDate() {
-//    def date = new Date()
-//    def formattedDate = date.format('yyMMddHHmm')
-//    return formattedDate
-//}
 
 jar {
 
