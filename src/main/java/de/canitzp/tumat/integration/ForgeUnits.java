@@ -1,13 +1,13 @@
 package de.canitzp.tumat.integration;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.ColoredText;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.local.L10n;
 import de.canitzp.tumat.network.SyncUtil;
 import de.ellpeck.actuallyadditions.mod.items.InitItems;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +24,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author canitzp
@@ -45,16 +44,16 @@ public class ForgeUnits implements IWorldRenderer{
             if(storage != null){
                 IBlockState state = world.getBlockState(tileEntity.getPos());
                 String modid = state.getBlock().getRegistryName().getResourceDomain();
-                String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + "Energy";
+                String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + L10n.ENERGY;
                 int cap = storage.getMaxEnergyStored();
                 for(String s : cableString){
                     String toComp = state.getBlock().getUnlocalizedName();
                     if(toComp.contains("block_laser_relay")){
-                        component.addOneLineRenderer(new ColoredText("Max transfer: " + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))));
+                        component.addOneLineRenderer(new ColoredText(L10n.ENERGY_MAXTRANSFER + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))));
                         return component;
                     }
                     if(toComp.contains(s)){
-                        component.addOneLineRenderer(new TextComponent("Max transfer: " + name).setFormat(TextFormatting.RED));
+                        component.addOneLineRenderer(new TextComponent(L10n.ENERGY_MAXTRANSFER + name).setFormat(TextFormatting.RED));
                         return component;
                     }
                 }

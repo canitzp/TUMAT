@@ -4,6 +4,7 @@ import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.local.L10n;
 import mod.chiselsandbits.api.IMultiStateBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -25,7 +26,7 @@ public class ChiselsAndBits implements IWorldRenderer{
         if(state.getBlock() instanceof IMultiStateBlock){
             component.clear();
             component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
-            component.addOneLineRenderer(new TextComponent("Base Block: " + InfoUtil.getBlockName(((IMultiStateBlock) state.getBlock()).getPrimaryState(world, pos))));
+            component.addOneLineRenderer(new TextComponent(L10n.getChiselAndBitsBaseBlock(InfoUtil.getBlockName(((IMultiStateBlock) state.getBlock()).getPrimaryState(world, pos)))));
         }
         return component;
     }

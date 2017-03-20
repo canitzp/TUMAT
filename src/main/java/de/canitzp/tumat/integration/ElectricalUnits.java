@@ -6,6 +6,7 @@ import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.EnergyComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.local.L10n;
 import ic2.api.tile.IEnergyStorage;
 import ic2.api.tile.IWrenchable;
 import net.minecraft.block.state.IBlockState;
@@ -41,7 +42,7 @@ public class ElectricalUnits implements IWorldRenderer{
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         IBlockState state = world.getBlockState(pos);
         if(ConfigBoolean.SHOW_HARVESTABILITY.value && state.getBlock() instanceof IWrenchable){
-            component.addOneLineRenderer(new TextComponent(TextFormatting.GOLD + "IC2 Wrenchable"));
+            TextComponent.createOneLine(component, L10n.IC2_WRENCHABLE, TextFormatting.GOLD);
         }
         return component;
     }

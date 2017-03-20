@@ -9,11 +9,15 @@ import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import de.canitzp.tumat.configuration.cats.ConfigString;
+import de.canitzp.tumat.local.L10n;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiBossOverlay;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,7 +36,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.BossInfoLerping;
 import net.minecraft.world.World;
 import net.minecraftforge.client.GuiIngameForge;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -52,7 +55,7 @@ public class RenderOverlay{
 
     private static RayTraceResult savedTrace;
 
-    public static void render(WorldClient world, EntityPlayerSP player, ScaledResolution resolution, FontRenderer fontRenderer, RenderGameOverlayEvent.ElementType type, float partialTicks, boolean shouldCalculate) {
+    public static void render(WorldClient world, EntityPlayerSP player, FontRenderer fontRenderer, float partialTicks, boolean shouldCalculate) {
         boolean calculate = savedTrace == null || shouldCalculate;
         RayTraceResult trace;
         if (calculate) {
@@ -130,7 +133,7 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            component.addOneLineRenderer(new TextComponent("Item " + InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET +  " x " + ((EntityItem) entity).getEntityItem().getCount()));
+            TextComponent.createOneLine(component, L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getEntityItem().getCount())));
             component.addOneLineRenderer(new DescriptionComponent(((EntityItem) entity).getEntityItem()));
             String modname = InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem());
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){

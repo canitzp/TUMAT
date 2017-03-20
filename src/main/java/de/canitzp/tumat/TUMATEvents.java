@@ -4,6 +4,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.local.L10n;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketSendServerConfig;
 import net.minecraft.client.Minecraft;
@@ -53,9 +54,9 @@ public class TUMATEvents{
                         Minecraft.getMinecraft().fontRenderer.drawString(buildText, 2, 2, 0x80FFFFFF);
                         GlStateManager.popMatrix();
                     }
-                    RenderOverlay.render(mc.world, mc.player, event.getResolution(), mc.fontRenderer, event.getType(), event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
+                    RenderOverlay.render(mc.world, mc.player, mc.fontRenderer, event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
-                    InfoUtil.drawCenteredString(mc.fontRenderer, "<ERROR>", GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
+                    InfoUtil.drawCenteredString(mc.fontRenderer, L10n.ERROR_TEXT, GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
                     if(mc.world.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();

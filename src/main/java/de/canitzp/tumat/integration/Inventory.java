@@ -4,6 +4,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.local.L10n;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.item.ItemStack;
@@ -34,12 +35,12 @@ public class Inventory implements IWorldRenderer{
                                 freeSlots++;
                             }
                         }
-                        component.addOneLineRenderer(new TextComponent("Free slots: " + freeSlots + " / " + handler.getSlots()).setFormat(TextFormatting.GOLD));
+                        TextComponent.createOneLine(component, L10n.getInventoryFreeSlots(freeSlots, handler.getSlots()), TextFormatting.GOLD);
                         if(handler.getSlots() > 1000){
-                            component.addOneLineRenderer(new TextComponent("Showing this may produce lag!").setFormat(TextFormatting.RED));
+                            TextComponent.createOneLine(component, L10n.INVENTORY_LAG_WARN, TextFormatting.RED);
                         }
                     } else if(handler.getSlots() > 1000){
-                        component.addOneLineRenderer(new TextComponent("Over 1000 slots. Sneak to show anyway.").setFormat(TextFormatting.GOLD));
+                        TextComponent.createOneLine(component, L10n.INVENTORY_OVER_1000, TextFormatting.GOLD);
                     }
                 }
             }

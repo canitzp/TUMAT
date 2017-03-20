@@ -4,6 +4,7 @@ import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.local.L10n;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -16,7 +17,6 @@ import net.minecraftforge.common.IShearable;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 
@@ -39,10 +39,10 @@ public class Harvestability implements IWorldRenderer{
             ItemStack stack = player.getHeldItemMainhand();
             if (stack != ItemStack.EMPTY) {
                 String color = getTextColorTool(tool, stack);
-                component.addOneLineRenderer(new TextComponent("Effective Tool: " + color + StringUtils.capitalize(tool)));
+                TextComponent.createOneLine(component, L10n.getHarvestEffectiveTool(color, tool));
                 if (!isTinkersConstructLoaded && "pickaxe".equals(tool) && level != null && color.equals(TextFormatting.GREEN.toString())) {
                     color = getTextColorLevel(state, player.getHeldItemMainhand());
-                    component.addOneLineRenderer(new TextComponent("Harvest Level: " + color + level));
+                    TextComponent.createOneLine(component, L10n.getHarvestLevel(color, level));
                 }
             }
         }

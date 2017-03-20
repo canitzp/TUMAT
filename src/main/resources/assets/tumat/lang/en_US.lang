@@ -1,0 +1,20 @@
+#General
+tumat.error.text=<ERROR>
+    #Item name, amount
+tumat.item.text=Item %s x %s
+tumat.energy.energy=Energy
+tumat.energy.max_transfer=Max transfer:
+    #color, tool name
+tumat.harvest.effective_tool=Effective Tool: %s %s
+    #color, tool name
+tumat.harvest.level=Harvest level: %s %s
+tumat.inventory.free_slots=Free slots: %i / %i
+tumat.inventory.lag_warning=Showing this may produce lag!
+tumat.inventory.its_over_1000=Over 1000 slots. Sneak to show anyway.
+
+#Integration
+tumat.chiselandbits.base_block=Base Block: %s
+tumat.commoncapabilities.temp=Temp: %d°C / %s°C
+tumat.commoncapabilities.work.on=Does work
+tumat.commoncapabilities.work.off=Inactive
+tumat.ic2.wrenchable=IC2 Wrenchable
