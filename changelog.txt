@@ -1,9 +1,19 @@
+1.8.0-RC2:
+    -Block or item description is now smaller than the other text
+    -Gradle file can now download a file directly -> used for Pam's HarvestCraft
+    -Added Pam's HarvestCraft integration
+    -TUMAT is now fully localised, go and add some languages
+
+
+    -API:
+        -Added IComponentRender#getHeightPerLine(FontRenderer)
+
 1.8.0-RC1:
     -Fixed an <ERROR> with RFTools Powercells
     -ForgeUnits are now the preferred Energy Unit
     -Added the maven and jenkins stuff to the build.gradle
     -Disabled IC2, TCon, Tesla integration
-    -Removed DeepResonance
+    -Removed DeepResonance integration
     -Added a y offset if a boss bar gets rendered
     -TUMAT now tries more to find a valid name for a block
     -Cable are now showing their max transfer rate

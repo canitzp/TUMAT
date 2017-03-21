@@ -90,7 +90,7 @@ dependencies {
         dest "./libs/Pams HarvestCraft.jar"
     }
 
-    compileOnly fileTree("./libs")
+    compile fileTree("./libs")
 }
 
 processResources
