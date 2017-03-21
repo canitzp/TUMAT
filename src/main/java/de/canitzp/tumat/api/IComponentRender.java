@@ -1,5 +1,6 @@
 package de.canitzp.tumat.api;
 
+import de.canitzp.tumat.api.components.DescriptionComponent;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,5 +35,13 @@ public interface IComponentRender{
      * @return The Amount of lines.
      */
     default int getLines(FontRenderer fontRenderer){return 1;}
+
+    /**
+     * This defines which size the height of one line is.
+     * @param fontRenderer The FontRender object
+     * @return The height per line.
+     * @see DescriptionComponent
+     */
+    default int getHeightPerLine(FontRenderer fontRenderer){return fontRenderer.FONT_HEIGHT + 1;}
 
 }

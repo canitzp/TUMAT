@@ -8,6 +8,7 @@ import net.minecraft.client.resources.I18n;
 public class L10n {
 
     public static final String ERROR_TEXT = I18n.format("tumat.error.text");
+    public static final String SNEAKFORMORE = I18n.format("tumat.sneak_for_more");
     public static final String ENERGY = I18n.format("tumat.energy.energy");
     public static final String ENERGY_MAXTRANSFER = I18n.format("tumat.energy.max_transfer");
     public static final String INVENTORY_LAG_WARN = I18n.format("tumat.inventory.lag_warning");
@@ -16,6 +17,7 @@ public class L10n {
     public static final String COMMONCAPS_WORK_ON = I18n.format("tumat.commoncapabilities.work.on");
     public static final String COMMONCAPS_WORK_OFF = I18n.format("tumat.commoncapabilities.work.off");
     public static final String IC2_WRENCHABLE = I18n.format("tumat.ic2.wrenchable");
+    public static final String REDSTONE_LOCKED = I18n.format("tumat.vanilla.redstone_locked");
 
 
     public static String getItemText(String name, String count){
@@ -38,8 +40,28 @@ public class L10n {
         return I18n.format("tumat.chiselandbits.base_block", blockName);
     }
 
-    public static String getCommonCapsTemp(double currentTemp, String maxTemp){
+    public static String getCommonCapsTemp(String currentTemp, String maxTemp){
         return I18n.format("tumat.commoncapabilities.temp", currentTemp, maxTemp);
+    }
+
+    public static String getVanillaGrowRate(String percent){
+        return I18n.format("tumat.vanilla.grow_status", percent);
+    }
+
+    public static String getVanillaRedstoneStrength(int power){
+        return I18n.format("tumat.vanilla.redstone", power);
+    }
+
+    public static String getVanillaRedstoneDelay(int delay){
+        return I18n.format("tumat.vanilla.redstone_delay", delay);
+    }
+
+    public static String getVanillaLight(int light){
+        return I18n.format("tumat.vanilla.light", light);
+    }
+
+    public static String getVanillaLightSource(int source){
+        return I18n.format("tumat.vanilla.light_source", source);
     }
 
 }

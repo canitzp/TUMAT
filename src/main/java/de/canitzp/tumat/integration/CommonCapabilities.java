@@ -28,8 +28,8 @@ public class CommonCapabilities implements IWorldRenderer{
         if(ConfigBoolean.SHOW_TEMPERATURE_COMMONCAPABILITIES.value && tile.hasCapability(TemperatureConfig.CAPABILITY, side)){
             ITemperature temp = tile.getCapability(TemperatureConfig.CAPABILITY, side);
             if(temp != null){
-                double max = Math.round(temp.getMaximumTemperature() * 10F) / 10F;
-                ColoredText.createOneLine(component, L10n.getCommonCapsTemp(Math.round(temp.getTemperature() * 10F) / 10F, max > 10000 ? "<10000" : String.valueOf(max)), ColoredText.Colors.ORANGE_BRIGHT);
+                float max = Math.round(temp.getMaximumTemperature() * 10F) / 10F;
+                ColoredText.createOneLine(component, L10n.getCommonCapsTemp(String.valueOf((Math.round(temp.getTemperature() * 10F) / 10F)), max > 10000 ? "<10000" : String.valueOf(max)), ColoredText.Colors.ORANGE_BRIGHT);
             }
         }
         //Worker

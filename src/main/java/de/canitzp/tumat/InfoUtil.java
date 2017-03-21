@@ -1,12 +1,14 @@
 package de.canitzp.tumat;
 
 import de.canitzp.tumat.configuration.cats.ConfigString;
+import de.canitzp.tumat.local.L10n;
 import de.canitzp.tumat.network.NetworkHandler;
 import de.canitzp.tumat.network.PacketUpdateTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -19,7 +21,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
@@ -75,7 +76,7 @@ public class InfoUtil{
                     for(int i = 0; i <= 1; i++){
                         cached.add(s.get(i));
                     }
-                    cached.add("<Sneak to show more>");
+                    cached.add(L10n.SNEAKFORMORE);
                     s.clear();
                     s.addAll(cached);
                 }
@@ -175,7 +176,7 @@ public class InfoUtil{
                     if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
                         strings.add("Color: #" + String.format("%06X", nbttagcompound.getInteger("color")));
                     } else {
-                        strings.add(TextFormatting.ITALIC + I18n.translateToLocal("item.dyed"));
+                        strings.add(TextFormatting.ITALIC + I18n.format("item.dyed"));
                     }
                 }
                 if (nbttagcompound.getTagId("Lore") == 9) {

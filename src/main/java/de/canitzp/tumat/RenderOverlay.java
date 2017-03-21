@@ -193,14 +193,14 @@ public class RenderOverlay{
                         for(IComponentRender component : lists){
                             if(component != null){
                                 int x = GuiTUMAT.getXFromPercantage();
-                                lineAmount = component.getLines(fontRenderer);
+                                lineAmount = component.getLines(fontRenderer) * component.getHeightPerLine(fontRenderer);
                                 renderBackground(x, y2, tooltipComponent.getLength(), lineAmount);
                                 GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
                                 component.render(fontRenderer, GuiTUMAT.getXFromPercantage(), y2, 0xFFFFFF);
                             }
                         }
                     }
-                    y2 += 10*lineAmount;
+                    y2 += lineAmount;
                 }
                 GlStateManager.popMatrix();
             }

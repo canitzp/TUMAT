@@ -18,11 +18,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 /**
  * @author canitzp
  */
@@ -129,6 +124,10 @@ public class TUMAT{
         if(Loader.isModLoaded("commoncapabilities")){
             logger.info("[PreInit][Integration] Loading Common Capabilities integration");
             TUMATApi.registerRenderComponent(CommonCapabilities.class);
+        }
+        if(Loader.isModLoaded("harvestcraft")){
+            logger.info("[PreInit][Integration] Loading Pam's HarvestCraft integration");
+            TUMATApi.registerRenderComponent(PamsHarvestCraft.class);
         }
 
         //Harvestability:

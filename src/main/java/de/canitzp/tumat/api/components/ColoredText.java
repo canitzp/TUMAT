@@ -47,6 +47,8 @@ public class ColoredText extends TextComponent{
         WHITE(0x00FFFFFF),
         ORANGE_BRIGHT(0x00EA723F),
         BROWN_BRIGHT(0x00965A40),
+        BROWN_PLANT(0x00A97D15),
+        RED_REDSTONE(0x00720000),
 
         ;
 
