@@ -3,7 +3,6 @@ package de.canitzp.tumat.api.components;
 import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IComponentRender;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 
@@ -21,7 +20,7 @@ public class DescriptionComponent implements IComponentRender {
     public DescriptionComponent(String[] desc){
         if(desc != null && !(desc.length <= 0)){
             for(String s : desc){
-                lines.add(new TextComponent(s).setFormat(TextFormatting.GRAY));
+                lines.add(new ScaledTextComponent(s, 0.8F).setFormat(TextFormatting.GRAY));
             }
         }
     }
@@ -36,14 +35,10 @@ public class DescriptionComponent implements IComponentRender {
 
     @Override
     public void render(FontRenderer fontRenderer, int x, int y, int color) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, 0);
-        GlStateManager.scale(0.8F, 0.8F, 0);
-        for (TextComponent line : lines) {
-            line.render(fontRenderer, 0, 0, color);
-            GlStateManager.translate(0, 9, 0);
+        for (int i = 0; i < lines.size(); i++) {
+            TextComponent line = lines.get(i);
+            line.render(fontRenderer, x, y + (8*i), color);
         }
-        GlStateManager.popMatrix();
     }
 
     @Override

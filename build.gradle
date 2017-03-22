@@ -84,6 +84,14 @@ dependencies {
         src "https://minecraft.curseforge.com/projects/pams-harvestcraft/files/2395571/download"
         dest "./libs/Pams HarvestCraft.jar"
     }
+    download {
+        src "https://github.com/jaquadro/Chameleon/releases/download/cham-3.0.2/Chameleon-1.11-3.0.2.jar"
+        dest "./libs/Chameleon.jar"
+    }
+    download {
+        src "https://github.com/jaquadro/StorageDrawers/releases/download/sd-4.2.0/StorageDrawers-1.11.2-4.2.0.jar"
+        dest "./libs/Storage Drawers.jar"
+    }
 
     compile fileTree("./libs")
 }

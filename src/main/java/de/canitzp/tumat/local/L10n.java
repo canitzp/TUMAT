@@ -7,6 +7,7 @@ import net.minecraft.client.resources.I18n;
  */
 public class L10n {
 
+    public static final String EMPTY = I18n.format("tumat.general.empty");
     public static final String ERROR_TEXT = I18n.format("tumat.error.text");
     public static final String SNEAKFORMORE = I18n.format("tumat.sneak_for_more");
     public static final String ENERGY = I18n.format("tumat.energy.energy");
@@ -62,6 +63,10 @@ public class L10n {
 
     public static String getVanillaLightSource(int source){
         return I18n.format("tumat.vanilla.light_source", source);
+    }
+
+    public static String getStorageDrawersContent(int slot, String itemName){
+        return I18n.format("tumat.storagedrawers.content", slot, itemName);
     }
 
 }

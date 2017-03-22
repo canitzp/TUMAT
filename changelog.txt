@@ -1,3 +1,8 @@
+1.8.0-RC3:
+    -Fixed Pam's HarvestCraft integration outside my development environment
+    -Storage Drawers integration
+    -French translation by Xandoria
+
 1.8.0-RC2:
     -Block or item description is now smaller than the other text
     -Gradle file can now download a file directly -> used for Pam's HarvestCraft

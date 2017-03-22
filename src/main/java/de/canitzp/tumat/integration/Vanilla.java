@@ -7,7 +7,11 @@ import de.canitzp.tumat.api.components.ColoredText;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.local.L10n;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockRedstoneRepeater;
+import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -21,14 +25,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.lang.reflect.Method;
 
 /**
  * @author canitzp
  */
 @SideOnly(Side.CLIENT)
 public class Vanilla implements IWorldRenderer{
+
+    private static final Method getAgeProperty = ReflectionHelper.findMethod(BlockCrops.class, "getAgeProperty", "func_185524_e");
 
     @Override
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
@@ -37,10 +46,15 @@ public class Vanilla implements IWorldRenderer{
         if(state.getBlock() instanceof IPlantable){
             IBlockState plant = ((IPlantable) state.getBlock()).getPlant(world, pos);
             if(plant != null){
-                if(ConfigBoolean.SHOW_PLANT_GROWTH_STATUS.value && plant.getBlock() instanceof BlockCrops && InfoUtil.hasProperty(plant, BlockCrops.AGE)){
-                    int plantStatus = plant.getValue(BlockCrops.AGE);
-                    float growStatus = Math.round((plantStatus / 7F * 100F) * 100.00F) / 100.00F;
-                    ColoredText.createOneLine(component, L10n.getVanillaGrowRate(String.valueOf(growStatus)), ColoredText.Colors.BROWN_PLANT);
+                if(ConfigBoolean.SHOW_PLANT_GROWTH_STATUS.value && plant.getBlock() instanceof BlockCrops){
+                    try {
+                        PropertyInteger prop = (PropertyInteger) getAgeProperty.invoke(plant.getBlock());
+                        int plantStatus = state.getValue(prop);
+                        float growStatus = Math.round((plantStatus / (prop.getAllowedValues().size()-1 * 1.0F) * 100F) * 100.00F) / 100.00F;
+                        ColoredText.createOneLine(component, L10n.getVanillaGrowRate(String.valueOf(growStatus)), ColoredText.Colors.BROWN_PLANT);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 if(plant.getBlock() instanceof BlockDoublePlant && InfoUtil.hasProperty(plant, BlockDoublePlant.HALF)){
                     BlockDoublePlant.EnumBlockHalf half = plant.getValue(BlockDoublePlant.HALF);
@@ -51,11 +65,6 @@ public class Vanilla implements IWorldRenderer{
                     }
                 }
             }
-        }
-        if(ConfigBoolean.SHOW_PLANT_GROWTH_STATUS.value && state.getBlock() instanceof BlockBeetroot && InfoUtil.hasProperty(state, BlockBeetroot.BEETROOT_AGE)){
-            int plantStatus = state.getValue(BlockBeetroot.BEETROOT_AGE);
-            float growStatus = Math.round((plantStatus / 3F * 100F) * 100.00F) / 100.00F;
-            ColoredText.createOneLine(component, L10n.getVanillaGrowRate(String.valueOf(growStatus)), ColoredText.Colors.BROWN_PLANT);
         }
 
         if(ConfigBoolean.SHOW_REDSTONE_STRENGTH.value) {
