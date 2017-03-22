@@ -8,20 +8,20 @@ tumat.energy.max_transfer=Transfert Max :
     #color, tool name
 tumat.harvest.effective_tool=Outil efficace : %s %s
     #color, tool name
-tumat.harvest.level=Matériau nécessaire : %s %s
+tumat.harvest.level=MatÃ©riau nÃ©cessaire : %s %s
 tumat.inventory.free_slots=Emplacements libres : %d / %d
 tumat.inventory.lag_warning=Afficher ceci pourrait occasionner du lag !
 tumat.inventory.its_over_1000=Il y a plus de 1000 emplacements. S'accroupir pour les voir tous.
 
 #Integration
 tumat.chiselandbits.base_block=Bloc de base : %s
-tumat.commoncapabilities.temp=Température : %s°C / %s°C
-tumat.commoncapabilities.work.on=Allumé
+tumat.commoncapabilities.temp=TempÃ©rature : %sÂ°C / %sÂ°C
+tumat.commoncapabilities.work.on=AllumÃ©
 tumat.commoncapabilities.work.off=Eteint
-tumat.ic2.wrenchable=IC2 Clé anglaise utilisable
-tumat.vanilla.grow_status=Maturité : %s %%
+tumat.ic2.wrenchable=IC2 ClÃ© anglaise utilisable
+tumat.vanilla.grow_status=MaturitÃ© : %s %%
 tumat.vanilla.redstone=Puissance : %d
-tumat.vanilla.redstone_delay=Délai : %d
-tumat.vanilla.redstone_locked=Verrouillé
-tumat.vanilla.light=Lumière : %d
-tumat.vanilla.light_source=Source de lumière : %d
+tumat.vanilla.redstone_delay=DÃ©lai : %d
+tumat.vanilla.redstone_locked=VerrouillÃ©
+tumat.vanilla.light=LumiÃ¨re : %d
+tumat.vanilla.light_source=Source de lumiÃ¨re : %d
