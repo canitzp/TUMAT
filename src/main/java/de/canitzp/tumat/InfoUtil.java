@@ -47,18 +47,22 @@ public class InfoUtil{
     public static String getBlockName(IBlockState state){
         Item itemBlock = Item.getItemFromBlock(state.getBlock());
         if(itemBlock != null && itemBlock != Items.AIR){
-            return getItemName(new ItemStack(itemBlock, 1, state.getBlock().getMetaFromState(state)));
+            int meta = 0;
+            try {
+                meta = state.getBlock().getMetaFromState(state);
+            } catch (Exception ignored){} // To avoid bugs with doubled plants from OreFlowers since there isn't a size check #7
+            return getItemName(new ItemStack(itemBlock, 1, meta));
         } else {
             return state.getBlock().getLocalizedName();
         }
     }
 
     public static String getItemName(ItemStack stack){
-        return stack != ItemStack.EMPTY ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+        return !stack.isEmpty() ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
     public static List<String> getDescription(ItemStack stack){
-        if(stack != ItemStack.EMPTY && stack.getItem() != null){
+        if(!stack.isEmpty()){
             List<String> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
