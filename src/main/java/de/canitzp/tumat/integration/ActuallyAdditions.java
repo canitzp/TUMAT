@@ -33,15 +33,15 @@ public class ActuallyAdditions implements IWorldRenderer{
         if(tileEntity instanceof TileEntityCompost){
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate && InfoUtil.getItemStackInSlot(tileEntity, side, 0) != ItemStack.EMPTY, "ConversionTime");
             int time = ((TileEntityCompost) tileEntity).conversionTime;
-            component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + time + "/3000 Ticks"));
+            component.add(new TextComponent(TextFormatting.AQUA.toString() + time + "/3000 Ticks"), TooltipComponent.Priority.HIGH);
         } else if(tileEntity instanceof TileEntityDisplayStand){
             ItemStack stack = InfoUtil.getItemStackInSlot(tileEntity, side, 0);
             if(stack != ItemStack.EMPTY){
-                component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + stack.getDisplayName()));
+                component.add(new TextComponent(TextFormatting.AQUA.toString() + stack.getDisplayName()), TooltipComponent.Priority.HIGH);
             }
         } else if(tileEntity instanceof TileEntitySmileyCloud){
             if(!Objects.equals(((TileEntitySmileyCloud) tileEntity).name, ""))
-                component.addOneLineRenderer(new TextComponent(TextFormatting.AQUA.toString() + ((TileEntitySmileyCloud) tileEntity).name));
+                component.add(new TextComponent(TextFormatting.AQUA.toString() + ((TileEntitySmileyCloud) tileEntity).name), TooltipComponent.Priority.HIGH);
         }
         return component;
     }

@@ -49,11 +49,11 @@ public class ForgeUnits implements IWorldRenderer{
                 for(String s : cableString){
                     String toComp = state.getBlock().getUnlocalizedName();
                     if(toComp.contains("block_laser_relay")){
-                        component.addOneLineRenderer(new ColoredText(L10n.ENERGY_MAXTRANSFER + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))));
+                        component.add(new ColoredText(L10n.ENERGY_MAXTRANSFER + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                     if(toComp.contains(s)){
-                        component.addOneLineRenderer(new TextComponent(L10n.ENERGY_MAXTRANSFER + name).setFormat(TextFormatting.RED));
+                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + name).setFormat(TextFormatting.RED), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                 }
@@ -86,7 +86,7 @@ public class ForgeUnits implements IWorldRenderer{
         } else {
             text.setFormat(TextFormatting.RED);
         }
-        return component.addOneLineRenderer(text);
+        return component.add(text, TooltipComponent.Priority.HIGH);
     }
 
 }

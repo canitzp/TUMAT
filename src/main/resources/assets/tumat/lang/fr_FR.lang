@@ -1,4 +1,5 @@
 #General
+tumat.general.empty=Vide
 tumat.error.text=<ERREUR>
 tumat.sneak_for_more=<S'accroupir pour voir plus>
     #Item name, amount
@@ -25,3 +26,4 @@ tumat.vanilla.redstone_delay=Délai : %d
 tumat.vanilla.redstone_locked=Verrouillé
 tumat.vanilla.light=Lumière : %d
 tumat.vanilla.light_source=Source de lumière : %d
+tumat.storagedrawers.content=Emplacement %d: %s

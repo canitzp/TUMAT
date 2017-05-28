@@ -17,6 +17,16 @@ public class GuiFact implements IModGuiFactory {
     }
 
     @Override
+    public boolean hasConfigGui() {
+        return true;
+    }
+
+    @Override
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        throw new AbstractMethodError();
+    }
+
+    @Override
     public Class<? extends GuiScreen> mainConfigGuiClass() {
         return GuiConf.class;
     }

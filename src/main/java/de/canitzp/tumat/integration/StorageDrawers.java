@@ -40,7 +40,7 @@ public class StorageDrawers implements IWorldRenderer {
                             lines.add(L10n.getStorageDrawersContent(i, TextFormatting.WHITE + L10n.EMPTY));
                         }
                     }
-                    component.addRenderer(new DescriptionComponent(lines));
+                    component.add(new DescriptionComponent(lines), TooltipComponent.Priority.HIGH);
                 }
             } else {
                 ScaledTextComponent.createOneLine(component, 0.8F, L10n.SNEAKFORMORE, TextFormatting.GRAY);

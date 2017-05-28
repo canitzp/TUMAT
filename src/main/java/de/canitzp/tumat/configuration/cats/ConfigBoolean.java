@@ -7,6 +7,7 @@ public enum ConfigBoolean {
 
     SHOULD_TUMAT_RENDER("ShouldRenderOverlay", "The main on or off switch. Set this to false to deactivate the rendering.", true, ConfigCats.GENERAL, true),
     SERVER_CONTROL("ServerControl", "Should the Server control the tooltips for the clients. At the client this config changes nothing.", false, ConfigCats.GENERAL),
+    RENDER_ICONS("RenderIcons", "Activate this to render the icons of blocks, items and more to the tooltip", false, ConfigCats.RENDERING),
 
     SHOW_BLOCKS("ShowBlocks", "If true TUMAT shows tooltips for Blocks.", true, ConfigCats.GENERAL, true),
     SHOW_ENTITIES("ShowEntities", "If true TUMAT shows tooltips for Entities.", true, ConfigCats.GENERAL, true),

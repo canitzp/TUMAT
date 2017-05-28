@@ -1,8 +1,6 @@
 package de.canitzp.tumat.integration;
 
-import com.google.common.collect.Lists;
 import de.canitzp.tumat.InfoUtil;
-import de.canitzp.tumat.TUMAT;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.DescriptionComponent;
@@ -34,7 +32,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +43,6 @@ public class IndustrialCraft2 implements IWorldRenderer{
     @Override
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         IBlockState state = world.getBlockState(pos);
-        /*
         if(state.getBlock() instanceof BlockTileEntity){
             if(InfoUtil.hasProperty(state, ((BlockTileEntity) state.getBlock()).typeProperty)){
                 IProperty<MetaTeBlock> property = ((BlockTileEntity) state.getBlock()).typeProperty;
@@ -55,18 +51,16 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 String name = property.getName(teBlock).replace("_active", "");
                 String unlocalized = "ic2.te." + name;
                 if(!name.contains("cable")){
-                    component.setFirst(Lists.newArrayList(new TextComponent(Localization.translate(unlocalized))));
+                    component.setName(new TextComponent(Localization.translate(unlocalized)));
                 }
-                //component.addOneLineRenderer(new DescriptionComponent(((BlockTileEntity) state.getBlock()).getItemStack(teBlock.teBlock)));
             }
         }
-        */
         return component;
     }
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate) {
-        /*if (tileEntity instanceof TileEntityBlock) {
+        if (tileEntity instanceof TileEntityBlock) {
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "components");
             if (((TileEntityBlock) tileEntity).hasComponent(Energy.class)) {
                 Energy energy = ((TileEntityBlock) tileEntity).getComponent(Energy.class);
@@ -79,7 +73,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
                             if (cap < stored) {
                                 cap = stored;
                             }
-                            component.addOneLineRenderer(new EnergyComponent(stored, cap, "EU", TextFormatting.YELLOW));
+                            component.add(new EnergyComponent(stored, cap, "EU", TextFormatting.YELLOW), TooltipComponent.Priority.HIGH);
                         }
                     }
                     if (!energy.getSourceDirs().isEmpty()) {
@@ -91,11 +85,11 @@ public class IndustrialCraft2 implements IWorldRenderer{
                 if (tileEntity instanceof TileEntityTransformer) {
                     desc.add(String.format("%s %.0f %s %s %.0f %s", Localization.translate("ic2.item.tooltip.Low"), EnergyNet.instance.getPowerFromTier(energy.getSinkTier()), Localization.translate("ic2.generic.text.EUt"), Localization.translate("ic2.item.tooltip.High"), EnergyNet.instance.getPowerFromTier(energy.getSourceTier() + 1), Localization.translate("ic2.generic.text.EUt")));
                 }
-                component.addOneLineRenderer(new DescriptionComponent(desc));
+                component.clear(TooltipComponent.Priority.LOW);
+                component.add(new DescriptionComponent(desc), TooltipComponent.Priority.LOW);
             }
         }
         if (tileEntity instanceof TileEntityCable) {
-            String text = "Cable";
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "cableType", "insulation");
             NBTTagCompound nbt = new NBTTagCompound();
             tileEntity.writeToNBT(nbt);
@@ -104,14 +98,14 @@ public class IndustrialCraft2 implements IWorldRenderer{
                     CableType cableType = CableType.values[nbt.getByte("cableType") & 255];
                     int insulation = nbt.getByte("insulation") & 255;
                     ItemStack cable = ItemCable.getCable(cableType, insulation);
-                    text = InfoUtil.getItemName(cable);
-                    component.addOneLineRenderer(new DescriptionComponent(cable));
+                    component.setName(new TextComponent(InfoUtil.getItemName(cable)));
+                    component.clear(TooltipComponent.Priority.LOW);
+                    component.add(new DescriptionComponent(cable), TooltipComponent.Priority.LOW);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            component.setFirst(Collections.singletonList(new TextComponent(text)));
-        }*/
+        }
         return component;
     }
 }

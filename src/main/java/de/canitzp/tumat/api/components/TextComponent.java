@@ -45,7 +45,7 @@ public class TextComponent implements IComponentRender{
     }
 
     public static void createOneLine(TooltipComponent component, String displayString, TextFormatting... formatting){
-        component.addOneLineRenderer(new TextComponent(displayString).setFormat(formatting));
+        component.add(new TextComponent(displayString).setFormat(formatting), TooltipComponent.Priority.LOW);
     }
 
     public static TextComponent createWithSensitiveName(World world, EntityPlayer player, RayTraceResult trace, BlockPos pos, IBlockState state){

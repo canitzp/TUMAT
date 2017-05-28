@@ -92,12 +92,11 @@ public class TUMAT{
             Energy.set(Energy.EU);
             TUMATApi.registerRenderComponent(ElectricalUnits.class);
         }
-        /*
-        if(Loader.isModLoaded("IC2")){
+
+        if(Loader.isModLoaded("ic2")){
             logger.info("[Integration] Loading IndustrialCraft 2 integration");
             TUMATApi.registerRenderComponent(IndustrialCraft2.class);
         }
-        */
 
         //Tanks:
         TUMATApi.registerRenderComponent(FluidHandler.class);

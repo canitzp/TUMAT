@@ -32,7 +32,7 @@ public class FluidHandler implements IWorldRenderer{
                     for(IFluidTankProperties tank : props){
                         if(tank != null && tank.getContents() != null){
                             FluidStack fluidStack = tank.getContents();
-                            component.addOneLineRenderer(new TextComponent(fluidStack.amount + "mB / " + tank.getCapacity() + "mB " + fluidStack.getLocalizedName()));
+                            component.add(new TextComponent(fluidStack.amount + "mB / " + tank.getCapacity() + "mB " + fluidStack.getLocalizedName()), TooltipComponent.Priority.HIGH);
                         }
                     }
                 }

@@ -60,8 +60,7 @@ public class Vanilla implements IWorldRenderer{
                     BlockDoublePlant.EnumBlockHalf half = plant.getValue(BlockDoublePlant.HALF);
                     if(half == BlockDoublePlant.EnumBlockHalf.UPPER){
                         IBlockState down = world.getBlockState(pos.down());
-                        component.clear();
-                        component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(down)));
+                        component.setName(new TextComponent(InfoUtil.getBlockName(down)));
                     }
                 }
             }
@@ -99,8 +98,7 @@ public class Vanilla implements IWorldRenderer{
     @Override
     public TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, TooltipComponent component, boolean shouldCalculate) {
         if(entity instanceof EntityDragonPart){
-            component.clear();
-            component.addOneLineRenderer(new TextComponent(EntityList.getTranslationName(EntityList.getKey(EntityDragon.class))));
+            component.setName(new TextComponent(EntityList.getTranslationName(EntityList.getKey(EntityDragon.class))));
         }
         return component;
     }

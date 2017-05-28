@@ -25,7 +25,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -42,7 +41,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -86,26 +84,24 @@ public class RenderOverlay{
             trace = savedTrace;
         }
         if (trace != null) {
-            List<TooltipComponent> componentsForRendering = new ArrayList<>();
             switch (trace.typeOfHit) {
                 case BLOCK: {
                     if (ConfigBoolean.SHOW_BLOCKS.value) {
-                        addToListIfNotNull(componentsForRendering, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
+                        renderComponents(fontRenderer, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
                     }
                     break;
                 }
                 case ENTITY: {
-                    addToListIfNotNull(componentsForRendering, renderEntity(world, player, trace.entityHit, calculate));
+                    renderComponents(fontRenderer, renderEntity(world, player, trace.entityHit, calculate));
                     break;
                 }
                 case MISS: {
                     if (ConfigBoolean.SHOW_FLUIDS.value) {
-                        addToListIfNotNull(componentsForRendering, renderMiss(world, player, trace, calculate));
+                        renderComponents(fontRenderer, renderMiss(world, player, trace, calculate));
                     }
                     break;
                 }
             }
-            renderComponents(fontRenderer, componentsForRendering);
         }
     }
 
@@ -113,19 +109,21 @@ public class RenderOverlay{
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(pos)){
             IBlockState state = world.getBlockState(pos);
-            component.addOneLineRenderer(TextComponent.createWithSensitiveName(world, player, savedTrace, pos, state));
-            component.addOneLineRenderer(new DescriptionComponent(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state))));
-            String modName = InfoUtil.getModName(state.getBlock());
+            component.setName(TextComponent.createWithSensitiveName(world, player, savedTrace, pos, state));
+            component.add(new DescriptionComponent(InfoUtil.newStackFromBlock(world, pos, state, player, savedTrace)), TooltipComponent.Priority.LOW);
+            component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
+                    renderer.renderBlock(world, player, pos, side, component, shouldCalculate);
                     TileEntity tile = world.getTileEntity(pos);
                     if(ConfigBoolean.SHOW_TILES.value && tile != null){
-                        renderer.renderTileEntity(world, player, tile, side, component.newLine(), shouldCalculate);
+                        renderer.renderTileEntity(world, player, tile, side, component, shouldCalculate);
                     }
-                    renderer.renderBlock(world, player, pos, side, component.newLine(), shouldCalculate);
+                    component.setIconRenderer(renderer.getIconRenderObject(world, player, pos, side, savedTrace, shouldCalculate));
                 }
             }
-            component.setModName(modName);
+        } else {
+            return null;
         }
         return component;
     }
@@ -134,33 +132,30 @@ public class RenderOverlay{
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
             TextComponent.createOneLine(component, L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getEntityItem().getCount())));
-            component.addOneLineRenderer(new DescriptionComponent(((EntityItem) entity).getEntityItem()));
-            String modname = InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem());
+            component.add(new DescriptionComponent(((EntityItem) entity).getEntityItem()), TooltipComponent.Priority.LOW);
+            component.setModName(new TextComponent(InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem())));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
                 }
             }
-            component.setModName(modname);
         } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
-            component.addOneLineRenderer(new TextComponent(InfoUtil.getEntityName(entity)));
-            component.addOneLineRenderer(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()));
-            String modName = InfoUtil.getModName(entity);
+            component.setName(new TextComponent(InfoUtil.getEntityName(entity)));
+            component.add(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()), TooltipComponent.Priority.HIGH);
+            component.setModName(new TextComponent(InfoUtil.getModName(entity)));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
                 }
             }
-            component.setModName(modName);
         } else if(ConfigBoolean.SHOW_ENTITIES.value){
-            component.addOneLineRenderer(new TextComponent(InfoUtil.getEntityName(entity)));
-            String modName = InfoUtil.getModName(entity);
+            component.setName(new TextComponent(InfoUtil.getEntityName(entity)));
+            component.setModName(new TextComponent(InfoUtil.getModName(entity)));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntity(world, player, entity, component, shouldCalculate);
                 }
             }
-            component.setModName(modName);
         }
         return component;
     }
@@ -170,45 +165,46 @@ public class RenderOverlay{
         if(!world.isAirBlock(trace.getBlockPos())){
             IBlockState state = world.getBlockState(trace.getBlockPos());
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
-                component.addOneLineRenderer(new TextComponent(state.getBlock().getLocalizedName()));
-                component.addOneLineRenderer(new TextComponent(InfoUtil.getModName(state.getBlock())));
+                component.setName(new TextComponent(state.getBlock().getLocalizedName()));
+                component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
             }
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
-                    renderer.renderMiss(world, player, trace, component.newLine(), shouldCalculate);
+                    renderer.renderMiss(world, player, trace, component, shouldCalculate);
                 }
             }
         }
         return component;
     }
 
-    public static void renderComponents(FontRenderer fontRenderer, List<TooltipComponent> lines){
-        for(TooltipComponent tooltipComponent : lines){
-            if(tooltipComponent != null){
-                int y2 = GuiTUMAT.getYFromPercantage() + getBossBarOffset();
-                GlStateManager.pushMatrix();
-                for(List<IComponentRender> lists : tooltipComponent.endComponent()){
-                    int lineAmount = 0;
-                    if(lists != null){
-                        for(IComponentRender component : lists){
-                            if(component != null){
-                                int x = GuiTUMAT.getXFromPercantage();
-                                lineAmount = component.getLines(fontRenderer) * component.getHeightPerLine(fontRenderer);
-                                renderBackground(x, y2, tooltipComponent.getLength(), lineAmount);
-                                GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
-                                component.render(fontRenderer, GuiTUMAT.getXFromPercantage(), y2, 0xFFFFFF);
-                            }
-                        }
-                    }
-                    y2 += lineAmount;
-                }
-                GlStateManager.popMatrix();
+    public static void renderComponents(FontRenderer fontRenderer, TooltipComponent component) {
+        if(component != null){
+            TooltipComponent.Finished finished = component.close();
+            int x = GuiTUMAT.getXFromPercantage();
+            int y = GuiTUMAT.getYFromPercantage() + getBossBarOffset();
+            int lines = 0;
+            if(ConfigBoolean.SHOW_BACKGROUND.value){
+                renderBackground(x, y, finished.getLength(), finished.getHeight());
             }
+            GlStateManager.pushMatrix();
+            for(IComponentRender render : finished.getComponents()){
+                if(render != null){
+                    GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
+                    render.render(fontRenderer, x, y, 0xFFFFFF);
+                    int lineY = render.getLines(fontRenderer) * render.getHeightPerLine(fontRenderer);
+                    lines += lineY;
+                    y += lineY;
+                }
+            }
+            if(ConfigBoolean.RENDER_ICONS.value && component.getIconRenderer() != null && component.getIconRenderer().shouldRender()){
+                component.getIconRenderer().render(x - finished.getLength() / 2 - 22, GuiTUMAT.getYFromPercantage() + (lines / 2 - 10));
+            }
+            GlStateManager.popMatrix();
         }
     }
 
-    private static void renderBackground(int x, int y, int width, int lines){
-        if(ConfigBoolean.SHOW_BACKGROUND.value){
+    private static void renderBackground(int x, int y, int width, int height){
+        if(ConfigBoolean.SHOW_BACKGROUND.value && height > 0){
             World world = Minecraft.getMinecraft().world;
             long color = 0x806A9BC3;
             String hexConf = ConfigString.BACKGROUND_COLOR.value;
@@ -226,7 +222,9 @@ public class RenderOverlay{
                 }
             }
             x = x - width/2;
-            Gui.drawRect(x - 3, y - 1, x + width + 3, y + 10 * lines - 1, (int) color);
+            GlStateManager.pushMatrix();
+            Gui.drawRect(x - 23, y - 1, x + width + 3, y + height + 1, (int) color);
+            GlStateManager.popMatrix();
         }
     }
 

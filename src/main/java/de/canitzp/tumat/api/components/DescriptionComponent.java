@@ -15,18 +15,12 @@ import java.util.List;
  */
 public class DescriptionComponent implements IComponentRender {
 
-    public List<TextComponent> lines = new ArrayList<>();
-
-    public DescriptionComponent(String[] desc){
-        if(desc != null && !(desc.length <= 0)){
-            for(String s : desc){
-                lines.add(new ScaledTextComponent(s, 0.8F).setFormat(TextFormatting.GRAY));
-            }
-        }
-    }
+    private List<TextComponent> lines = new ArrayList<>();
 
     public DescriptionComponent(List<String> desc){
-        this(desc.toArray(new String[]{}));
+        for(String line : desc){
+            this.lines.add(new ScaledTextComponent(line, 0.8F).setFormat(TextFormatting.GRAY));
+        }
     }
 
     public DescriptionComponent(ItemStack stack){
@@ -37,7 +31,7 @@ public class DescriptionComponent implements IComponentRender {
     public void render(FontRenderer fontRenderer, int x, int y, int color) {
         for (int i = 0; i < lines.size(); i++) {
             TextComponent line = lines.get(i);
-            line.render(fontRenderer, x, y + (8*i), color);
+            line.render(fontRenderer, x, y + (getHeightPerLine(fontRenderer) * i), color);
         }
     }
 

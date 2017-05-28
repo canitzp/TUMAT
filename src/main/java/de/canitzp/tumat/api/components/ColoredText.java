@@ -35,7 +35,7 @@ public class ColoredText extends TextComponent{
     }
 
     public static void createOneLine(TooltipComponent component, String displayString, int color){
-        component.addOneLineRenderer(new ColoredText(displayString, color));
+        component.add(new ColoredText(displayString, color), TooltipComponent.Priority.HIGH);
     }
 
     public static void createOneLine(TooltipComponent component, String displayString, Colors color){

@@ -32,7 +32,7 @@ public class ElectricalUnits implements IWorldRenderer{
             int current = ((IEnergyStorage) tileEntity).getStored();
             int capacity = ((IEnergyStorage) tileEntity).getCapacity();
             if(capacity > 0){
-                component.addOneLineRenderer(new EnergyComponent(current, capacity, "EU", TextFormatting.YELLOW));
+                component.add(new EnergyComponent(current, capacity, "EU", TextFormatting.YELLOW), TooltipComponent.Priority.HIGH);
             }
         }
         return component;

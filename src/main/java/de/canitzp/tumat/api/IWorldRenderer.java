@@ -1,5 +1,8 @@
 package de.canitzp.tumat.api;
 
+import de.canitzp.tumat.IconRenderer;
+import de.canitzp.tumat.InfoUtil;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -15,6 +18,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,6 +106,13 @@ public interface IWorldRenderer{
      */
     default TooltipComponent renderEntityItem(WorldClient world, EntityPlayerSP player, EntityItem entity, ItemStack stack, TooltipComponent component, boolean shouldCalculate){
         return component;
+    }
+
+    //TODO add javadoc
+    @Nullable
+    default IconRenderer getIconRenderObject(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, RayTraceResult trace, boolean shouldCalculate){
+        IBlockState state = world.getBlockState(pos);
+        return new IconRenderer(InfoUtil.newStackFromBlock(world, pos, state, player, trace));
     }
 
     /**

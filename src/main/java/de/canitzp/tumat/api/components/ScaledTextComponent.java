@@ -32,7 +32,7 @@ public class ScaledTextComponent extends TextComponent {
     }
 
     public static void createOneLine(TooltipComponent component, float scale, String displayString, TextFormatting... formatting){
-        component.addOneLineRenderer(new ScaledTextComponent(displayString, scale).setFormat(formatting));
+        component.add(new ScaledTextComponent(displayString, scale).setFormat(formatting), TooltipComponent.Priority.HIGH);
     }
 
 }

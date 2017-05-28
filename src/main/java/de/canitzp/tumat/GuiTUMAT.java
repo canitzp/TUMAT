@@ -21,7 +21,6 @@ import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -46,9 +45,9 @@ public class GuiTUMAT extends GuiScreen{
     public GuiTUMAT(){
         Block block = Block.REGISTRY.getRandomObject(new Random(System.currentTimeMillis()));
         component = new TooltipComponent();
-        component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(block.getDefaultState())));
-        component.addOneLineRenderer(new TextComponent("Power: " + TextFormatting.RED + "6"));
-        component.addOneLineRenderer(new TextComponent(InfoUtil.getModName(block)));
+        component.setName(new TextComponent(InfoUtil.getBlockName(block.getDefaultState())));
+        component.add(new TextComponent("Power: " + TextFormatting.RED + "6"), TooltipComponent.Priority.HIGH);
+        component.setModName(new TextComponent(InfoUtil.getModName(block)));
         //directMove.add(new PutItHere(15, 15));
     }
 
@@ -61,7 +60,7 @@ public class GuiTUMAT extends GuiScreen{
         for(PutItHere directMover : this.directMove){
             directMover.render(this.mc.fontRenderer);
         }
-        RenderOverlay.renderComponents(this.mc.fontRenderer, Collections.singletonList(this.component));
+        RenderOverlay.renderComponents(this.mc.fontRenderer, this.component);
         this.mc.fontRenderer.drawString("?", 2, 2, 0xFFFFFF);
         if(mouseX <= 7 && mouseY <= 11){
             this.drawHoveringText(helpHovering, mouseX + 2, mouseY + 18);
@@ -86,6 +85,7 @@ public class GuiTUMAT extends GuiScreen{
                 }
             }
         } else {
+            /*
             int[] intray = null;
             for(PutItHere directMover : this.directMove){
                 intray = directMover.onMouseClick(this.mc.fontRenderer, mouseX, mouseY, this.component.getLength());
@@ -97,6 +97,7 @@ public class GuiTUMAT extends GuiScreen{
                 ConfigFloat.OFFSET_X.saveNewValue(getPercentageX(intray[0]));
                 ConfigFloat.OFFSET_Y.saveNewValue(getPercentageY(intray[1]));
             }
+            */
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }

@@ -24,9 +24,8 @@ public class ChiselsAndBits implements IWorldRenderer{
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         IBlockState state = world.getBlockState(pos);
         if(state.getBlock() instanceof IMultiStateBlock){
-            component.clear();
-            component.addOneLineRenderer(new TextComponent(InfoUtil.getBlockName(state)));
-            component.addOneLineRenderer(new TextComponent(L10n.getChiselAndBitsBaseBlock(InfoUtil.getBlockName(((IMultiStateBlock) state.getBlock()).getPrimaryState(world, pos)))));
+            component.setName(new TextComponent(InfoUtil.getBlockName(state)));
+            component.add(new TextComponent(L10n.getChiselAndBitsBaseBlock(InfoUtil.getBlockName(((IMultiStateBlock) state.getBlock()).getPrimaryState(world, pos)))), TooltipComponent.Priority.HIGH);
         }
         return component;
     }

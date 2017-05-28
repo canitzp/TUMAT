@@ -7,6 +7,7 @@ import de.canitzp.tumat.network.PacketUpdateTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
@@ -20,7 +21,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
@@ -29,6 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,11 +52,7 @@ public class InfoUtil{
     public static String getBlockName(IBlockState state){
         Item itemBlock = Item.getItemFromBlock(state.getBlock());
         if(itemBlock != null && itemBlock != Items.AIR){
-            int meta = 0;
-            try {
-                meta = state.getBlock().getMetaFromState(state);
-            } catch (Exception ignored){} // To avoid bugs with doubled plants from OreFlowers since there isn't a size check #7
-            return getItemName(new ItemStack(itemBlock, 1, meta));
+            return getItemName(new ItemStack(itemBlock, 1, getMetaFromBlock(state)));
         } else {
             return state.getBlock().getLocalizedName();
         }
@@ -227,6 +228,20 @@ public class InfoUtil{
         if(shouldCalculate){
             NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
         }
+    }
+
+    public static int getMetaFromBlock(IBlockState state){
+        int meta = 0;
+        try {
+            meta = state.getBlock().getMetaFromState(state);
+        } catch (Exception ignored){
+            ignored.printStackTrace();
+        } // To avoid bugs with doubled plants from OreFlowers since there isn't a size check #7
+        return meta;
+    }
+
+    public static ItemStack newStackFromBlock(World world, BlockPos pos, IBlockState state, @Nullable EntityPlayerSP player, @Nullable RayTraceResult trace){
+        return state.getBlock().getPickBlock(state, trace, world, pos, player);
     }
 
 }

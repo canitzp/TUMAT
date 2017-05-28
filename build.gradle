@@ -24,7 +24,7 @@ targetCompatibility = 1.8
 
 version = project.tumat_version
 group = "de.canizp.tumat"
-archivesBaseName = "TUMAT-" + project.tumat_version
+archivesBaseName = "TUMAT-"
 
 if(hasProperty('buildnumber')){
     version = "${version}-${this.properties['buildnumber']}"
@@ -71,7 +71,7 @@ dependencies {
     deobfCompile "refinedstorage:refinedstorage:" + project.refinedstorage_version + "-+"
     deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:" + project.minecraft_version + "-" + project.commoncaps_version + "-+"
     compileOnly "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ":dev"
-    runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ":dev"
+    runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ""
     compileOnly "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
     runtime "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
 
