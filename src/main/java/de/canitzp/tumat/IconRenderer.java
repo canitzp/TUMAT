@@ -33,14 +33,7 @@ public class IconRenderer {
         GlStateManager.enableRescaleNormal();
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(1.25F, 1.25F, 1.25F);
-
-        //Minecraft mc = Minecraft.getMinecraft();
-        //boolean flagBefore = mc.fontRenderer.getUnicodeFlag();
-        //mc.fontRendererObj.setUnicodeFlag(false);
         Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(this.iconStack, 0, 0);
-        //Minecraft.getMinecraft().getRenderItem().renderItemOverlayIntoGUI(mc.fontRendererObj, stack, 0, 0, null);
-        //mc.fontRendererObj.setUnicodeFlag(flagBefore);
-
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }

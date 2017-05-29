@@ -6,7 +6,7 @@ import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.DescriptionComponent;
-import de.canitzp.tumat.api.components.ScaledTextComponent;
+import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.local.L10n;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -43,7 +43,7 @@ public class StorageDrawers implements IWorldRenderer {
                     component.add(new DescriptionComponent(lines), TooltipComponent.Priority.HIGH);
                 }
             } else {
-                ScaledTextComponent.createOneLine(component, 0.8F, L10n.SNEAKFORMORE, TextFormatting.GRAY);
+                component.add(new TextComponent(L10n.SNEAKFORMORE).setScale(0.8F).setFormat(TextFormatting.GRAY), TooltipComponent.Priority.HIGH);
             }
         }
         return component;

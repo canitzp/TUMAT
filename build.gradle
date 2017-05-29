@@ -74,10 +74,9 @@ dependencies {
     runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ""
     compileOnly "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
     runtime "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
+    compile "slimeknights.mantle:Mantle:1.11.2-1.2.0.26:deobf"
+    compile "slimeknights:TConstruct:1.11.2-2.7.0.26:deobf"
 
-    //No Tesla support anymore deobfCompile "net.darkhax.tesla:Tesla:1.11-1.3.0.51"
-    //compileOnly "slimeknights.mantle:Mantle:1.10.2-1.1.0.188:deobf"
-    //compileOnly "slimeknights:TConstruct:1.10.2-2.5.6.414:deobf"
     //compileOnly "MCMultiPart:MCMultiPart:1.3.0:universal"
 
     download {

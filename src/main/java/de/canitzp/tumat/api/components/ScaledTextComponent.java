@@ -8,6 +8,7 @@ import net.minecraft.util.text.TextFormatting;
 /**
  * @author canitzp
  */
+@Deprecated
 public class ScaledTextComponent extends TextComponent {
 
     public float scale;

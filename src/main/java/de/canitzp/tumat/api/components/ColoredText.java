@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * This class is if you need to color a text with a hex value. (#AARRGGBB - AA isn't working)
  * @author canitzp
  */
+@Deprecated
 @SideOnly(Side.CLIENT)
 public class ColoredText extends TextComponent{
 

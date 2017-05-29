@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -34,6 +35,10 @@ public class TUMAT{
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)
     public static TUMAT instance;
+
+    static {
+        FluidRegistry.enableUniversalBucket();
+    }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -81,12 +86,7 @@ public class TUMAT{
         //Energy:
         Energy.FU.isActive = true;
         TUMATApi.registerRenderComponent(ForgeUnits.class);
-        /*
-        if(Loader.isModLoaded("tesla")){
-            logger.info("[Integration] Loading Tesla integration");
-            Energy.set(Energy.TESLA);
-            TUMATApi.registerRenderComponent(Tesla.class);
-        }*/
+
         if(isClassLoaded("ic2/api/tile/IEnergyStorage")){
             logger.info("[PreInit][Integration] Loading ElectricalUnit integration");
             Energy.set(Energy.EU);
@@ -114,12 +114,10 @@ public class TUMAT{
             logger.info("[PreInit][Integration] Loading ChiselAndBits integration");
             TUMATApi.registerRenderComponent(ChiselsAndBits.class);
         }
-        /*
         if(Loader.isModLoaded("tconstruct")){
             logger.info("[Integration] Loading Tinkers Construct integration");
             TUMATApi.registerRenderComponent(TinkersConstruct.class);
         }
-        */
         if(Loader.isModLoaded("commoncapabilities")){
             logger.info("[PreInit][Integration] Loading Common Capabilities integration");
             TUMATApi.registerRenderComponent(CommonCapabilities.class);

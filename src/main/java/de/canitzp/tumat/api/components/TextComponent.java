@@ -5,6 +5,7 @@ import de.canitzp.tumat.api.IComponentRender;
 import de.canitzp.tumat.api.TooltipComponent;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -20,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TextComponent implements IComponentRender{
 
     protected String displayString;
+    protected int color = 0xFFFFFF;
+    protected float scale = 1.0F;
 
     public TextComponent(String displayString){
         this.displayString = displayString;
@@ -36,12 +39,20 @@ public class TextComponent implements IComponentRender{
 
     @Override
     public void render(FontRenderer fontRenderer, int x, int y, int color){
-        InfoUtil.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, color);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(this.getScale(fontRenderer), this.getScale(fontRenderer), 0);
+        InfoUtil.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, this.getColor(fontRenderer, color));
+        GlStateManager.popMatrix();
     }
 
     @Override
     public int getLength(FontRenderer fontRenderer){
         return fontRenderer.getStringWidth(this.displayString);
+    }
+
+    @Override
+    public int getHeightPerLine(FontRenderer fontRenderer) {
+        return Math.round(this.getScale(fontRenderer) * 10);
     }
 
     public static void createOneLine(TooltipComponent component, String displayString, TextFormatting... formatting){
@@ -56,6 +67,24 @@ public class TextComponent implements IComponentRender{
             } catch (Exception ignored){}
         }
         return new TextComponent(s);
+    }
+
+    public float getScale(FontRenderer fontRenderer){
+        return this.scale;
+    }
+
+    public int getColor(FontRenderer fontRenderer, int oldColor){
+        return this.color;
+    }
+
+    public TextComponent setScale(float scale){
+        this.scale = scale;
+        return this;
+    }
+
+    public TextComponent setColor(int color){
+        this.color = color;
+        return this;
     }
 
 }

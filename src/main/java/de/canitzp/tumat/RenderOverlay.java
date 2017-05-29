@@ -27,6 +27,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -35,12 +36,16 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.BossInfoLerping;
 import net.minecraft.world.World;
 import net.minecraftforge.client.GuiIngameForge;
+import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +55,8 @@ import java.util.UUID;
  */
 @SideOnly(Side.CLIENT)
 public class RenderOverlay{
+
+    private static Map<ResourceLocation, IconRenderer> bucketCache = new HashMap<>();
 
     private static RayTraceResult savedTrace;
 
@@ -131,9 +138,10 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            TextComponent.createOneLine(component, L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getEntityItem().getCount())));
+            component.setName(new TextComponent(L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getEntityItem().getCount()))));
             component.add(new DescriptionComponent(((EntityItem) entity).getEntityItem()), TooltipComponent.Priority.LOW);
             component.setModName(new TextComponent(InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem())));
+            component.setIconRenderer(new IconRenderer(((EntityItem) entity).getEntityItem()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
@@ -167,6 +175,14 @@ public class RenderOverlay{
             if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
                 component.setName(new TextComponent(state.getBlock().getLocalizedName()));
                 component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
+                IconRenderer renderer;
+                if(bucketCache.containsKey(state.getBlock().getRegistryName())){
+                    renderer = bucketCache.get(state.getBlock().getRegistryName());
+                } else {
+                    renderer = new IconRenderer(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, FluidRegistry.lookupFluidForBlock(state.getBlock())));
+                    bucketCache.put(state.getBlock().getRegistryName(), renderer);
+                }
+                component.setIconRenderer(renderer);
             }
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){

@@ -1,8 +1,10 @@
 1.9.0:
-    -Added icon rendering for Blocks and Items. Disabled by default
+    -Added icon rendering for Blocks and Items (Fluids show their corresponding buckets). Disabled by default
     -Changed the way how TooltipComponents are working to enhance the performance
     -Reactivated the IC2 integration
+    -Reactivated the TinkersConstruct integration
     -Fixed a bug with some Items doesn't have the same metadata then the block Closes #7
+    -Combined some TextComponent functions to one class
 
 1.8.0-RC3:
     -Fixed Pam's HarvestCraft integration outside my development environment

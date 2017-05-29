@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.ColoredText;
 import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.local.L10n;
@@ -49,7 +48,7 @@ public class ForgeUnits implements IWorldRenderer{
                 for(String s : cableString){
                     String toComp = state.getBlock().getUnlocalizedName();
                     if(toComp.contains("block_laser_relay")){
-                        component.add(new ColoredText(L10n.ENERGY_MAXTRANSFER + cap + "CF", InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
+                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + cap + "CF").setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                     if(toComp.contains(s)){
@@ -82,7 +81,7 @@ public class ForgeUnits implements IWorldRenderer{
     private TooltipComponent render(TooltipComponent component, String modid, String name, int current, int cap){
         TextComponent text = new TextComponent(String.format("%d %s / %d %s", current, name, cap, name));
         if(modid.equals("actuallyadditions")){
-            text = new ColoredText(text, InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery)));
+            text.setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery)));
         } else {
             text.setFormat(TextFormatting.RED);
         }
