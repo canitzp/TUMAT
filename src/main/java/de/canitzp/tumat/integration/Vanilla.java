@@ -18,8 +18,8 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -97,7 +97,7 @@ public class Vanilla implements IWorldRenderer{
 
     @Override
     public TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, TooltipComponent component, boolean shouldCalculate) {
-        if(entity instanceof EntityDragonPart){
+        if(entity instanceof MultiPartEntityPart){
             component.setName(new TextComponent(EntityList.getTranslationName(EntityList.getKey(EntityDragon.class))));
         }
         return component;

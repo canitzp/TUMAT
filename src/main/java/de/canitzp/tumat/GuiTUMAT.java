@@ -6,13 +6,13 @@ import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
@@ -141,7 +141,7 @@ public class GuiTUMAT extends GuiScreen{
             GlStateManager.pushAttrib();
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.5, 0.5, 0.5);
-            InfoUtil.drawCenteredString(renderer, "Click here for direct moving.", this.x + this.width + 9, this.y + this.height + 9, EnumDyeColor.GRAY.getMapColor().colorValue);
+            InfoUtil.drawCenteredString(renderer, "Click here for direct moving.", this.x + this.width + 9, this.y + this.height + 9, MapColor.GRAY.colorValue);
             GlStateManager.popMatrix();
             GlStateManager.popAttrib();
         }

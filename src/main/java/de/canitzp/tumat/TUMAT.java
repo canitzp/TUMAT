@@ -30,7 +30,7 @@ public class TUMAT{
     public static final String MODVERSION = "@VERSION@";
     public static final String BUILD_DATE = "@BUILD_DATE@";
     public static final String DEPENDENCIES = "before:hardcorequesting;";
-    public static final String MCVERSION = "1.11,1.11.2";
+    public static final String MCVERSION = "1.12";
     public static boolean DEBUG = MODVERSION.contains("DEBUG");
     public static final Logger logger = LogManager.getLogger(MODNAME);
     @Mod.Instance(MODID)

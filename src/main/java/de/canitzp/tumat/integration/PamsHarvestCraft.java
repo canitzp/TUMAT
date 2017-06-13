@@ -1,24 +1,13 @@
 package de.canitzp.tumat.integration;
 
-import com.pam.harvestcraft.blocks.growables.PamCropGrowable;
 import de.canitzp.tumat.api.IWorldRenderer;
-import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.TextComponent;
-import de.canitzp.tumat.configuration.cats.ConfigBoolean;
-import de.canitzp.tumat.local.L10n;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 /**
  * @author canitzp
  */
 public class PamsHarvestCraft implements IWorldRenderer {
 
+    /*
     @Override
     public TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, TooltipComponent component, boolean shouldCalculate) {
         IBlockState state = world.getBlockState(pos);
@@ -29,4 +18,5 @@ public class PamsHarvestCraft implements IWorldRenderer {
         }
         return component;
     }
+    */
 }

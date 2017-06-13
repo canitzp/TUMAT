@@ -14,10 +14,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiBossOverlay;
-import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -33,7 +30,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.BossInfoLerping;
 import net.minecraft.world.World;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.common.ForgeModContainer;
@@ -138,13 +134,13 @@ public class RenderOverlay{
     private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            component.setName(new TextComponent(L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getEntityItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getEntityItem().getCount()))));
-            component.add(new DescriptionComponent(((EntityItem) entity).getEntityItem()), TooltipComponent.Priority.LOW);
-            component.setModName(new TextComponent(InfoUtil.getModName(((EntityItem) entity).getEntityItem().getItem())));
-            component.setIconRenderer(new IconRenderer(((EntityItem) entity).getEntityItem()));
+            component.setName(new TextComponent(L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getItem().getCount()))));
+            component.add(new DescriptionComponent(((EntityItem) entity).getItem()), TooltipComponent.Priority.LOW);
+            component.setModName(new TextComponent(InfoUtil.getModName(((EntityItem) entity).getItem().getItem())));
+            component.setIconRenderer(new IconRenderer(((EntityItem) entity).getItem()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
-                    renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getEntityItem(), component, shouldCalculate);
+                    renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getItem(), component, shouldCalculate);
                 }
             }
         } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
@@ -257,7 +253,7 @@ public class RenderOverlay{
                 if(field.getType() == GuiBossOverlay.class){
                     field.setAccessible(true);
                     try {
-                        Map<UUID, BossInfoLerping> mapBossInfos = ReflectionHelper.getPrivateValue(GuiBossOverlay.class, (GuiBossOverlay) field.get(guiIngame), 2);
+                        Map<UUID, BossInfoClient> mapBossInfos = ReflectionHelper.getPrivateValue(GuiBossOverlay.class, (GuiBossOverlay) field.get(guiIngame), 2);
                         return mapBossInfos.size() * (8 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -282,10 +278,10 @@ public class RenderOverlay{
                 }
 
                 Vec3d lookVec = player.getLook(partialTicks);
-                Vec3d lookingEyeVec = eyeVec.addVector(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance);
+                Vec3d lookingEyeVec = eyeVec.addVector(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance);
                 pointedEntity = null;
                 Vec3d calcVec = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().addCoord(lookVec.xCoord * maxDistance, lookVec.yCoord * maxDistance, lookVec.zCoord * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value);
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().grow(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value);
                 double d2 = currentDistance;
 
                 for(Entity entity : list){
@@ -293,7 +289,7 @@ public class RenderOverlay{
                     AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(collisionBorder, collisionBorder + (entity instanceof EntityItem ? 0.35 : 0), collisionBorder);
                     RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(eyeVec, lookingEyeVec);
 
-                    if(axisalignedbb.isVecInside(eyeVec)){
+                    if(axisalignedbb.contains(eyeVec)){
                         if(d2 >= 0.0D){
                             pointedEntity = entity;
                             calcVec = raytraceresult == null ? eyeVec : raytraceresult.hitVec;

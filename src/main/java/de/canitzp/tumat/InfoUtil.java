@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -67,7 +68,7 @@ public class InfoUtil{
             List<String> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
-                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().player, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().world, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
                 } catch(Exception ignore){}
             }
             desc.addAll(getDescriptionAddition(stack));
