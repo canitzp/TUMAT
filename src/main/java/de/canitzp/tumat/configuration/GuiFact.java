@@ -23,21 +23,11 @@ public class GuiFact implements IModGuiFactory {
 
     @Override
     public GuiScreen createConfigGui(GuiScreen parentScreen) {
-        throw new AbstractMethodError();
-    }
-
-    @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return GuiConf.class;
+        return new GuiConf(parentScreen);
     }
 
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-        return null;
-    }
-
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
         return null;
     }
 

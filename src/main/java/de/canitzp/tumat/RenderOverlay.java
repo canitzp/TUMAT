@@ -19,9 +19,13 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemMonsterPlacer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -33,9 +37,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.common.ForgeModContainer;
-import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.UniversalBucket;
+import net.minecraftforge.fluids.*;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -147,6 +149,12 @@ public class RenderOverlay{
             component.setName(new TextComponent(InfoUtil.getEntityName(entity)));
             component.add(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()), TooltipComponent.Priority.HIGH);
             component.setModName(new TextComponent(InfoUtil.getModName(entity)));
+            ResourceLocation res = EntityList.getKey(entity);
+            if(res != null){
+                ItemStack spawnEgg = new ItemStack(Items.SPAWN_EGG);
+                ItemMonsterPlacer.applyEntityIdToItemStack(spawnEgg, res);
+                component.setIconRenderer(new IconRenderer(spawnEgg));
+            }
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
                     renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
@@ -175,7 +183,7 @@ public class RenderOverlay{
                 if(bucketCache.containsKey(state.getBlock().getRegistryName())){
                     renderer = bucketCache.get(state.getBlock().getRegistryName());
                 } else {
-                    renderer = new IconRenderer(UniversalBucket.getFilledBucket(ForgeModContainer.getInstance().universalBucket, FluidRegistry.lookupFluidForBlock(state.getBlock())));
+                    renderer = new IconRenderer(FluidUtil.getFilledBucket(new FluidStack(FluidRegistry.lookupFluidForBlock(state.getBlock()), 1000)));
                     bucketCache.put(state.getBlock().getRegistryName(), renderer);
                 }
                 component.setIconRenderer(renderer);
@@ -195,8 +203,9 @@ public class RenderOverlay{
             int x = GuiTUMAT.getXFromPercantage();
             int y = GuiTUMAT.getYFromPercantage() + getBossBarOffset();
             int lines = 0;
+            boolean renderIcon = ConfigBoolean.RENDER_ICONS.value && component.getIconRenderer() != null && component.getIconRenderer().shouldRender();
             if(ConfigBoolean.SHOW_BACKGROUND.value){
-                renderBackground(x, y, finished.getLength(), finished.getHeight());
+                renderBackground(x, y, finished.getLength(), finished.getHeight(), renderIcon);
             }
             GlStateManager.pushMatrix();
             for(IComponentRender render : finished.getComponents()){
@@ -208,14 +217,14 @@ public class RenderOverlay{
                     y += lineY;
                 }
             }
-            if(ConfigBoolean.RENDER_ICONS.value && component.getIconRenderer() != null && component.getIconRenderer().shouldRender()){
+            if(renderIcon){
                 component.getIconRenderer().render(x - finished.getLength() / 2 - 22, GuiTUMAT.getYFromPercantage() + (lines / 2 - 10));
             }
             GlStateManager.popMatrix();
         }
     }
 
-    private static void renderBackground(int x, int y, int width, int height){
+    private static void renderBackground(int x, int y, int width, int height, boolean renderIcon){
         if(ConfigBoolean.SHOW_BACKGROUND.value && height > 0){
             World world = Minecraft.getMinecraft().world;
             long color = 0x806A9BC3;
@@ -235,7 +244,7 @@ public class RenderOverlay{
             }
             x = x - width/2;
             GlStateManager.pushMatrix();
-            Gui.drawRect(x - 23, y - 1, x + width + 3, y + height + 1, (int) color);
+            Gui.drawRect(renderIcon ? x - 23 : x - 1, y - 1, x + width + 3, y + height + 1, (int) color);
             GlStateManager.popMatrix();
         }
     }
