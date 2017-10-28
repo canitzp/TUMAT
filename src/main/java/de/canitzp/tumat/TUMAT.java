@@ -130,6 +130,10 @@ public class TUMAT{
             logger.info("[PreInit][Integration] Loading Storage Drawers integration");
             TUMATApi.registerRenderComponent(StorageDrawers.class);
         }
+        if(Loader.isModLoaded("ichunutil")){
+            logger.info("[PreInit][Integration] Loading iChunUtil integration");
+            TUMATApi.registerRenderComponent(IChunUtil.class);
+        }
 
         //Harvestability:
         TUMATApi.registerRenderComponent(Harvestability.class);

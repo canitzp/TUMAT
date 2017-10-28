@@ -67,31 +67,30 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
-
-    //compileOnly "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version + ":api"
-    //runtime
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:" + project.minecraft_version + "-" + project.actadd_version
-    compileOnly "mod.chiselsandbits:chiselsandbits:+"
-    deobfCompile "refinedstorage:refinedstorage:" + project.refinedstorage_version + "-+"
-    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:" + project.minecraft_version + "-" + project.commoncaps_version + "-+"
-    compileOnly "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ":dev"
-    runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version + ""
-    deobfCompile "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version
-    compileOnly "slimeknights.mantle:Mantle:1.11.2-1.2.0.26:deobf"
-    compileOnly "slimeknights:TConstruct:1.11.2-2.7.0.26:deobf"
-
-    deobfCompile "com.github.jaquadro:Chameleon:cham-4.0.2"
-
-    /*download {
-        src "https://minecraft.curseforge.com/projects/pams-harvestcraft/files/2395571/download"
-        dest "./libs/Pams HarvestCraft.jar"
-    }*/
-    download {
-        src "https://github.com/jaquadro/StorageDrawers/releases/download/sd-5.1.3/StorageDrawers-1.12-5.1.3.jar"
-        dest "./libs/Storage Drawers.jar"
+    if(project.minecraft_version.toString().startsWith("1.12")){
+        deobfCompile "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version_12
+        deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:" + project.minecraft_version + "-" + project.actadd_version_12
+        compileOnly "mod.chiselsandbits:chiselsandbits:" + project.chiselandbits_version_12
+        deobfCompile "refinedstorage:refinedstorage:" + project.refinedstorage_version_12 + "-+"
+        deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:" + project.minecraft_version + "-" + project.commoncaps_version_12 + "-+"
+        compileOnly "net.industrial-craft:industrialcraft-2:" + project.ic2_version_12 + ":dev"
+        runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version_12 + ""
+        deobfCompile "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version_12
+        compileOnly "slimeknights.mantle:Mantle:" + project.mantle_version_12 + ":deobf"
+        compileOnly "slimeknights:TConstruct:" + project.tinkers_version_12 + ":deobf"
+        deobfCompile "com.github.jaquadro:Chameleon:cham-" + project.chamaleon_version_12
+        download {
+            src project.storagedrawers_url_12.toString()
+            dest "./libs/Storage Drawers.jar"
+        }
+        download {
+            src project.ichunutil_url_12.toString()
+            dest "./libs/iChunUtil.jar"
+        }
     }
+    if(project.minecraft_version.toString().startsWith("1.11")){
 
+    }
     compile fileTree("./libs")
 }
 
@@ -110,9 +109,7 @@ processResources
     }
 }
 
-jar {
-
-}
+jar {}
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output

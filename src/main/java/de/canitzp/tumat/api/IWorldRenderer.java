@@ -19,7 +19,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -146,5 +148,14 @@ public interface IWorldRenderer{
      * This method gets called inside the TUMAT postInit.
      */
     default void init(){}
+
+    /**
+     * This is made cause iChunUtil does add a entity INTO the player
+     * @return a list of all entity classes names that should be ignored
+     */
+    @SideOnly(Side.CLIENT)
+    default List<String> getInvisibleEntities(){
+        return new ArrayList<>();
+    }
 
 }

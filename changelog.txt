@@ -1,3 +1,6 @@
+1.12.x-1.11.1:
+    -Fixed iChunUtil hitbox bug
+
 1.11.0:
     -Updated Forge version and fixed errors with the ne registry system
     -Enabled Integration for StorageDrawers

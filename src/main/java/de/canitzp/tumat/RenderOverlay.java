@@ -43,10 +43,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author canitzp
@@ -55,6 +52,7 @@ import java.util.UUID;
 public class RenderOverlay{
 
     private static Map<ResourceLocation, IconRenderer> bucketCache = new HashMap<>();
+    private static List<String> ignoredEntities = null;
 
     private static RayTraceResult savedTrace;
 
@@ -62,6 +60,12 @@ public class RenderOverlay{
         boolean calculate = savedTrace == null || shouldCalculate;
         RayTraceResult trace;
         if (calculate) {
+            if(ignoredEntities == null){
+                ignoredEntities = new ArrayList<>();
+                for(IWorldRenderer worldRenderer : TUMATApi.getRegisteredComponents()){
+                    ignoredEntities.addAll(worldRenderer.getInvisibleEntities());
+                }
+            }
             float distance = 0F;
             NetHandlerPlayClient clientHandler = Minecraft.getMinecraft().getConnection();
             if (clientHandler != null) {
@@ -290,7 +294,7 @@ public class RenderOverlay{
                 Vec3d lookingEyeVec = eyeVec.addVector(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance);
                 pointedEntity = null;
                 Vec3d calcVec = null;
-                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().grow(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && !(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value);
+                List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().grow(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && (!(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value) && !ignoredEntities.contains(entity.getClass().getName()));
                 double d2 = currentDistance;
 
                 for(Entity entity : list){
