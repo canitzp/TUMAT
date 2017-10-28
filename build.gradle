@@ -23,7 +23,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 version = project.tumat_version
-group = "de.canizp.tumat"
+group = "de.canitzp.tumat"
 archivesBaseName = "TUMAT"
 
 if(hasProperty('buildnumber')){
