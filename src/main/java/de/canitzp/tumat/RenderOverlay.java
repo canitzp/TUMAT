@@ -1,5 +1,6 @@
 package de.canitzp.tumat;
 
+import com.google.common.collect.Lists;
 import de.canitzp.tumat.api.IComponentRender;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
@@ -126,7 +127,14 @@ public class RenderOverlay{
                     renderer.renderBlock(world, player, pos, side, component, shouldCalculate);
                     TileEntity tile = world.getTileEntity(pos);
                     if(ConfigBoolean.SHOW_TILES.value && tile != null){
-                        renderer.renderTileEntity(world, player, tile, side, component, shouldCalculate);
+                        try {
+                            renderer.renderTileEntity(world, player, tile, side, component, shouldCalculate);
+                        } catch (Exception e){
+                            component.add(new DescriptionComponent(Lists.newArrayList("An error occured", "while getting tile data!")), TooltipComponent.Priority.HIGH);
+                            if(world.getTotalWorldTime() % 150 == 0){
+                                TUMAT.logger.error("An error occured while getting tile data from: " + state.getBlock().getUnlocalizedName() + " at: " + pos, e);
+                            }
+                        }
                     }
                     component.setIconRenderer(renderer.getIconRenderObject(world, player, pos, side, savedTrace, shouldCalculate));
                 }
@@ -185,12 +193,15 @@ public class RenderOverlay{
                 component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
                 IconRenderer renderer;
                 if(bucketCache.containsKey(state.getBlock().getRegistryName())){
-                    renderer = bucketCache.get(state.getBlock().getRegistryName());
+                    component.setIconRenderer(bucketCache.get(state.getBlock().getRegistryName()));
                 } else {
-                    renderer = new IconRenderer(FluidUtil.getFilledBucket(new FluidStack(FluidRegistry.lookupFluidForBlock(state.getBlock()), 1000)));
-                    bucketCache.put(state.getBlock().getRegistryName(), renderer);
+                    Fluid fluid = FluidRegistry.lookupFluidForBlock(state.getBlock());
+                    if(fluid != null){
+                        renderer = new IconRenderer(FluidUtil.getFilledBucket(new FluidStack(fluid, 1000)));
+                        bucketCache.put(state.getBlock().getRegistryName(), renderer);
+                        component.setIconRenderer(renderer);
+                    }
                 }
-                component.setIconRenderer(renderer);
             }
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){

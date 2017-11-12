@@ -1,7 +1,11 @@
 package de.canitzp.tumat;
 
+import com.google.common.collect.Lists;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
+import de.canitzp.tumat.api.TooltipComponent;
+import de.canitzp.tumat.api.components.DescriptionComponent;
+import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.ConfigHandler;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.local.L10n;
@@ -57,6 +61,9 @@ public class TUMATEvents{
                     RenderOverlay.render(mc.world, mc.player, mc.fontRenderer, event.getPartialTicks(), mc.world.getTotalWorldTime() % 3 == 0);
                 } catch(Exception e){
                     InfoUtil.drawCenteredString(mc.fontRenderer, L10n.ERROR_TEXT, GuiTUMAT.getXFromPercantage(), GuiTUMAT.getYFromPercantage(), 0xFFFFFF);
+
+                    RenderOverlay.renderComponents(mc.fontRenderer, new TooltipComponent().setName(new TextComponent(L10n.ERROR_TEXT))
+                            .add(new DescriptionComponent(Lists.newArrayList("")), TooltipComponent.Priority.HIGH));
                     if(mc.world.getTotalWorldTime() % 100 == 0){
                         TUMAT.logger.error("An Error occurred while rendering the tooltip.", e);
                         e.printStackTrace();

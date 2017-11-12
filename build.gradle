@@ -87,6 +87,14 @@ dependencies {
             src project.ichunutil_url_12.toString()
             dest "./libs/iChunUtil.jar"
         }
+        download {
+            src project.extrautils2_url_12.toString()
+            dest "./libs/ExtraUtils2.jar"
+        }
+        download {
+            src project.pamsharvestcraft_url_12.toString()
+            dest "./libs/Pam's Harvestcraft.jar"
+        }
     }
     if(project.minecraft_version.toString().startsWith("1.11")){
 

@@ -1,8 +1,14 @@
+1.12.x-1.12.0:
+    -Reimplemented Pam's Harvestcraft integration
+    -Added ExtraUtilities2 integration
+    -Fixed StorageDrawers crash
+    -Fixed energy syncing at various machines
+
 1.12.x-1.11.1:
     -Fixed iChunUtil hitbox bug
 
 1.11.0:
-    -Updated Forge version and fixed errors with the ne registry system
+    -Updated Forge version and fixed errors with the new registry system
     -Enabled Integration for StorageDrawers
     -Entities are now rendering their spawn egg as icon
 

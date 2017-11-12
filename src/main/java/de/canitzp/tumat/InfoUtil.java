@@ -22,12 +22,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -119,18 +121,11 @@ public class InfoUtil{
     }
 
     public static String getModName(Entity entity){
-        String entityName = EntityList.getEntityString(entity);
-        if(entityName != null){
-            String[] array = entityName.split("\\.");
-            if(array.length >= 2) {
-                entityName = getModName(array[0]);
-            } else {
-                entityName = "Minecraft";
-            }
-        } else {
-            entityName = "Minecraft";
+        ResourceLocation entityLoc = EntityList.getKey(entity);
+        if(entityLoc != null){
+            return ConfigString.MOD_NAME_FORMAT.value + getModName(entityLoc.getResourceDomain());
         }
-        return ConfigString.MOD_NAME_FORMAT.value + getModName(entityName);
+        return ConfigString.MOD_NAME_FORMAT.value + "Minecraft";
     }
 
     public static boolean hasProperty(IBlockState state, IProperty<?> property){

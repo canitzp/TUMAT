@@ -20,6 +20,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,11 +45,10 @@ public class ForgeUnits implements IWorldRenderer{
                 IBlockState state = world.getBlockState(tileEntity.getPos());
                 String modid = state.getBlock().getRegistryName().getResourceDomain();
                 String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + L10n.ENERGY;
-                int cap = storage.getMaxEnergyStored();
                 for(String s : cableString){
                     String toComp = state.getBlock().getUnlocalizedName();
                     if(toComp.contains("block_laser_relay")){
-                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + cap + "CF").setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
+                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + storage.getMaxEnergyStored() + "CF").setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                     if(toComp.contains(s)){
@@ -56,9 +56,9 @@ public class ForgeUnits implements IWorldRenderer{
                         return component;
                     }
                 }
-                int energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
-                if(cap > 0){
-                    this.render(component, modid, name, energy, cap);
+                Pair<Integer, Integer> energy = SyncUtil.getForgeUnits(tileEntity.getPos(), side);
+                if(energy.getRight() > 0){
+                    this.render(component, modid, name, energy.getLeft(), energy.getRight());
                 }
             }
         }

@@ -10,6 +10,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Map;
 
 /**
  * @author canitzp
@@ -17,22 +20,24 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class PacketSyncEnergyClient implements IMessage, IMessageHandler<PacketSyncEnergyClient, IMessage>{
 
     private BlockPos pos;
-    private int energy;
+    private int currentEnergy, capEnergy;
     private EnumFacing side;
 
     public PacketSyncEnergyClient(){}
 
-    public PacketSyncEnergyClient(BlockPos pos, EnumFacing side, int energy){
+    public PacketSyncEnergyClient(BlockPos pos, EnumFacing side, int currentEnergy, int capEnergy){
         this.pos = pos;
         this.side = side;
-        this.energy = energy;
+        this.currentEnergy = currentEnergy;
+        this.capEnergy = capEnergy;
     }
 
     @Override
     public void fromBytes(ByteBuf buf){
         PacketBuffer buffer = new PacketBuffer(buf);
         this.pos = buffer.readBlockPos();
-        this.energy = buffer.readInt();
+        this.currentEnergy = buffer.readInt();
+        this.capEnergy = buffer.readInt();
         this.side = EnumFacing.values()[buffer.readInt()];
     }
 
@@ -40,7 +45,8 @@ public class PacketSyncEnergyClient implements IMessage, IMessageHandler<PacketS
     public void toBytes(ByteBuf buf){
         PacketBuffer buffer = new PacketBuffer(buf);
         buffer.writeBlockPos(this.pos);
-        buffer.writeInt(this.energy);
+        buffer.writeInt(this.currentEnergy);
+        buffer.writeInt(this.capEnergy);
         buffer.writeInt(this.side.ordinal());
     }
 
@@ -51,7 +57,14 @@ public class PacketSyncEnergyClient implements IMessage, IMessageHandler<PacketS
             @SideOnly(Side.CLIENT)
             @Override
             public void run(){
-                SyncUtil.energyMap.put(new SyncUtil.SidedPosition(message.pos, message.side), message.energy);
+                SyncUtil.SidedPosition pos = new SyncUtil.SidedPosition(message.pos, message.side);
+                for(Map.Entry<SyncUtil.SidedPosition, Pair<Integer, Integer>> entry : SyncUtil.energyMap.entrySet()){
+                    if(entry.getKey().equals(pos)){
+                        entry.setValue(Pair.of(message.currentEnergy, message.capEnergy));
+                        return;
+                    }
+                }
+                SyncUtil.energyMap.put(pos, Pair.of(message.currentEnergy, message.capEnergy));
             }
         });
         return null;

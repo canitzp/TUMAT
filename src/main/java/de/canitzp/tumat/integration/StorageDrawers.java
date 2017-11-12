@@ -1,7 +1,6 @@
 package de.canitzp.tumat.integration;
 
 import com.jaquadro.minecraft.storagedrawers.block.tile.TileEntityDrawers;
-import com.jaquadro.minecraft.storagedrawers.inventory.DrawerItemHandler;
 import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
@@ -27,10 +26,10 @@ public class StorageDrawers implements IWorldRenderer {
 
     @Override
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate) {
-        if(tileEntity instanceof TileEntityDrawers && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)){
-            if(player.isSneaking()){
+        if(player.isSneaking() && tileEntity instanceof TileEntityDrawers){
+            if(tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)){
                 IItemHandler handler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
-                if(handler instanceof DrawerItemHandler){
+                if(handler != null){
                     List<String> lines = new ArrayList<>();
                     for(int i = 1; i < handler.getSlots(); i++){
                         ItemStack stack = handler.getStackInSlot(i);

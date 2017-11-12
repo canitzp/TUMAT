@@ -134,6 +134,10 @@ public class TUMAT{
             logger.info("[PreInit][Integration] Loading iChunUtil integration");
             TUMATApi.registerRenderComponent(IChunUtil.class);
         }
+        if(Loader.isModLoaded("extrautils2")){
+            logger.info("[PreInit][Integration] Loading ExtraUtilities2 integration");
+            TUMATApi.registerRenderComponent(ExtraUtils2.class);
+        }
 
         //Harvestability:
         TUMATApi.registerRenderComponent(Harvestability.class);
