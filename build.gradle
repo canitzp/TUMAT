@@ -8,7 +8,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath 'de.undercouch:gradle-download-task:3.2.0'
+        classpath 'de.undercouch:gradle-download-task:3.4.2'
     }
 }
 
@@ -63,11 +63,15 @@ repositories {
     }
     maven { // GitHub release downloads
         url 'https://jitpack.io'
-     }
+    }
+    maven {
+        name = "CurseForge"
+        url = "https://minecraft.curseforge.com/api/maven/"
+    }
 }
 
 dependencies {
-    if(project.minecraft_version.toString().startsWith("1.12")){
+    if(project.minecraft_version.toString().startsWith("1.12")) {
         deobfCompile "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version_12
         deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:" + project.minecraft_version + "-" + project.actadd_version_12
         compileOnly "mod.chiselsandbits:chiselsandbits:" + project.chiselandbits_version_12
@@ -79,27 +83,10 @@ dependencies {
         compileOnly "slimeknights.mantle:Mantle:" + project.mantle_version_12 + ":deobf"
         compileOnly "slimeknights:TConstruct:" + project.tinkers_version_12 + ":deobf"
         deobfCompile "com.github.jaquadro:Chameleon:cham-" + project.chamaleon_version_12
-        download {
-            src project.storagedrawers_url_12.toString()
-            dest "./libs/Storage Drawers.jar"
-        }
-        download {
-            src project.ichunutil_url_12.toString()
-            dest "./libs/iChunUtil.jar"
-        }
-        download {
-            src project.extrautils2_url_12.toString()
-            dest "./libs/ExtraUtils2.jar"
-        }
-        download {
-            src project.pamsharvestcraft_url_12.toString()
-            dest "./libs/Pam's Harvestcraft.jar"
-        }
+        compile 'iChunUtil:iChunUtil:1.12.2:7.1.4'
+        compile 'storage-drawers:StorageDrawers:1.12.2:5.3.6'
+        compile 'extra-utilities:extrautils2:1.12:1.7.5'
     }
-    if(project.minecraft_version.toString().startsWith("1.11")){
-
-    }
-    compile fileTree("./libs")
 }
 
 processResources

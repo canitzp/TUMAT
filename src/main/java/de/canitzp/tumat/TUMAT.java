@@ -122,10 +122,10 @@ public class TUMAT{
             logger.info("[PreInit][Integration] Loading Common Capabilities integration");
             TUMATApi.registerRenderComponent(CommonCapabilities.class);
         }
-        if(Loader.isModLoaded("harvestcraft")){
+        /*if(Loader.isModLoaded("harvestcraft")){
             logger.info("[PreInit][Integration] Loading Pam's HarvestCraft integration");
             TUMATApi.registerRenderComponent(PamsHarvestCraft.class);
-        }
+        }*/
         if(Loader.isModLoaded("storagedrawers")){
             logger.info("[PreInit][Integration] Loading Storage Drawers integration");
             TUMATApi.registerRenderComponent(StorageDrawers.class);

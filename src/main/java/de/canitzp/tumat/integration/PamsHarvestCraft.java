@@ -1,4 +1,4 @@
-package de.canitzp.tumat.integration;
+/*package de.canitzp.tumat.integration;
 
 import com.pam.harvestcraft.blocks.growables.PamCropGrowable;
 import de.canitzp.tumat.api.IWorldRenderer;
@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 /**
  * @author canitzp
  */
+/*
 public class PamsHarvestCraft implements IWorldRenderer {
 
     @Override
@@ -31,3 +32,4 @@ public class PamsHarvestCraft implements IWorldRenderer {
     }
 
 }
+*/
