@@ -84,7 +84,7 @@ public class ConfigHandler {
 
     @SideOnly(Side.CLIENT)
     public static void readFromServerNBT(NBTTagCompound nbt){
-        if(!nbt.hasNoTags()){
+        if(!nbt.isEmpty()){
             for(ConfigBoolean conf : ConfigBoolean.values()){
                 if(nbt.hasKey(conf.name, 1)){ // 1 means byte and a boolean is saved as byte in a nbt compound
                     conf.value = nbt.getBoolean(conf.name);

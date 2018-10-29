@@ -40,8 +40,9 @@ public class TextComponent implements IComponentRender{
     @Override
     public void render(FontRenderer fontRenderer, int x, int y, int color){
         GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, 0);
         GlStateManager.scale(this.getScale(fontRenderer), this.getScale(fontRenderer), 0);
-        InfoUtil.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, x, y, this.getColor(fontRenderer, color));
+        InfoUtil.drawCenteredString(fontRenderer, TextFormatting.RESET.toString() + this.displayString, 0, 0, this.getColor(fontRenderer, color));
         GlStateManager.popMatrix();
     }
 

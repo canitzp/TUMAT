@@ -43,16 +43,16 @@ public class ForgeUnits implements IWorldRenderer{
             IEnergyStorage storage = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             if(storage != null){
                 IBlockState state = world.getBlockState(tileEntity.getPos());
-                String modid = state.getBlock().getRegistryName().getResourceDomain();
+                String modid = state.getBlock().getRegistryName().getNamespace();
                 String name = names.containsKey(modid) ? names.get(modid) : TextFormatting.RED + L10n.ENERGY;
                 for(String s : cableString){
-                    String toComp = state.getBlock().getUnlocalizedName();
+                    String toComp = state.getBlock().getTranslationKey();
                     if(toComp.contains("block_laser_relay")){
-                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + storage.getMaxEnergyStored() + "CF").setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))), TooltipComponent.Priority.HIGH);
+                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + storage.getMaxEnergyStored() + "CF").setColor(InitItems.itemBattery.getRGBDurabilityForDisplay(new ItemStack(InitItems.itemBattery))).setScale(0.85F), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                     if(toComp.contains(s)){
-                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + name).setFormat(TextFormatting.RED), TooltipComponent.Priority.HIGH);
+                        component.add(new TextComponent(L10n.ENERGY_MAXTRANSFER + name).setFormat(TextFormatting.RED).setScale(0.85F), TooltipComponent.Priority.HIGH);
                         return component;
                     }
                 }
@@ -85,6 +85,7 @@ public class ForgeUnits implements IWorldRenderer{
         } else {
             text.setFormat(TextFormatting.RED);
         }
+        text.setScale(0.85F);
         return component.add(text, TooltipComponent.Priority.HIGH);
     }
 

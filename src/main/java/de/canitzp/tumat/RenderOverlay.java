@@ -132,7 +132,7 @@ public class RenderOverlay{
                         } catch (Exception e){
                             component.add(new DescriptionComponent(Lists.newArrayList("An error occured", "while getting tile data!")), TooltipComponent.Priority.HIGH);
                             if(world.getTotalWorldTime() % 150 == 0){
-                                TUMAT.logger.error("An error occured while getting tile data from: " + state.getBlock().getUnlocalizedName() + " at: " + pos, e);
+                                TUMAT.logger.error("An error occured while getting tile data from: " + state.getBlock().getTranslationKey() + " at: " + pos, e);
                             }
                         }
                     }
@@ -302,7 +302,7 @@ public class RenderOverlay{
                 }
 
                 Vec3d lookVec = player.getLook(partialTicks);
-                Vec3d lookingEyeVec = eyeVec.addVector(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance);
+                Vec3d lookingEyeVec = eyeVec.add(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance);
                 pointedEntity = null;
                 Vec3d calcVec = null;
                 List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().grow(lookVec.x * maxDistance, lookVec.y * maxDistance, lookVec.z * maxDistance).expand(1.0D, 1.0D, 1.0D), entity -> entity != null && (!(entity instanceof EntityItem) || ConfigBoolean.SHOW_DROPPED_ITEMS.value) && !ignoredEntities.contains(entity.getClass().getName()));

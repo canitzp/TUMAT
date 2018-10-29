@@ -40,29 +40,23 @@ minecraft {
 }
 
 repositories {
-    maven { // Tesla
-        url = "http://maven.epoxide.xyz"
-    }
     maven { // Actually Additions
         url = "http://maven.chaosfield.at"
     }
     maven { // JEI
+        url = "http://dvs1.progwml6.com"
+    }
+    maven { // Chisel and Bits
         url = "http://dvs1.progwml6.com/files/maven"
     }
     maven { // IC2
         url = "http://maven.ic2.player.to/"
     }
     maven { // RefinedStorage
-        url = "http://dl.bintray.com/raoulvdberge/dev"
-    }
-    maven { // MCMultiPart
-        url = "http://maven.amadornes.com/"
+        url = "https://repo.raoulvdberge.com/"
     }
     maven { // CommonCapabilities
         url "https://dl.bintray.com/cyclopsmc/dev/"
-    }
-    maven { // GitHub release downloads
-        url 'https://jitpack.io'
     }
     maven {
         name = "CurseForge"
@@ -71,22 +65,21 @@ repositories {
 }
 
 dependencies {
-    if(project.minecraft_version.toString().startsWith("1.12")) {
-        deobfCompile "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version_12
-        deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:" + project.minecraft_version + "-" + project.actadd_version_12
-        compileOnly "mod.chiselsandbits:chiselsandbits:" + project.chiselandbits_version_12
-        deobfCompile "refinedstorage:refinedstorage:" + project.refinedstorage_version_12 + "-+"
-        deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:" + project.minecraft_version + "-" + project.commoncaps_version_12 + "-+"
-        compileOnly "net.industrial-craft:industrialcraft-2:" + project.ic2_version_12 + ":dev"
-        runtime "net.industrial-craft:industrialcraft-2:" + project.ic2_version_12 + ""
-        deobfCompile "net.sengir.forestry:forestry_" + project.minecraft_version + ":" + project.forestry_version_12
-        compileOnly "slimeknights.mantle:Mantle:" + project.mantle_version_12 + ":deobf"
-        compileOnly "slimeknights:TConstruct:" + project.tinkers_version_12 + ":deobf"
-        deobfCompile "com.github.jaquadro:Chameleon:cham-" + project.chamaleon_version_12
-        compile 'iChunUtil:iChunUtil:1.12.2:7.1.4'
-        compile 'storage-drawers:StorageDrawers:1.12.2:5.3.6'
-        compile 'extra-utilities:extrautils2:1.12:1.7.5'
-    }
+    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${project.actadd_version}"
+    deobfCompile "chameleon:Chameleon:${project.chameleon_version}"
+    deobfCompile "mod.chiselsandbits:chiselsandbits:${project.chiselandbits_version}"
+    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:${project.commoncaps_version}"
+    deobfCompile "extra-utilities:extrautils2:${project.extrautils2_version}"
+    deobfCompile "net.sengir.forestry:forestry_${project.forestry_version}"
+    deobfCompile "iChunUtil:iChunUtil:${project.ichunutil_version}"
+    compileOnly "net.industrial-craft:industrialcraft-2:${project.ic2_version}:dev"
+    runtime "net.industrial-craft:industrialcraft-2:${project.ic2_version}"
+    deobfCompile "mezz.jei:jei_${project.jei_version}"
+    deobfCompile "slimeknights.mantle:Mantle:${project.mantle_version}"
+    //deobfCompile "pams-harvestcraft:Pam's+HarvestCraft:1.12.2:za"
+    deobfCompile "refinedstorage:refinedstorage:${project.refinedstorage_version}"
+    deobfCompile "storage-drawers:StorageDrawers:${project.storagedrawers_version}"
+    deobfCompile "slimeknights:TConstruct:${project.tinkers_version}"
 }
 
 processResources

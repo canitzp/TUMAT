@@ -93,7 +93,7 @@ public class IndustrialCraft2 implements IWorldRenderer{
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate, "cableType", "insulation");
             NBTTagCompound nbt = new NBTTagCompound();
             tileEntity.writeToNBT(nbt);
-            if (!nbt.hasNoTags()) {
+            if (!nbt.isEmpty()) {
                 try {
                     CableType cableType = CableType.values[nbt.getByte("cableType") & 255];
                     int insulation = nbt.getByte("insulation") & 255;

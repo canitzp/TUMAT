@@ -1,3 +1,7 @@
+1.12.x-1.12.1:
+    -Fixed crash with ActuallyAdditions Compost (Fixes #12)
+    -Removing Pam's Harvestcraft completly now, until the TUMAT rewrite with addon system
+
 1.12.x-1.12.0:
     -Reimplemented Pam's Harvestcraft integration
     -Added ExtraUtilities2 integration

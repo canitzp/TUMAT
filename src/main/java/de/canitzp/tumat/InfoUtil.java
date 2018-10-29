@@ -62,7 +62,7 @@ public class InfoUtil{
     }
 
     public static String getItemName(ItemStack stack){
-        return !stack.isEmpty() ? stack.getRarity().rarityColor + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+        return !stack.isEmpty() ? stack.getRarity().rarityName + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
     public static List<String> getDescription(ItemStack stack){
@@ -115,7 +115,7 @@ public class InfoUtil{
 
     public static String getModName(IForgeRegistryEntry entry){
         if(entry != null && entry.getRegistryName() != null) {
-            return ConfigString.MOD_NAME_FORMAT.value + getModName(entry.getRegistryName().getResourceDomain());
+            return ConfigString.MOD_NAME_FORMAT.value + getModName(entry.getRegistryName().getNamespace());
         }
         return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
     }
@@ -123,7 +123,7 @@ public class InfoUtil{
     public static String getModName(Entity entity){
         ResourceLocation entityLoc = EntityList.getKey(entity);
         if(entityLoc != null){
-            return ConfigString.MOD_NAME_FORMAT.value + getModName(entityLoc.getResourceDomain());
+            return ConfigString.MOD_NAME_FORMAT.value + getModName(entityLoc.getNamespace());
         }
         return ConfigString.MOD_NAME_FORMAT.value + "Minecraft";
     }
@@ -183,7 +183,7 @@ public class InfoUtil{
                 if (nbttagcompound.getTagId("Lore") == 9) {
                     NBTTagList nbttaglist3 = nbttagcompound.getTagList("Lore", 8);
 
-                    if (!nbttaglist3.hasNoTags()) {
+                    if (!nbttaglist3.isEmpty()) {
                         for (int l1 = 0; l1 < nbttaglist3.tagCount(); ++l1) {
                             strings.add(TextFormatting.DARK_PURPLE + "" + TextFormatting.ITALIC + nbttaglist3.getStringTagAt(l1));
                         }

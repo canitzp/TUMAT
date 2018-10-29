@@ -1,6 +1,7 @@
 package de.canitzp.tumat.integration;
 
 import de.canitzp.tumat.InfoUtil;
+import de.canitzp.tumat.ReflectionUtil;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TooltipComponent;
 import de.canitzp.tumat.api.components.TextComponent;
@@ -32,8 +33,11 @@ public class ActuallyAdditions implements IWorldRenderer{
     public TooltipComponent renderTileEntity(WorldClient world, EntityPlayerSP player, TileEntity tileEntity, EnumFacing side, TooltipComponent component, boolean shouldCalculate){
         if(tileEntity instanceof TileEntityCompost){
             InfoUtil.syncTileEntity(tileEntity, shouldCalculate && InfoUtil.getItemStackInSlot(tileEntity, side, 0) != ItemStack.EMPTY, "ConversionTime");
-            int time = ((TileEntityCompost) tileEntity).conversionTime;
-            component.add(new TextComponent(TextFormatting.AQUA.toString() + time + "/3000 Ticks"), TooltipComponent.Priority.HIGH);
+            Integer time = ReflectionUtil.getInstanceOfField(TileEntityCompost.class, Integer.class, (TileEntityCompost) tileEntity, "conversionTime");
+            Integer max = ReflectionUtil.getInstanceOfField(TileEntityCompost.class, Integer.class, null, "COMPOST_TIME_TICKS");
+            if(time != null && max != null){
+                component.add(new TextComponent(TextFormatting.AQUA.toString() + time + "/" + max + " Ticks"), TooltipComponent.Priority.HIGH);
+            }
         } else if(tileEntity instanceof TileEntityDisplayStand){
             ItemStack stack = InfoUtil.getItemStackInSlot(tileEntity, side, 0);
             if(stack != ItemStack.EMPTY){
