@@ -1,3 +1,6 @@
+1.12.x-1.12.2:
+    -Fixed that all the rarity names a added before a Block
+
 1.12.x-1.12.1:
     -Fixed crash with ActuallyAdditions Compost (Fixes #12)
     -Removing Pam's Harvestcraft completly now, until the TUMAT rewrite with addon system

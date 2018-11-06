@@ -62,7 +62,7 @@ public class InfoUtil{
     }
 
     public static String getItemName(ItemStack stack){
-        return !stack.isEmpty() ? stack.getRarity().rarityName + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+        return !stack.isEmpty() ? stack.getRarity().color + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
     }
 
     public static List<String> getDescription(ItemStack stack){
