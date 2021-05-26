@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "trainz",
+  "version": "${version}",
+  "name": "Trainz",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "canitzp"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "Insert License Here",
+  "icon": "assets/examplemod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.canitzp.trainz.fabric.TrainzFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">=1.16.4",
+    "architectury": ">=1.1.55"
+  },
+  "suggests": {}
+}
