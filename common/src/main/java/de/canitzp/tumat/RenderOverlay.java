@@ -1,6 +1,7 @@
 package de.canitzp.tumat;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.canitzp.tumat.api.IComponentRender;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
@@ -11,37 +12,28 @@ import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.configuration.cats.ConfigFloat;
 import de.canitzp.tumat.configuration.cats.ConfigString;
 import de.canitzp.tumat.local.L10n;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.state.IBlockState;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemMonsterPlacer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.client.GuiIngameForge;
-import net.minecraftforge.common.ForgeModContainer;
-import net.minecraftforge.fluids.*;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -49,17 +41,17 @@ import java.util.*;
 /**
  * @author canitzp
  */
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderOverlay{
 
     private static Map<ResourceLocation, IconRenderer> bucketCache = new HashMap<>();
     private static List<String> ignoredEntities = null;
 
-    private static RayTraceResult savedTrace;
+    private static HitResult savedTrace;
 
-    public static void render(WorldClient world, EntityPlayerSP player, FontRenderer fontRenderer, float partialTicks, boolean shouldCalculate) {
+    public static void render(ClientLevel world, LocalPlayer player, PoseStack pose, Font fontRenderer, float partialTicks, boolean shouldCalculate) {
         boolean calculate = savedTrace == null || shouldCalculate;
-        RayTraceResult trace;
+        HitResult trace;
         if (calculate) {
             if(ignoredEntities == null){
                 ignoredEntities = new ArrayList<>();
@@ -68,9 +60,9 @@ public class RenderOverlay{
                 }
             }
             float distance = 0F;
-            NetHandlerPlayClient clientHandler = Minecraft.getMinecraft().getConnection();
+            ClientPacketListener clientHandler = Minecraft.getInstance().getConnection();
             if (clientHandler != null) {
-                switch (clientHandler.getPlayerInfo(player.getGameProfile().getId()).getGameType()) {
+                switch (clientHandler.getPlayerInfo(player.getGameProfile().getId()).getGameMode()) {
                     case CREATIVE: {
                         distance = ConfigFloat.DISTANCE_CREATIVE.value;
                         break;
@@ -94,10 +86,10 @@ public class RenderOverlay{
             trace = savedTrace;
         }
         if (trace != null) {
-            switch (trace.typeOfHit) {
+            switch (trace.getType()) {
                 case BLOCK: {
                     if (ConfigBoolean.SHOW_BLOCKS.value) {
-                        renderComponents(fontRenderer, renderBlock(world, player, trace.getBlockPos(), trace.sideHit, calculate));
+                        renderComponents(pose, fontRenderer, renderBlock(world, player, ((BlockHitResult) trace), calculate));
                     }
                     break;
                 }
@@ -115,12 +107,12 @@ public class RenderOverlay{
         }
     }
 
-    private static TooltipComponent renderBlock(WorldClient world, EntityPlayerSP player, BlockPos pos, EnumFacing side, boolean shouldCalculate){
+    private static TooltipComponent renderBlock(ClientLevel world, LocalPlayer player, BlockHitResult trace, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(pos)){
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             component.setName(TextComponent.createWithSensitiveName(world, player, savedTrace, pos, state));
-            component.add(new DescriptionComponent(InfoUtil.newStackFromBlock(world, pos, state, player, savedTrace)), TooltipComponent.Priority.LOW);
+            component.add(new DescriptionComponent(state.getBlock().asItem().getDefaultInstance()), TooltipComponent.Priority.LOW);
             component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
@@ -145,31 +137,28 @@ public class RenderOverlay{
         return component;
     }
 
-    private static TooltipComponent renderEntity(WorldClient world, EntityPlayerSP player, Entity entity, boolean shouldCalculate){
+    private static TooltipComponent renderEntity(ClientLevel world, LocalPlayer player, EntityHitResult trace, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
-        if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof EntityItem){
-            component.setName(new TextComponent(L10n.getItemText(InfoUtil.getItemName(((EntityItem) entity).getItem()) + TextFormatting.RESET, String.valueOf(((EntityItem) entity).getItem().getCount()))));
-            component.add(new DescriptionComponent(((EntityItem) entity).getItem()), TooltipComponent.Priority.LOW);
-            component.setModName(new TextComponent(InfoUtil.getModName(((EntityItem) entity).getItem().getItem())));
-            component.setIconRenderer(new IconRenderer(((EntityItem) entity).getItem()));
+        Entity entity = trace.getEntity();
+        if(ConfigBoolean.SHOW_DROPPED_ITEMS.value && entity instanceof ItemEntity){
+            component.setName(new TextComponent(L10n.getItemText(InfoUtil.getItemName(((ItemEntity) entity).getItem()) + ChatFormatting.RESET, String.valueOf(((ItemEntity) entity).getItem().getCount()))));
+            component.add(new DescriptionComponent(((ItemEntity) entity).getItem()), TooltipComponent.Priority.LOW);
+            component.setModName(new TextComponent(InfoUtil.getModName(((ItemEntity) entity).getItem())));
+            component.setIconRenderer(new IconRenderer(((ItemEntity) entity).getItem()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
-                    renderer.renderEntityItem(world, player, (EntityItem) entity, ((EntityItem) entity).getItem(), component, shouldCalculate);
+                    renderer.renderEntityItem(world, player, (ItemEntity) entity, ((ItemEntity) entity).getItem(), component, shouldCalculate);
                 }
             }
-        } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof EntityLivingBase){
+        } else if(ConfigBoolean.SHOW_ENTITIES.value && entity instanceof LivingEntity){
             component.setName(new TextComponent(InfoUtil.getEntityName(entity)));
-            component.add(new TextComponent(TextFormatting.RED.toString() + ((EntityLivingBase) entity).getHealth() + "/" + ((EntityLivingBase) entity).getMaxHealth()), TooltipComponent.Priority.HIGH);
+            component.add(new TextComponent(TextFormatting.RED.toString() + ((LivingEntity) entity).getHealth() + "/" + ((LivingEntity) entity).getMaxHealth()), TooltipComponent.Priority.HIGH);
             component.setModName(new TextComponent(InfoUtil.getModName(entity)));
-            ResourceLocation res = EntityList.getKey(entity);
-            if(res != null){
-                ItemStack spawnEgg = new ItemStack(Items.SPAWN_EGG);
-                ItemMonsterPlacer.applyEntityIdToItemStack(spawnEgg, res);
-                component.setIconRenderer(new IconRenderer(spawnEgg));
-            }
+            SpawnEggItem spawnEggItem = SpawnEggItem.byId(entity.getType());
+            component.setIconRenderer(new IconRenderer(spawnEggItem.getDefaultInstance()));
             for(IWorldRenderer renderer : TUMATApi.getRegisteredComponents()){
                 if(renderer.shouldBeActive()){
-                    renderer.renderLivingEntity(world, player, (EntityLivingBase) entity, component, shouldCalculate);
+                    renderer.renderLivingEntity(world, player, (LivingEntity) entity, component, shouldCalculate);
                 }
             }
         } else if(ConfigBoolean.SHOW_ENTITIES.value){
@@ -184,12 +173,12 @@ public class RenderOverlay{
         return component;
     }
 
-    private static TooltipComponent renderMiss(WorldClient world, EntityPlayerSP player, RayTraceResult trace, boolean shouldCalculate){
+    private static TooltipComponent renderMiss(ClientLevel world, LocalPlayer player, HitResult trace, boolean shouldCalculate){
         TooltipComponent component = new TooltipComponent();
         if(!world.isAirBlock(trace.getBlockPos())){
-            IBlockState state = world.getBlockState(trace.getBlockPos());
-            if(state.getBlock() instanceof BlockLiquid || state.getBlock() instanceof BlockFluidBase){
-                component.setName(new TextComponent(state.getBlock().getLocalizedName()));
+            BlockState state = world.getBlockState(trace.getBlockPos());
+            if(state.getBlock() instanceof LiquidBlock){
+                component.setName(new TextComponent(state.getBlock().getName()));
                 component.setModName(new TextComponent(InfoUtil.getModName(state.getBlock())));
                 IconRenderer renderer;
                 if(bucketCache.containsKey(state.getBlock().getRegistryName())){
@@ -212,30 +201,16 @@ public class RenderOverlay{
         return component;
     }
 
-    public static void renderComponents(FontRenderer fontRenderer, TooltipComponent component) {
+    public static void renderComponents(PoseStack pose, Font fontRenderer, TooltipComponent component) {
         if(component != null){
-            TooltipComponent.Finished finished = component.close();
+            
             int x = GuiTUMAT.getXFromPercantage();
             int y = GuiTUMAT.getYFromPercantage() + getBossBarOffset();
-            int lines = 0;
             boolean renderIcon = ConfigBoolean.RENDER_ICONS.value && component.getIconRenderer() != null && component.getIconRenderer().shouldRender();
             if(ConfigBoolean.SHOW_BACKGROUND.value){
                 renderBackground(x, y, finished.getLength(), finished.getHeight(), renderIcon);
             }
-            GlStateManager.pushMatrix();
-            for(IComponentRender render : finished.getComponents()){
-                if(render != null){
-                    GlStateManager.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
-                    render.render(fontRenderer, x, y, 0xFFFFFF);
-                    int lineY = render.getLines(fontRenderer) * render.getHeightPerLine(fontRenderer);
-                    lines += lineY;
-                    y += lineY;
-                }
-            }
-            if(renderIcon){
-                component.getIconRenderer().render(x - finished.getLength() / 2 - 22, GuiTUMAT.getYFromPercantage() + (lines / 2 - 10));
-            }
-            GlStateManager.popMatrix();
+            component.render(pose, fontRenderer, x, y);
         }
     }
 
@@ -271,19 +246,9 @@ public class RenderOverlay{
     }
 
     private static int getBossBarOffset(){
-        if(GuiIngameForge.renderBossHealth){
-            GuiIngame guiIngame = Minecraft.getMinecraft().ingameGUI;
-            for(Field field : GuiIngame.class.getDeclaredFields()){
-                if(field.getType() == GuiBossOverlay.class){
-                    field.setAccessible(true);
-                    try {
-                        Map<UUID, BossInfoClient> mapBossInfos = ReflectionHelper.getPrivateValue(GuiBossOverlay.class, (GuiBossOverlay) field.get(guiIngame), 2);
-                        return mapBossInfos.size() * (8 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        Gui gui = Minecraft.getInstance().gui;
+        if(gui != null){
+            return ReflectionHelper.getBossBarEvents(gui.getBossOverlay()).size() * (8 + Minecraft.getInstance().font.lineHeight);
         }
         return 0;
     }

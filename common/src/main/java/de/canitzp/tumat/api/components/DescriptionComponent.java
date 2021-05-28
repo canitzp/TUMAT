@@ -2,9 +2,9 @@ package de.canitzp.tumat.api.components;
 
 import de.canitzp.tumat.InfoUtil;
 import de.canitzp.tumat.api.IComponentRender;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class DescriptionComponent implements IComponentRender {
 
     public DescriptionComponent(List<String> desc){
         for(String line : desc){
-            this.lines.add(new ScaledTextComponent(line, 0.8F).setFormat(TextFormatting.GRAY));
+            this.lines.add(new ScaledTextComponent(line, 0.8F).setFormat(ChatFormatting.GRAY));
         }
     }
 
@@ -28,7 +28,7 @@ public class DescriptionComponent implements IComponentRender {
     }
 
     @Override
-    public void render(FontRenderer fontRenderer, int x, int y, int color) {
+    public void render(Font fontRenderer, int x, int y, int color) {
         for (int i = 0; i < lines.size(); i++) {
             TextComponent line = lines.get(i);
             line.render(fontRenderer, x, y + (getHeightPerLine(fontRenderer) * i), color);
@@ -36,7 +36,7 @@ public class DescriptionComponent implements IComponentRender {
     }
 
     @Override
-    public int getLength(FontRenderer fontRenderer) {
+    public int getLength(Font fontRenderer) {
         int max = 0;
         for(TextComponent text : lines){
             if(text.getLength(fontRenderer) > max){
@@ -47,12 +47,12 @@ public class DescriptionComponent implements IComponentRender {
     }
 
     @Override
-    public int getLines(FontRenderer fontRenderer) {
+    public int getLines(Font fontRenderer) {
         return this.lines.size();
     }
 
     @Override
-    public int getHeightPerLine(FontRenderer fontRenderer) {
+    public int getHeightPerLine(Font fontRenderer) {
         return 8;
     }
 }

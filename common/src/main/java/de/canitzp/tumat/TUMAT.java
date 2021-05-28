@@ -28,6 +28,8 @@ public class TUMAT{
         logger.info("[Init] Load network stuff");
         NetworkHandler.init();
         if(Platform.getEnv() == EnvType.CLIENT){
+            logger.info("[Init] Registering events");
+            TUMATEvents.initClient();
             logger.info("[Init] Load integrations");
             loadIntegrations();
             TUMATApi.allowGuiToRenderOverlay(InventoryScreen.class, CreativeModeInventoryScreen.class, ChatScreen.class);

@@ -1,13 +1,16 @@
 package de.canitzp.tumat.api;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.canitzp.tumat.IconRenderer;
-import de.canitzp.tumat.api.components.TextComponent;
+import de.canitzp.tumat.configuration.cats.ConfigBoolean;
+import de.canitzp.tumat.configuration.cats.ConfigFloat;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,37 +18,33 @@ import java.util.List;
  * This is the main collection for all things that get rendered with TUMAT
  * @author canitzp
  */
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class TooltipComponent{
 
     private TextComponent name;
-    private List<IComponentRender> high = new ArrayList<>();
-    private List<IComponentRender> low = new ArrayList<>();
+    private List<MutableComponent> high = new ArrayList<>();
+    private List<MutableComponent> low = new ArrayList<>();
     private TextComponent modName;
     private IconRenderer iconRenderer;
     private int length = 0, height = 0;
 
-    public TooltipComponent setName(@Nonnull TextComponent name){
+    public TooltipComponent setName(TextComponent name){
         this.name = name;
         return this;
     }
 
-    public TooltipComponent setModName(@Nonnull TextComponent modName){
+    public TooltipComponent setModName(TextComponent modName){
         this.modName = modName;
         return this;
     }
 
-    @Deprecated
-    public TooltipComponent setModName(String s){
-        return this.setModName(new TextComponent(s));
-    }
-
-    public TooltipComponent add(IComponentRender render, Priority priority){
-        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        if(this.length < render.getLength(fontRenderer)){
-            this.length = render.getLength(fontRenderer);
+    public TooltipComponent add(MutableComponent render, Priority priority){
+        Font fontRenderer = Minecraft.getInstance().font;
+        int length = fontRenderer.width(render);
+        if(this.length < length){
+            this.length = length;
         }
-        this.height += render.getLines(fontRenderer) * render.getHeightPerLine(fontRenderer);
+        this.height += fontRenderer.lineHeight;
         switch (priority){
             case LOW: {
                 this.low.add(render);
@@ -58,30 +57,33 @@ public class TooltipComponent{
         }
         return this;
     }
-
-    public TooltipComponent clear(Priority priority){
-        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        switch (priority){
-            case LOW: {
-                for(IComponentRender render : this.low){
-                    this.height -= render.getLines(fontRenderer) * render.getHeightPerLine(fontRenderer);
-                }
-                this.low.clear();
-                break;
-            }
-            case HIGH:{
-                for(IComponentRender render : this.high){
-                    this.height -= render.getLines(fontRenderer) * render.getHeightPerLine(fontRenderer);
-                }
-                this.high.clear();
-                break;
+    
+    public void render(PoseStack pose, Font font, float x, float y){
+        List<MutableComponent> finished = new ArrayList<>();
+        finished.add(this.name);
+        finished.addAll(this.high);
+        finished.addAll(this.low);
+        finished.add(this.modName);
+    
+        pose.pushPose();
+        int maxLength = 0;
+        for(int i = 0; i < finished.size(); i++){
+            MutableComponent component = finished.get(0);
+            pose.scale(ConfigFloat.SCALE.value, ConfigFloat.SCALE.value, ConfigFloat.SCALE.value);
+            int length = font.draw(pose, component, x, y + ((i * 10)), 0xFFFFFF);
+            if(length > maxLength){
+                maxLength = length;
             }
         }
-        return this;
+        if(ConfigBoolean.SHOW_BACKGROUND.value && this.iconRenderer != null && this.iconRenderer.shouldRender()){
+            this.iconRenderer.render(pose, Math.round(x - (maxLength / 2.0F)) - 22, Math.round(y + (finished.size() / 2.0F)) - 10);
+        }
+        pose.popPose();
     }
 
+    @Deprecated
     public Finished close(){
-        List<IComponentRender> list = new ArrayList<>();
+        List<MutableComponent> list = new ArrayList<>();
         list.add(this.name);
         list.addAll(this.high);
         list.addAll(this.low);
@@ -106,7 +108,7 @@ public class TooltipComponent{
     }
 
     public class Finished{
-        private List<IComponentRender> list;
+        private List<MutableComponent> list;
         private int length, height;
         public Finished(List<IComponentRender> list, int length, int height) {
             this.list = list;

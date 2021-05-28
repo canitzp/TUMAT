@@ -1,42 +1,28 @@
 package de.canitzp.tumat;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.canitzp.tumat.configuration.cats.ConfigString;
 import de.canitzp.tumat.local.L10n;
-import de.canitzp.tumat.network.NetworkHandler;
-import de.canitzp.tumat.network.PacketUpdateTileEntity;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,146 +32,123 @@ import java.util.List;
 /**
  * @author canitzp
  */
-@SuppressWarnings("ConstantConditions")
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class InfoUtil{
 
     private static final HashMap<String, String> cachedModNames = new HashMap<>();
 
-    public static String getBlockName(IBlockState state){
-        Item itemBlock = Item.getItemFromBlock(state.getBlock());
+    public static MutableComponent getBlockName(BlockState state){
+        Item itemBlock = state.getBlock().asItem();
         if(itemBlock != null && itemBlock != Items.AIR){
-            return getItemName(new ItemStack(itemBlock, 1, getMetaFromBlock(state)));
+            return getItemName(new ItemStack(itemBlock, 1));
         } else {
-            return state.getBlock().getLocalizedName();
+            return state.getBlock().getName();
         }
     }
 
-    public static String getItemName(ItemStack stack){
-        return !stack.isEmpty() ? stack.getRarity().color + getDebugAddition(stack, stack.getDisplayName()) : "<Unknown>";
+    public static MutableComponent getItemName(ItemStack stack){
+        return !stack.isEmpty() ? getDebugAddition(stack, (MutableComponent) stack.getDisplayName()).withStyle(stack.getRarity().color) : new TextComponent("<Unknown>");
     }
 
-    public static List<String> getDescription(ItemStack stack){
+    public static List<FormattedText> getDescription(ItemStack stack){
         if(!stack.isEmpty()){
-            List<String> desc = new ArrayList<>();
+            List<Component> desc = new ArrayList<>();
             if((getStackVisibility(stack) & 32) == 0){
                 try{
-                    stack.getItem().addInformation(stack, Minecraft.getMinecraft().world, desc, Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+                    stack.getItem().appendHoverText(stack, Minecraft.getInstance().level, desc, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                 } catch(Exception ignore){}
             }
             desc.addAll(getDescriptionAddition(stack));
             if(!desc.isEmpty()){
-                List<String> s = new ArrayList<>();
-                for(String s1 : desc){
-                    s.addAll(Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(s1, 200));
+                List<FormattedText> formattedDesc = new ArrayList<>();
+                for(Component component : desc){
+                    formattedDesc.addAll(Minecraft.getInstance().font.getSplitter().splitLines(component, 200, Style.EMPTY));
                 }
-                if(s.size() > 2 && !Minecraft.getMinecraft().player.isSneaking()){
-                    List<String> cached = new ArrayList<>();
+                if(formattedDesc.size() > 2 && !Minecraft.getInstance().player.isShiftKeyDown()){
+                    List<FormattedText> cached = new ArrayList<>();
                     for(int i = 0; i <= 1; i++){
-                        cached.add(s.get(i));
+                        cached.add(formattedDesc.get(i));
                     }
-                    cached.add(L10n.SNEAKFORMORE);
-                    s.clear();
-                    s.addAll(cached);
+                    cached.add(new TranslatableComponent(L10n.SNEAKFORMORE));
+                    formattedDesc.clear();
+                    formattedDesc.addAll(cached);
                 }
-                return s;
+                return formattedDesc;
             }
         }
         return Collections.emptyList();
     }
 
-    private static String getModName(String modid){
-        if (cachedModNames.containsKey(modid)) {
-            return cachedModNames.get(modid);
-        } else {
-            if("minecraft".equals(modid) || "Minecraft".equals(modid)){
-                return "Minecraft";
-            }
-            for(ModContainer mod : Loader.instance().getActiveModList()){
-                if(mod.getModId().toLowerCase().equals(modid)){
-                    String name = mod.getName();
-                    cachedModNames.put(modid, name);
-                    return name;
-                }
-            }
-            cachedModNames.put(modid, StringUtils.capitalize(modid));
-            return StringUtils.capitalize(modid);
-        }
-    }
-
-    public static String getModName(IForgeRegistryEntry entry){
-        if(entry != null && entry.getRegistryName() != null) {
-            return ConfigString.MOD_NAME_FORMAT.value + getModName(entry.getRegistryName().getNamespace());
+    public static String getModName(ItemStack stack){
+        if(!stack.isEmpty()){
+            ResourceLocation itemKey = Registry.ITEM.getKey(stack.getItem());
+            // todo find modname for modid, instead of returning the modid!
+            return ConfigString.MOD_NAME_FORMAT.value + itemKey.getNamespace();
         }
         return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
     }
 
     public static String getModName(Entity entity){
-        ResourceLocation entityLoc = EntityList.getKey(entity);
-        if(entityLoc != null){
-            return ConfigString.MOD_NAME_FORMAT.value + getModName(entityLoc.getNamespace());
+        if(entity != null){
+            ResourceLocation entityTypeKey = Registry.ENTITY_TYPE.getKey(entity.getType());
+            // todo find modname for modid, instead of returning the modid!
+            return ConfigString.MOD_NAME_FORMAT.value + entityTypeKey.getNamespace();
         }
-        return ConfigString.MOD_NAME_FORMAT.value + "Minecraft";
+        return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
     }
 
-    public static boolean hasProperty(IBlockState state, IProperty<?> property){
-        return state.getProperties().get(property) != null;
+    public static boolean hasProperty(BlockState state, Property<?> property){
+        return state.getProperties().contains(property);
     }
 
-    public static String getDebugAddition(ItemStack stack, String s){
-        if(Minecraft.getMinecraft().gameSettings.advancedItemTooltips){
-            int i = Item.getIdFromItem(stack.getItem());
-            if (stack.getHasSubtypes()) {
-                s += String.format("%s#%04d/%d%s", " (", i, stack.getItemDamage(), ")");
-            } else {
-                s += String.format("%s#%04d%s", " (", i, ")");
-            }
-        } else if(stack.getItem() instanceof ItemMap){
-            s += " #" + stack.getItemDamage();
+    public static MutableComponent getDebugAddition(ItemStack stack, MutableComponent s){
+        if(Minecraft.getInstance().options.advancedItemTooltips){
+            ResourceLocation itemKey = Registry.ITEM.getKey(stack.getItem());
+            s.append(String.format(" (#%s)", itemKey.toString()));
         }
         return s;
     }
 
     public static int getStackVisibility(ItemStack stack){
-        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("HideFlags", 99)) {
-            return stack.getTagCompound().getInteger("HideFlags");
+        if (stack.hasTag() && stack.getTag().contains("HideFlags", 99)) {
+            return stack.getTag().getInt("HideFlags");
         }
         return 0;
     }
 
-    public static List<String> getDescriptionAddition(ItemStack stack) {
-        List<String> strings = new ArrayList<>();
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbt = stack.getTagCompound();
+    public static List<Component> getDescriptionAddition(ItemStack stack) {
+        List<Component> strings = new ArrayList<>();
+        if (stack.hasTag()) {
+            CompoundTag nbt = stack.getTag();
             int visibilityFlag = getStackVisibility(stack);
             if ((visibilityFlag & 1) == 0) {
-                NBTTagList nbttaglist = stack.getEnchantmentTagList();
+                ListTag nbttaglist = stack.getEnchantmentTags();
                 if (nbttaglist != null) {
-                    for (int j = 0; j < nbttaglist.tagCount(); ++j) {
-                        int k = nbttaglist.getCompoundTagAt(j).getShort("id");
-                        int l = nbttaglist.getCompoundTagAt(j).getShort("lvl");
-                        if (Enchantment.getEnchantmentByID(k) != null) {
-                            strings.add(Enchantment.getEnchantmentByID(k).getTranslatedName(l));
+                    for (int j = 0; j < nbttaglist.size(); ++j) {
+                        int k = nbttaglist.getCompound(j).getShort("id");
+                        int l = nbttaglist.getCompound(j).getShort("lvl");
+                        if (Enchantment.byId(k) != null) {
+                            strings.add(Enchantment.byId(k).getFullname(l));
                         }
                     }
                 }
             }
 
-            if (nbt.hasKey("display", 10)) {
-                NBTTagCompound nbttagcompound = nbt.getCompoundTag("display");
-                if (nbttagcompound.hasKey("color", 3)) {
-                    if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
-                        strings.add("Color: #" + String.format("%06X", nbttagcompound.getInteger("color")));
+            if (nbt.contains("display", 10)) {
+                CompoundTag nbttagcompound = nbt.getCompound("display");
+                if (nbttagcompound.contains("color", 3)) {
+                    if (Minecraft.getInstance().options.advancedItemTooltips) {
+                        strings.add(new TextComponent("Color: #" + String.format("%06X", nbttagcompound.getInt("color"))));
                     } else {
-                        strings.add(TextFormatting.ITALIC + I18n.format("item.dyed"));
+                        strings.add(new TranslatableComponent("item.dyed").withStyle(Style.EMPTY.withItalic(true)));
                     }
                 }
-                if (nbttagcompound.getTagId("Lore") == 9) {
-                    NBTTagList nbttaglist3 = nbttagcompound.getTagList("Lore", 8);
+                if (nbttagcompound.getTagType("Lore") == 9) {
+                    ListTag nbttaglist3 = nbttagcompound.getList("Lore", 8);
 
                     if (!nbttaglist3.isEmpty()) {
-                        for (int l1 = 0; l1 < nbttaglist3.tagCount(); ++l1) {
-                            strings.add(TextFormatting.DARK_PURPLE + "" + TextFormatting.ITALIC + nbttaglist3.getStringTagAt(l1));
+                        for (int l1 = 0; l1 < nbttaglist3.size(); ++l1) {
+                            strings.add(new TextComponent(nbttaglist3.getString(l1)).withStyle(Style.EMPTY.withItalic(true).withColor(ChatFormatting.DARK_PURPLE)));
                         }
                     }
                 }
@@ -194,50 +157,23 @@ public class InfoUtil{
         return strings;
     }
 
-    public static ItemStack getItemStackInSlot(TileEntity inventory, EnumFacing side, int slot){
-        if(inventory.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)){
-            return inventory.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).getStackInSlot(slot);
-        }
-        return ItemStack.EMPTY;
-    }
-
     /**
      * Renders the specified text to the screen, center-aligned.
      */
-    public static void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color){
+    public static void drawCenteredString(PoseStack pose, Font font, String text, int x, int y, int color){
         if(text == null){
             text = "TUMAT NPE Error";
         }
-        fontRendererIn.drawStringWithShadow(text, (float) (x - fontRendererIn.getStringWidth(text) / 2), (float) y, color);
+        font.drawShadow(pose, text, (float) (x - font.width(text) / 2), (float) y, color);
     }
 
     public static String getEntityName(Entity entity){
-        String defaultName = entity.getName();
+        String defaultName = entity.getName().getString();
         if(defaultName.endsWith(".name")){
             String[] array = defaultName.split("\\.");
             defaultName = StringUtils.capitalize(array[array.length - 2]);
         }
         return defaultName;
-    }
-
-    public static void syncTileEntity(TileEntity tile, boolean shouldCalculate, String... nbtKeys){
-        if(shouldCalculate){
-            NetworkHandler.network.sendToServer(new PacketUpdateTileEntity(tile.getPos(), nbtKeys));
-        }
-    }
-
-    public static int getMetaFromBlock(IBlockState state){
-        int meta = 0;
-        try {
-            meta = state.getBlock().getMetaFromState(state);
-        } catch (Exception ignored){
-            ignored.printStackTrace();
-        } // To avoid bugs with doubled plants from OreFlowers since there isn't a size check #7
-        return meta;
-    }
-
-    public static ItemStack newStackFromBlock(World world, BlockPos pos, IBlockState state, @Nullable EntityPlayerSP player, @Nullable RayTraceResult trace){
-        return state.getBlock().getPickBlock(state, trace, world, pos, player);
     }
 
 }
