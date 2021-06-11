@@ -79,22 +79,22 @@ public class InfoUtil{
         return Collections.emptyList();
     }
 
-    public static String getModName(ItemStack stack){
+    public static MutableComponent getModName(ItemStack stack){
         if(!stack.isEmpty()){
             ResourceLocation itemKey = Registry.ITEM.getKey(stack.getItem());
             // todo find modname for modid, instead of returning the modid!
-            return ConfigString.MOD_NAME_FORMAT.value + itemKey.getNamespace();
+            return new TextComponent(itemKey.getNamespace());
         }
-        return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
+        return new TextComponent("Empty").withStyle(Style.EMPTY.withItalic(true));
     }
 
-    public static String getModName(Entity entity){
+    public static MutableComponent getModName(Entity entity){
         if(entity != null){
             ResourceLocation entityTypeKey = Registry.ENTITY_TYPE.getKey(entity.getType());
             // todo find modname for modid, instead of returning the modid!
-            return ConfigString.MOD_NAME_FORMAT.value + entityTypeKey.getNamespace();
+            return new TextComponent(entityTypeKey.getNamespace());
         }
-        return ConfigString.MOD_NAME_FORMAT.value + "<Unknown>";
+        return new TextComponent("<Unknown>");
     }
 
     public static boolean hasProperty(BlockState state, Property<?> property){

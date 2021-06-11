@@ -9,10 +9,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is the main collection for all things that get rendered with TUMAT
@@ -21,19 +19,19 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class TooltipComponent{
 
-    private TextComponent name;
-    private List<MutableComponent> high = new ArrayList<>();
-    private List<MutableComponent> low = new ArrayList<>();
-    private TextComponent modName;
+    private MutableComponent name;
+    private Deque<MutableComponent> high = new ArrayDeque<>();
+    private Deque<MutableComponent> low = new ArrayDeque<>();
+    private MutableComponent modName;
     private IconRenderer iconRenderer;
     private int length = 0, height = 0;
 
-    public TooltipComponent setName(TextComponent name){
+    public TooltipComponent setName(MutableComponent name){
         this.name = name;
         return this;
     }
 
-    public TooltipComponent setModName(TextComponent modName){
+    public TooltipComponent setModName(MutableComponent modName){
         this.modName = modName;
         return this;
     }
@@ -47,11 +45,11 @@ public class TooltipComponent{
         this.height += fontRenderer.lineHeight;
         switch (priority){
             case LOW: {
-                this.low.add(render);
+                this.low.addLast(render);
                 break;
             }
             case HIGH:{
-                this.high.add(render);
+                this.high.addLast(render);
                 break;
             }
         }
@@ -59,7 +57,7 @@ public class TooltipComponent{
     }
     
     public void render(PoseStack pose, Font font, float x, float y){
-        List<MutableComponent> finished = new ArrayList<>();
+        List<MutableComponent> finished = new LinkedList<>();
         finished.add(this.name);
         finished.addAll(this.high);
         finished.addAll(this.low);
@@ -81,23 +79,6 @@ public class TooltipComponent{
         pose.popPose();
     }
 
-    @Deprecated
-    public Finished close(){
-        List<MutableComponent> list = new ArrayList<>();
-        list.add(this.name);
-        list.addAll(this.high);
-        list.addAll(this.low);
-        list.add(this.modName);
-        this.height += 20;
-        if(this.name != null && this.length < this.name.getLength(Minecraft.getMinecraft().fontRenderer)){
-            this.length = this.name.getLength(Minecraft.getMinecraft().fontRenderer);
-        }
-        if(this.modName != null && this.length < this.modName.getLength(Minecraft.getMinecraft().fontRenderer)){
-            this.length = this.modName.getLength(Minecraft.getMinecraft().fontRenderer);
-        }
-        return new Finished(this.name == null ? new ArrayList<>() : list, this.length, this.height);
-    }
-
     public TooltipComponent setIconRenderer(IconRenderer renderer){
         this.iconRenderer = renderer;
         return this;
@@ -105,29 +86,6 @@ public class TooltipComponent{
 
     public IconRenderer getIconRenderer() {
         return iconRenderer;
-    }
-
-    public class Finished{
-        private List<MutableComponent> list;
-        private int length, height;
-        public Finished(List<IComponentRender> list, int length, int height) {
-            this.list = list;
-            if(list.isEmpty()){
-                this.length = this.height = 0;
-            } else {
-                this.length = length;
-                this.height = height;
-            }
-        }
-        public List<IComponentRender> getComponents() {
-            return list;
-        }
-        public int getLength() {
-            return length;
-        }
-        public int getHeight() {
-            return height;
-        }
     }
 
     public enum Priority{

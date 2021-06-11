@@ -6,8 +6,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import de.canitzp.tumat.api.IWorldRenderer;
 import de.canitzp.tumat.api.TUMATApi;
 import de.canitzp.tumat.api.TooltipComponent;
-import de.canitzp.tumat.api.components.DescriptionComponent;
-import de.canitzp.tumat.api.components.TextComponent;
 import de.canitzp.tumat.configuration.cats.ConfigBoolean;
 import de.canitzp.tumat.local.L10n;
 import me.shedaniel.architectury.event.events.GuiEvent;

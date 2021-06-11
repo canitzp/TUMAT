@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +80,7 @@ public interface IWorldRenderer{
      * @param shouldCalculate Should be calculated within this method
      * @return A modified TooltipComponent
      */
-    default TooltipComponent renderTileEntity(ClientLevel world, LocalPlayer player, BlockEvent tileEntity, Direction side, TooltipComponent component, boolean shouldCalculate){
+    default TooltipComponent renderTileEntity(ClientLevel world, LocalPlayer player, BlockEntity tileEntity, Direction side, TooltipComponent component, boolean shouldCalculate){
         return component;
     }
 
